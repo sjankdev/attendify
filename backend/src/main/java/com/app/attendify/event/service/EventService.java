@@ -19,9 +19,9 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public Event createEvent(EventOrganizer eventOrganizer, String name, String description, Date eventDate) {
+    public Event createEvent(EventOrganizer eventOrganizer, String name, String description, Date eventDate, Boolean isEventActive) {
         Event event = new Event();
-        event.setEventOrganizer(eventOrganizer).setName(name).setDescription(description).setEventDate(eventDate).setIsEventActive(true);
+        event.setEventOrganizer(eventOrganizer).setName(name).setDescription(description).setEventDate(eventDate).setIsEventActive(isEventActive);
 
         return eventRepository.save(event);
     }

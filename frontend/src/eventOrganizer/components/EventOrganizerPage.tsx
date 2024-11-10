@@ -32,6 +32,7 @@ const EventOrganizerPage: React.FC = () => {
           name: eventName,
           description: eventDescription,
           eventDate: eventDate,
+          isEventActive: eventActive,
         },
         {
           headers: {

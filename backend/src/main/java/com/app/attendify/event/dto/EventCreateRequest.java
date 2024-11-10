@@ -7,6 +7,7 @@ public class EventCreateRequest {
     private String name;
     private String description;
     private Date eventDate;
+    private Boolean isEventActive;
 
     public String getName() {
         return name;
@@ -30,5 +31,13 @@ public class EventCreateRequest {
 
     public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public Boolean getIsEventActive() {
+        return isEventActive;
+    }
+
+    public void setIsEventActive(Boolean isEventActive) {
+        this.isEventActive = isEventActive;
     }
 }
