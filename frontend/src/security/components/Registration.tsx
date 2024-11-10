@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     email: "",
     password: "",
     fullName: "",
-    role: "USER",
+    role: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,9 @@ const Register: React.FC = () => {
         "http://localhost:8080/api/auth/signup",
         formData
       );
-      setSuccess("Registration successful!");
+      setSuccess(
+        "Registration successful! Please check your email for verification."
+      );
     } catch (error: any) {
       setError(error.response?.data?.message || "Registration failed");
     }
