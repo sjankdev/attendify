@@ -29,6 +29,7 @@ const Register: React.FC = () => {
   useEffect(() => {
     const fetchRolesData = async () => {
       try {
+        console.log("Fetching roles...");
         const rolesData = await fetchRoles();
         setRoles(rolesData);
       } catch (error) {
@@ -115,8 +116,9 @@ const Register: React.FC = () => {
             onChange={handleSelectChange}
             required
           >
+            <option value="">Select a role</option>
             {roles.map((role) => (
-              <option key={role.name} value={role.name}>
+              <option key={role.id} value={role.name}>
                 {role.name}
               </option>
             ))}

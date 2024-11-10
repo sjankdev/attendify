@@ -30,6 +30,14 @@ public class Role {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public RoleEnum getName() {
         return name;
     }
