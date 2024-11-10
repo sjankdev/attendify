@@ -1,6 +1,7 @@
 package com.app.attendify.event.controller;
 
 import com.app.attendify.event.dto.EventCreateRequest;
+import com.app.attendify.event.dto.EventUpdateRequest;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.service.EventService;
 import com.app.attendify.security.model.EventOrganizer;
@@ -11,12 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/events")
 public class EventController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventController.class);
 
     private final EventService eventService;
     private final EventOrganizerRepository eventOrganizerRepository;
@@ -39,6 +44,20 @@ public class EventController {
         EventOrganizer eventOrganizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new RuntimeException("EventOrganizer not found for the authenticated user"));
 
         return eventService.createEvent(eventOrganizer, eventCreateRequest.getName(), eventCreateRequest.getDescription(), eventCreateRequest.getEventDate());
+    }
+
+    @PutMapping("/update/{id}")
+    public Event updateEvent(@PathVariable("id") Integer eventId, @RequestBody EventUpdateRequest updateRequest) {
+        logger.info("Received update request for event ID: {}", eventId);
+        Event updatedEvent = eventService.updateEvent(eventId, updateRequest.getName(), updateRequest.getDescription(), updateRequest.getEventDate(), updateRequest.getIsEventActive());
+
+        if (updatedEvent != null) {
+            logger.info("Event updated successfully: {}", updatedEvent);
+        } else {
+            logger.error("Failed to update event with ID: {}", eventId);
+        }
+
+        return updatedEvent;
     }
 
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")

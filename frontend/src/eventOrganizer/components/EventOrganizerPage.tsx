@@ -9,8 +9,10 @@ const EventOrganizerPage: React.FC = () => {
   const [eventName, setEventName] = useState<string>("");
   const [eventDescription, setEventDescription] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
+  const [eventActive, setEventActive] = useState<boolean>(true);
 
   const [events, setEvents] = useState<any[]>([]);
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ const EventOrganizerPage: React.FC = () => {
       setEventName("");
       setEventDescription("");
       setEventDate("");
-      fetchMyEvents(); 
+      fetchMyEvents();
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
@@ -70,6 +72,76 @@ const EventOrganizerPage: React.FC = () => {
     }
   };
 
+  const handleUpdateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!eventName || !eventDescription || !eventDate) {
+      setError("All fields are required.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    console.log("Updating event with data:", {
+      name: eventName,
+      description: eventDescription,
+      eventDate: eventDate,
+      isEventActive: eventActive,
+    });
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/events/update/${editingEvent.id}`,
+        {
+          name: eventName,
+          description: eventDescription,
+          eventDate: eventDate,
+          isEventActive: eventActive,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log("Event updated response:", response.data);
+
+      setMessage("Event updated successfully!");
+      setEventName("");
+      setEventDescription("");
+      setEventDate("");
+      setEventActive(true);
+      setEditingEvent(null);
+      fetchMyEvents();
+    } catch (err: any) {
+      console.error("Error updating event:", err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        "Failed to update event. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditEvent = (event: any) => {
+    setEditingEvent(event);
+    setEventName(event.name);
+    setEventDescription(event.description);
+    setEventDate(event.eventDate);
+    setEventActive(event.isEventActive);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEvent(null);
+    setEventName("");
+    setEventDescription("");
+    setEventDate("");
+    setEventActive(true);
+  };
+
   useEffect(() => {
     fetchMyEvents();
   }, []);
@@ -80,8 +152,8 @@ const EventOrganizerPage: React.FC = () => {
 
       {message && <div>{message}</div>}
 
-      <h3>Create an Event</h3>
-      <form onSubmit={handleCreateEvent}>
+      <h3>{editingEvent ? "Edit Event" : "Create an Event"}</h3>
+      <form onSubmit={editingEvent ? handleUpdateEvent : handleCreateEvent}>
         <div>
           <label>Event Name</label>
           <input
@@ -111,9 +183,32 @@ const EventOrganizerPage: React.FC = () => {
           />
         </div>
 
+        <div>
+          <label>Status</label>
+          <select
+            value={eventActive ? "active" : "inactive"}
+            onChange={(e) => setEventActive(e.target.value === "active")}
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
         <button type="submit" disabled={loading}>
-          {loading ? "Creating Event..." : "Create Event"}
+          {loading
+            ? editingEvent
+              ? "Updating Event..."
+              : "Creating Event..."
+            : editingEvent
+            ? "Update Event"
+            : "Create Event"}
         </button>
+
+        {editingEvent && (
+          <button type="button" onClick={handleCancelEdit}>
+            Cancel
+          </button>
+        )}
       </form>
 
       <h3>Your Events</h3>
@@ -138,6 +233,7 @@ const EventOrganizerPage: React.FC = () => {
                 <strong>Status:</strong>{" "}
                 {event.isEventActive ? "Active" : "Inactive"}
               </p>
+              <button onClick={() => handleEditEvent(event)}>Edit</button>
             </li>
           ))}
         </ul>
