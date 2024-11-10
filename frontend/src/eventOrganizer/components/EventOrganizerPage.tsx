@@ -3,7 +3,7 @@ import axios from "axios";
 
 const EventOrganizerPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const [eventName, setEventName] = useState<string>("");
@@ -39,38 +39,40 @@ const EventOrganizerPage: React.FC = () => {
       );
 
       setMessage("Event created successfully!");
-      fetchEvents();
+
+      setEventName("");
+      setEventDescription("");
+      setEventDate("");
+      fetchMyEvents(); 
     } catch (err: any) {
-      setError("Failed to create event. Please try again.");
+      const errorMessage =
+        err?.response?.data?.message ||
+        "Failed to create event. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchEvents = async () => {
-    setLoading(true);
+  const fetchMyEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/events/list", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:8080/events/my-events",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setEvents(response.data);
-      setMessage(null);
     } catch (err: any) {
-      setError("Failed to fetch events. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Error fetching events:", err);
     }
   };
 
   useEffect(() => {
-    fetchEvents();
+    fetchMyEvents();
   }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>
@@ -78,7 +80,6 @@ const EventOrganizerPage: React.FC = () => {
 
       {message && <div>{message}</div>}
 
-      {/* Event creation form */}
       <h3>Create an Event</h3>
       <form onSubmit={handleCreateEvent}>
         <div>
@@ -116,19 +117,32 @@ const EventOrganizerPage: React.FC = () => {
       </form>
 
       <h3>Your Events</h3>
-      {events.length === 0 ? (
-        <div>No events created yet.</div>
-      ) : (
+      {events.length > 0 ? (
         <ul>
-          {events.map((event: any) => (
-            <li key={event.id}>
-              <h4>{event.name}</h4>
+          {events.map((event) => (
+            <li
+              key={event.id}
+              style={{
+                marginBottom: "20px",
+                border: "1px solid #ddd",
+                padding: "10px",
+              }}
+            >
+              <strong>{event.name}</strong>
               <p>{event.description}</p>
-              <p>{new Date(event.eventDate).toLocaleString()}</p>
-              <p>{event.isActive ? "Active" : "Inactive"}</p>
+              <p>
+                <strong>Event Date:</strong>{" "}
+                {new Date(event.eventDate).toLocaleString()}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                {event.isEventActive ? "Active" : "Inactive"}
+              </p>
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No events found.</p>
       )}
     </div>
   );

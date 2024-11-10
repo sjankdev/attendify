@@ -17,7 +17,8 @@ public class EventService {
 
     public Event createEvent(EventOrganizer eventOrganizer, String name, String description, Date eventDate) {
         Event event = new Event();
-        event.setEventOrganizer(eventOrganizer).setName(name).setDescription(description).setEventDate(eventDate).setActive(true);
+        event.setEventOrganizer(eventOrganizer).setName(name).setDescription(description).setEventDate(eventDate).setIsEventActive(true);
+
         return eventRepository.save(event);
     }
 

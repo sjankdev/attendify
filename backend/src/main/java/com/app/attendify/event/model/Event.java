@@ -27,7 +27,7 @@ public class Event {
     private EventOrganizer eventOrganizer;
 
     @Column(nullable = false)
-    private boolean isActive = true;
+    private Boolean isEventActive = true;
 
     public Integer getId() {
         return id;
@@ -74,17 +74,17 @@ public class Event {
         return this;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public Boolean getIsEventActive() {
+        return isEventActive;
     }
 
-    public Event setActive(boolean active) {
-        isActive = active;
+    public Event setIsEventActive(Boolean isEventActive) {
+        this.isEventActive = isEventActive;
         return this;
     }
 
     @Override
     public String toString() {
-        return "Event{" + "id=" + id + ", name='" + name + '\'' + ", description='" + description + '\'' + ", eventDate=" + eventDate + ", eventOrganizer=" + eventOrganizer + ", isActive=" + isActive + '}';
+        return "Event{" + "id=" + id + ", name='" + name + '\'' + ", description='" + description + '\'' + ", eventDate=" + eventDate + ", eventOrganizer=" + eventOrganizer + ", isEventActive=" + isEventActive + '}';
     }
 }

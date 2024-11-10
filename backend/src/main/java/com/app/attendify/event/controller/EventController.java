@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    @GetMapping("/list")
+    @GetMapping("/my-events")
     public List<Event> getEventsByOrganizer() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
