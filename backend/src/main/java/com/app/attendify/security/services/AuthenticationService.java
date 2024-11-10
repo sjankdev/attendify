@@ -51,7 +51,6 @@ public class AuthenticationService {
         }
 
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
-
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
@@ -62,9 +61,7 @@ public class AuthenticationService {
 
         String verificationToken = UUID.randomUUID().toString();
         savedUser.setEmailVerificationToken(verificationToken);
-
         sendVerificationEmail(savedUser);
-
         userRepository.save(savedUser);
 
         if (roleEnum == RoleEnum.EVENT_ORGANIZER) {
@@ -95,6 +92,16 @@ public class AuthenticationService {
     public User authenticate(LoginUserDto input) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
 
-        return userRepository.findByEmail(input.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(input.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        System.out.println("User email: " + user.getEmail() + " - Email verified: " + user.isEmailVerified());
+
+        if (!user.isEmailVerified()) {
+            throw new RuntimeException("Email not verified. Please verify your email before logging in.");
+        }
+
+        return user;
     }
+
+
 }
