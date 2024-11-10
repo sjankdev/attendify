@@ -12,7 +12,7 @@ public class EventParticipantController {
 
     @GetMapping("/home")
     @PreAuthorize("hasRole('EVENT_PARTICIPANT')")
-    public ResponseEntity<String> testEventOrganizerRole() {
+    public ResponseEntity<String> testEventParticipantRole() {
         return ResponseEntity.ok("You are authorized as an EVENT_PARTICIPANT!");
     }
 
