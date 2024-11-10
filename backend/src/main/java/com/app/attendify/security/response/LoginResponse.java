@@ -2,8 +2,8 @@ package com.app.attendify.security.response;
 
 public class LoginResponse {
     private String token;
-
     private long expiresIn;
+    private String message;
 
     public String getToken() {
         return token;
@@ -23,8 +23,12 @@ public class LoginResponse {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "LoginResponse{" + "token='" + token + '\'' + ", expiresIn=" + expiresIn + '}';
+    public String getMessage() {
+        return message;
+    }
+
+    public LoginResponse setMessage(String message) {
+        this.message = message;
+        return this;
     }
 }

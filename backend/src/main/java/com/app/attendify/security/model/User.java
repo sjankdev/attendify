@@ -41,6 +41,30 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
+    @Column(length = 64)
+    private String emailVerificationToken;
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public User setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+        return this;
+    }
+
+    public String getEmailVerificationToken() {
+        return emailVerificationToken;
+    }
+
+    public User setEmailVerificationToken(String emailVerificationToken) {
+        this.emailVerificationToken = emailVerificationToken;
+        return this;
+    }
+
     public Role getRole() {
         return role;
     }

@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     email: "",
     password: "",
     fullName: "",
-    role: "USER",
+    role: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +29,7 @@ const Register: React.FC = () => {
   useEffect(() => {
     const fetchRolesData = async () => {
       try {
+        console.log("Fetching roles...");
         const rolesData = await fetchRoles();
         setRoles(rolesData);
       } catch (error) {
@@ -63,7 +64,9 @@ const Register: React.FC = () => {
         "http://localhost:8080/api/auth/signup",
         formData
       );
-      setSuccess("Registration successful!");
+      setSuccess(
+        "Registration successful! Please check your email for verification."
+      );
     } catch (error: any) {
       setError(error.response?.data?.message || "Registration failed");
     }
@@ -113,8 +116,9 @@ const Register: React.FC = () => {
             onChange={handleSelectChange}
             required
           >
+            <option value="">Select a role</option>
             {roles.map((role) => (
-              <option key={role.name} value={role.name}>
+              <option key={role.id} value={role.name}>
                 {role.name}
               </option>
             ))}

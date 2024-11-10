@@ -1,6 +1,5 @@
 package com.app.attendify.security.services;
 
-
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.security.dto.RegisterUserDto;
 import com.app.attendify.security.model.*;
@@ -8,12 +7,15 @@ import com.app.attendify.security.repositories.EventOrganizerRepository;
 import com.app.attendify.security.repositories.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -28,18 +30,27 @@ public class AuthenticationService {
 
     private final EventParticipantRepository eventParticipantRepository;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, EventParticipantRepository eventParticipantRepository) {
+    private final JavaMailSender javaMailSender;
+
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, EventParticipantRepository eventParticipantRepository, JavaMailSender javaMailSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.roleRepository = roleRepository;
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.eventParticipantRepository = eventParticipantRepository;
+        this.javaMailSender = javaMailSender;
     }
 
     public User signup(RegisterUserDto input) {
-        Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.valueOf(input.getRole().toUpperCase()));
+        RoleEnum roleEnum;
+        try {
+            roleEnum = RoleEnum.valueOf(input.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Role not found: " + input.getRole());
+        }
 
+        Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
@@ -48,11 +59,16 @@ public class AuthenticationService {
 
         User savedUser = userRepository.save(user);
 
-        if (input.getRole().equalsIgnoreCase(RoleEnum.EVENT_ORGANIZER.name())) {
+        String verificationToken = UUID.randomUUID().toString();
+        savedUser.setEmailVerificationToken(verificationToken);
+        sendVerificationEmail(savedUser);
+        userRepository.save(savedUser);
+
+        if (roleEnum == RoleEnum.EVENT_ORGANIZER) {
             EventOrganizer eventOrganizer = new EventOrganizer();
             eventOrganizer.setUser(savedUser);
             eventOrganizerRepository.save(eventOrganizer);
-        } else if (input.getRole().equalsIgnoreCase(RoleEnum.EVENT_PARTICIPANT.name())) {
+        } else if (roleEnum == RoleEnum.EVENT_PARTICIPANT) {
             EventParticipant eventParticipant = new EventParticipant();
             eventParticipant.setUser(savedUser);
             eventParticipantRepository.save(eventParticipant);
@@ -61,10 +77,31 @@ public class AuthenticationService {
         return savedUser;
     }
 
+    private void sendVerificationEmail(User user) {
+        String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Email Verification");
+        message.setText("Please verify your email by clicking the link below:\n" + verificationUrl);
+
+        javaMailSender.send(message);
+    }
+
 
     public User authenticate(LoginUserDto input) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
 
-        return userRepository.findByEmail(input.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(input.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        System.out.println("User email: " + user.getEmail() + " - Email verified: " + user.isEmailVerified());
+
+        if (!user.isEmailVerified()) {
+            throw new RuntimeException("Email not verified. Please verify your email before logging in.");
+        }
+
+        return user;
     }
+
+
 }

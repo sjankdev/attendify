@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 interface LoginResponse {
   token: string;
   expiresIn: number;
+  message?: string;
 }
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,15 +19,18 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post<LoginResponse>('http://localhost:8080/auth/login', { email, password });
-      
-      localStorage.setItem('token', response.data.token);
-
-      console.log('Login successful:', response.data);
-
-    } catch (err) {
-      setError('Login failed. Please check your credentials.');
-      console.error('Error logging in:', err);
+      const response = await axios.post<LoginResponse>(
+        "http://localhost:8080/api/auth/login",
+        { email, password }
+      );
+      localStorage.setItem("token", response.data.token);
+      console.log("Login successful:", response.data);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
+      );
+      console.error("Error logging in:", err);
     } finally {
       setLoading(false);
     }
@@ -55,9 +59,9 @@ const Login: React.FC = () => {
           />
         </div>
         <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? "Logging in..." : "Login"}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );
