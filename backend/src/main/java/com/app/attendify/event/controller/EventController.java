@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/events")
 public class EventController {
@@ -37,5 +39,17 @@ public class EventController {
         EventOrganizer eventOrganizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new RuntimeException("EventOrganizer not found for the authenticated user"));
 
         return eventService.createEvent(eventOrganizer, eventCreateRequest.getName(), eventCreateRequest.getDescription(), eventCreateRequest.getEventDate());
+    }
+
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    @GetMapping("/list")
+    public List<Event> getEventsByOrganizer() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        EventOrganizer eventOrganizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new RuntimeException("EventOrganizer not found for the authenticated user"));
+
+        return eventService.getEventsByOrganizer(eventOrganizer);
     }
 }

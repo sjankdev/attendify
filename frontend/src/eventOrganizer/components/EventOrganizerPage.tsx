@@ -10,6 +10,8 @@ const EventOrganizerPage: React.FC = () => {
   const [eventDescription, setEventDescription] = useState<string>("");
   const [eventDate, setEventDate] = useState<string>("");
 
+  const [events, setEvents] = useState<any[]>([]);
+
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -37,6 +39,7 @@ const EventOrganizerPage: React.FC = () => {
       );
 
       setMessage("Event created successfully!");
+      fetchEvents();
     } catch (err: any) {
       setError("Failed to create event. Please try again.");
     } finally {
@@ -44,26 +47,25 @@ const EventOrganizerPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/event-organizer/home",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        setMessage(response.data);
-      } catch (err: any) {
-        setError("You are not authorized or something went wrong.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("http://localhost:8080/events/list", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setEvents(response.data);
+      setMessage(null);
+    } catch (err: any) {
+      setError("Failed to fetch events. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
   if (loading) {
@@ -113,7 +115,21 @@ const EventOrganizerPage: React.FC = () => {
         </button>
       </form>
 
-      {message && !error && <div>{message}</div>}
+      <h3>Your Events</h3>
+      {events.length === 0 ? (
+        <div>No events created yet.</div>
+      ) : (
+        <ul>
+          {events.map((event: any) => (
+            <li key={event.id}>
+              <h4>{event.name}</h4>
+              <p>{event.description}</p>
+              <p>{new Date(event.eventDate).toLocaleString()}</p>
+              <p>{event.isActive ? "Active" : "Inactive"}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class EventService {
@@ -20,5 +21,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-
+    public List<Event> getEventsByOrganizer(EventOrganizer eventOrganizer) {
+        return eventRepository.findByEventOrganizer(eventOrganizer);
+    }
 }
