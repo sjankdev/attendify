@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { fetchRoles } from "../services/roleService";
 import axios from "axios";
 
 interface Role {
@@ -26,19 +27,16 @@ const Register: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchRolesData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/auth/roles"
-        );
-        console.log(response.data);
-        setRoles(response.data);
+        const rolesData = await fetchRoles();
+        setRoles(rolesData);
       } catch (error) {
         setError("Failed to load roles");
       }
     };
 
-    fetchRoles();
+    fetchRolesData();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
