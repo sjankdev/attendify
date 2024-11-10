@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface LoginResponse {
   token: string;
   expiresIn: number;
+  role: string;
   message?: string;
 }
 
@@ -12,6 +14,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,10 +28,15 @@ const Login: React.FC = () => {
       );
       localStorage.setItem("token", response.data.token);
       console.log("Login successful:", response.data);
+
+      if (response.data.role === "EVENT_ORGANIZER") {
+        navigate("/event-organizer");
+      } else if (response.data.role === "EVENT_PARTICIPANT") {
+        navigate("/event-participant");
+      }
     } catch (err: any) {
       setError(
-        err.response?.data?.message ||
-          "Login failed. Please check your credentials."
+        err.response?.data?.message || "Login failed. Please check your credentials."
       );
       console.error("Error logging in:", err);
     } finally {

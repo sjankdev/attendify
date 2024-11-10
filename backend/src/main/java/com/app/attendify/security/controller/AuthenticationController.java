@@ -55,7 +55,7 @@ public class AuthenticationController {
 
             String jwtToken = jwtService.generateToken(authenticatedUser);
 
-            LoginResponse loginResponse = new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime());
+            LoginResponse loginResponse = new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime()).setRole(authenticatedUser.getRole().getName().name());
 
             return ResponseEntity.ok(loginResponse);
         } catch (RuntimeException e) {
@@ -64,5 +64,6 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
         }
     }
+
 
 }
