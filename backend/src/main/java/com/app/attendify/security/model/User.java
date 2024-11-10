@@ -14,8 +14,9 @@ import java.util.List;
 @Table(name = "users")
 @Entity
 public class User implements UserDetails {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Integer id;
 
@@ -36,10 +37,9 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
-
 
     public Role getRole() {
         return role;
@@ -47,17 +47,16 @@ public class User implements UserDetails {
 
     public User setRole(Role role) {
         this.role = role;
-
         return this;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());
-
         return List.of(authority);
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
