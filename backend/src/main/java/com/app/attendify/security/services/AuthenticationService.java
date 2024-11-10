@@ -3,9 +3,9 @@ package com.app.attendify.security.services;
 
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.security.dto.RegisterUserDto;
-import com.app.attendify.security.model.Role;
-import com.app.attendify.security.model.RoleEnum;
-import com.app.attendify.security.model.User;
+import com.app.attendify.security.model.*;
+import com.app.attendify.security.repositories.EventOrganizerRepository;
+import com.app.attendify.security.repositories.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,12 +24,17 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final RoleRepository roleRepository;
+    private final EventOrganizerRepository eventOrganizerRepository;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository) {
+    private final EventParticipantRepository eventParticipantRepository;
+
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, EventParticipantRepository eventParticipantRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.roleRepository = roleRepository;
+        this.eventOrganizerRepository = eventOrganizerRepository;
+        this.eventParticipantRepository = eventParticipantRepository;
     }
 
     public User signup(RegisterUserDto input) {
@@ -41,7 +46,19 @@ public class AuthenticationService {
 
         var user = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (input.getRole().equalsIgnoreCase(RoleEnum.EVENT_ORGANIZER.name())) {
+            EventOrganizer eventOrganizer = new EventOrganizer();
+            eventOrganizer.setUser(savedUser);
+            eventOrganizerRepository.save(eventOrganizer);
+        } else if (input.getRole().equalsIgnoreCase(RoleEnum.EVENT_PARTICIPANT.name())) {
+            EventParticipant eventParticipant = new EventParticipant();
+            eventParticipant.setUser(savedUser);
+            eventParticipantRepository.save(eventParticipant);
+        }
+
+        return savedUser;
     }
 
 
