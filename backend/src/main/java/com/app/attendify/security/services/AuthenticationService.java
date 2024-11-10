@@ -88,7 +88,6 @@ public class AuthenticationService {
         javaMailSender.send(message);
     }
 
-
     public User authenticate(LoginUserDto input) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
 
