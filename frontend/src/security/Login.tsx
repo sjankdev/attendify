@@ -20,10 +20,8 @@ const Login: React.FC = () => {
     try {
       const response = await axios.post<LoginResponse>('http://localhost:8080/auth/login', { email, password });
       
-      // Store the JWT token in local storage (or cookies for better security)
       localStorage.setItem('token', response.data.token);
 
-      // Redirect to a different page or update the state to show logged-in UI
       console.log('Login successful:', response.data);
 
     } catch (err) {
