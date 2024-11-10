@@ -5,6 +5,7 @@ import Register from "./security/components/Registration";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
+import EventParticipantPage from "./eventParticipant/components/EventOrganizerPage";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -31,8 +32,8 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/" element={<EventOrganizerPage />} />
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
+          <Route path="/event-participant" element={<EventParticipantPage />} />
         </Routes>
       </div>
     </Router>

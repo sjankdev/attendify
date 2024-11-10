@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const EventOrganizerPage: React.FC = () => {
+const EventParticipantPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -10,7 +10,7 @@ const EventOrganizerPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/event-organizer/home",
+          "http://localhost:8080/event-participant/home",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -43,4 +43,4 @@ const EventOrganizerPage: React.FC = () => {
   );
 };
 
-export default EventOrganizerPage;
+export default EventParticipantPage;

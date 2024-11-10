@@ -34,7 +34,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/event-organizers/**").hasRole("EVENT_ORGANIZER")
+                        .requestMatchers("/event-organizer/**").hasRole("EVENT_ORGANIZER")
+                        .requestMatchers("/event-participant/**").hasRole("EVENT_PARTICIPANT")
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
