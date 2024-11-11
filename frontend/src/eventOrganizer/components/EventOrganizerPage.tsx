@@ -127,6 +127,23 @@ const EventOrganizerPage: React.FC = () => {
     }
   };
 
+  const handleDeleteEvent = async (eventId: number) => {
+    try {
+      await axios.delete(`http://localhost:8080/events/delete/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setMessage("Event deleted successfully!");
+      fetchMyEvents();
+    } catch (err: any) {
+      const errorMessage =
+        err?.response?.data?.message ||
+        "Failed to delete event. Please try again.";
+      setError(errorMessage);
+    }
+  };
+
   const handleEditEvent = (event: any) => {
     setEditingEvent(event);
     setEventName(event.name);
@@ -235,6 +252,9 @@ const EventOrganizerPage: React.FC = () => {
                 {event.isEventActive ? "Active" : "Inactive"}
               </p>
               <button onClick={() => handleEditEvent(event)}>Edit</button>
+              <button onClick={() => handleDeleteEvent(event.id)}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>

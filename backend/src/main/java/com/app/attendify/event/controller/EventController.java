@@ -3,12 +3,15 @@ package com.app.attendify.event.controller;
 import com.app.attendify.event.dto.EventCreateRequest;
 import com.app.attendify.event.dto.EventUpdateRequest;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.event.service.EventService;
 import com.app.attendify.security.model.EventOrganizer;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.EventOrganizerRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +29,14 @@ public class EventController {
     private final EventService eventService;
     private final EventOrganizerRepository eventOrganizerRepository;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     @Autowired
-    public EventController(EventService eventService, EventOrganizerRepository eventOrganizerRepository, UserRepository userRepository) {
+    public EventController(EventService eventService, EventOrganizerRepository eventOrganizerRepository, UserRepository userRepository, EventRepository eventRepository) {
         this.eventService = eventService;
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
     }
 
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
@@ -58,6 +63,18 @@ public class EventController {
         }
 
         return updatedEvent;
+    }
+
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteEvent(@PathVariable("id") Integer eventId) {
+        logger.info("Received delete request for event ID: {}", eventId);
+        boolean isDeleted = eventService.deleteEventById(eventId);
+        if (isDeleted) {
+            return ResponseEntity.ok("Event deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found");
+        }
     }
 
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")

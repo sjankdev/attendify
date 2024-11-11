@@ -44,6 +44,18 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    public boolean deleteEventById(Integer eventId) {
+        if (eventRepository.existsById(eventId)) {
+            eventRepository.deleteById(eventId);
+            logger.info("Event with ID {} deleted successfully", eventId);
+            return true;
+        } else {
+            logger.error("Event with ID {} not found", eventId);
+            return false;
+        }
+    }
+
+
     public List<Event> getEventsByOrganizer(EventOrganizer eventOrganizer) {
         return eventRepository.findByEventOrganizer(eventOrganizer);
     }
