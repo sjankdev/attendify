@@ -19,7 +19,6 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    // Constructor Injection
     public RoleController(RoleService roleService) {
         this.roleService = roleService;
     }
@@ -28,7 +27,6 @@ public class RoleController {
     public List<Role> getRoles() {
         List<Role> roles = roleService.getAllRoles();
 
-        // Log the roles fetched
         logger.info("Fetched roles: {}", roles);
 
         return roles;
