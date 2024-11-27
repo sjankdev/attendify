@@ -8,6 +8,9 @@ WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 
+# Give execute permissions to the Maven wrapper script
+RUN chmod +x mvnw
+
 # Install dependencies (without running tests)
 RUN ./mvnw dependency:go-offline
 
@@ -23,7 +26,7 @@ FROM openjdk:17-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Use a wildcard to copy the JAR file (in case the version or name changes)
+# Ensure the target directory exists in the builder stage and use the JAR name correctly
 COPY --from=builder /app/target/*.jar app.jar
 
 # Expose the application port
