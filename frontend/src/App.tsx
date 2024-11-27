@@ -1,23 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+
+import Login from "./security/components/Login";
+import Register from "./security/components/Registration";
+import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
+import Homepage from "./public/Homepage";
+import EventParticipantPage from "./eventParticipant/components/EventOrganizerPage";
 
 function App() {
-   const [message, setMessage] = useState('');
-
-   useEffect(() => {
-     fetch('http://localhost:8080/api/test')
-       .then((response) => response.text())
-       .then((data) => setMessage(data))
-       .catch((error) => console.error("Error fetching data:", error));
-   }, []);
-
-   return (
-     <div>
-       <h1>Spring Boot and React Integration Test</h1>
-       <p>Message from Spring Boot: {message}</p>
-     </div>
-   );
+  return (
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/home" element={<Homepage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/event-organizer" element={<EventOrganizerPage />} />
+          <Route path="/event-participant" element={<EventParticipantPage />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
 
 export default App;
