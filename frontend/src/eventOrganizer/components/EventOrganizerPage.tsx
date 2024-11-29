@@ -3,7 +3,7 @@ import axios from "axios";
 
 const EventOrganizerPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [eventName, setEventName] = useState<string>("");
@@ -14,9 +14,47 @@ const EventOrganizerPage: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
+  const fetchMyEvents = async () => {
+    try {
+      const response = await axios.get(
+        "https://attendify-backend-el2r.onrender.com/events/my-events",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setEvents(response.data);
+    } catch (err: any) {
+      console.error("Error fetching events:", err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://attendify-backend-el2r.onrender.com/event-organizer/home",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setMessage(response.data);
+        fetchMyEvents();
+      } catch (err: any) {
+        setError("You are not authorized or something went wrong.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!eventName || !eventDescription || !eventDate) {
       setError("All fields are required.");
       return;
@@ -42,7 +80,6 @@ const EventOrganizerPage: React.FC = () => {
       );
 
       setMessage("Event created successfully!");
-
       setEventName("");
       setEventDescription("");
       setEventDate("");
@@ -57,25 +94,8 @@ const EventOrganizerPage: React.FC = () => {
     }
   };
 
-  const fetchMyEvents = async () => {
-    try {
-      const response = await axios.get(
-        "https://attendify-backend-el2r.onrender.com/events/my-events",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setEvents(response.data);
-    } catch (err: any) {
-      console.error("Error fetching events:", err);
-    }
-  };
-
   const handleUpdateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!eventName || !eventDescription || !eventDate) {
       setError("All fields are required.");
       return;
@@ -84,15 +104,8 @@ const EventOrganizerPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    console.log("Updating event with data:", {
-      name: eventName,
-      description: eventDescription,
-      eventDate: eventDate,
-      isEventActive: eventActive,
-    });
-
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://attendify-backend-el2r.onrender.com/events/update/${editingEvent.id}`,
         {
           name: eventName,
@@ -107,8 +120,6 @@ const EventOrganizerPage: React.FC = () => {
         }
       );
 
-      console.log("Event updated response:", response.data);
-
       setMessage("Event updated successfully!");
       setEventName("");
       setEventDescription("");
@@ -117,7 +128,6 @@ const EventOrganizerPage: React.FC = () => {
       setEditingEvent(null);
       fetchMyEvents();
     } catch (err: any) {
-      console.error("Error updating event:", err);
       const errorMessage =
         err?.response?.data?.message ||
         "Failed to update event. Please try again.";
@@ -160,14 +170,16 @@ const EventOrganizerPage: React.FC = () => {
     setEventActive(true);
   };
 
-  useEffect(() => {
-    fetchMyEvents();
-  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div style={{ color: "red" }}>{error}</div>;
+  }
 
   return (
     <div>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-
       {message && <div>{message}</div>}
 
       <h3>{editingEvent ? "Edit Event" : "Create an Event"}</h3>
@@ -212,16 +224,9 @@ const EventOrganizerPage: React.FC = () => {
           </select>
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading
-            ? editingEvent
-              ? "Updating Event..."
-              : "Creating Event..."
-            : editingEvent
-            ? "Update Event"
-            : "Create Event"}
+        <button type="submit">
+          {editingEvent ? "Update Event" : "Create Event"}
         </button>
-
         {editingEvent && (
           <button type="button" onClick={handleCancelEdit}>
             Cancel
@@ -233,14 +238,7 @@ const EventOrganizerPage: React.FC = () => {
       {events.length > 0 ? (
         <ul>
           {events.map((event) => (
-            <li
-              key={event.id}
-              style={{
-                marginBottom: "20px",
-                border: "1px solid #ddd",
-                padding: "10px",
-              }}
-            >
+            <li key={event.id}>
               <strong>{event.name}</strong>
               <p>{event.description}</p>
               <p>
@@ -252,9 +250,7 @@ const EventOrganizerPage: React.FC = () => {
                 {event.isEventActive ? "Active" : "Inactive"}
               </p>
               <button onClick={() => handleEditEvent(event)}>Edit</button>
-              <button onClick={() => handleDeleteEvent(event.id)}>
-                Delete
-              </button>
+              <button onClick={() => handleDeleteEvent(event.id)}>Delete</button>
             </li>
           ))}
         </ul>

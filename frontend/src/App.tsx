@@ -10,7 +10,7 @@ import Login from "./security/components/Login";
 import Register from "./security/components/Registration";
 import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
 import Homepage from "./public/Homepage";
-import EventParticipantPage from "./eventParticipant/components/EventOrganizerPage";
+import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
 
 function App() {
   return (
