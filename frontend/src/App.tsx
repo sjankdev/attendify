@@ -25,6 +25,8 @@ function App() {
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
           <Route path="/event-participant" element={<EventParticipantPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/403" element={<UnauthorizedPage />} />
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>
