@@ -12,10 +12,12 @@ import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
 import Homepage from "./public/Homepage";
 import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
 import UnauthorizedPage from "./security/components/UnauthorizedPage";
+import UnauthorizedInterceptor from "./security/components/UnauthorizedInterceptor";
 
 function App() {
   return (
     <Router basename="/">
+      <UnauthorizedInterceptor />
       <div>
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
