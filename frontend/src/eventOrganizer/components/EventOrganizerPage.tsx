@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../security/api/axiosConfig";
+import axios from "axios";
 
 const EventOrganizerPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [eventName, setEventName] = useState<string>("");
   const [eventDescription, setEventDescription] = useState<string>("");
@@ -15,13 +16,16 @@ const EventOrganizerPage: React.FC = () => {
 
   const fetchMyEvents = async () => {
     try {
-      const response = await axiosInstance.get("/events/my-events", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await axios.get(
+        "https://attendify-backend-el2r.onrender.com/events/my-events",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setEvents(response.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching events:", err);
     }
   };
@@ -29,14 +33,18 @@ const EventOrganizerPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get("/event-organizer/home", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await axios.get(
+          "https://attendify-backend-el2r.onrender.com/event-organizer/home",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         setMessage(response.data);
         fetchMyEvents();
-      } catch {
+      } catch (err: any) {
+        setError("You are not authorized or something went wrong.");
       } finally {
         setLoading(false);
       }
@@ -48,16 +56,16 @@ const EventOrganizerPage: React.FC = () => {
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventName || !eventDescription || !eventDate) {
-      setMessage("All fields are required.");
+      setError("All fields are required.");
       return;
     }
 
     setLoading(true);
-    setMessage(null);
+    setError(null);
 
     try {
-      await axiosInstance.post(
-        "/events/create",
+      const response = await axios.post(
+        "https://attendify-backend-el2r.onrender.com/events/create",
         {
           name: eventName,
           description: eventDescription,
@@ -77,10 +85,10 @@ const EventOrganizerPage: React.FC = () => {
       setEventDate("");
       fetchMyEvents();
     } catch (err: any) {
-      setMessage(
+      const errorMessage =
         err?.response?.data?.message ||
-          "Failed to create event. Please try again."
-      );
+        "Failed to create event. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -89,16 +97,16 @@ const EventOrganizerPage: React.FC = () => {
   const handleUpdateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventName || !eventDescription || !eventDate) {
-      setMessage("All fields are required.");
+      setError("All fields are required.");
       return;
     }
 
     setLoading(true);
-    setMessage(null);
+    setError(null);
 
     try {
-      await axiosInstance.put(
-        `/events/update/${editingEvent.id}`,
+      await axios.put(
+        `https://attendify-backend-el2r.onrender.com/events/update/${editingEvent.id}`,
         {
           name: eventName,
           description: eventDescription,
@@ -120,10 +128,10 @@ const EventOrganizerPage: React.FC = () => {
       setEditingEvent(null);
       fetchMyEvents();
     } catch (err: any) {
-      setMessage(
+      const errorMessage =
         err?.response?.data?.message ||
-          "Failed to update event. Please try again."
-      );
+        "Failed to update event. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -131,7 +139,7 @@ const EventOrganizerPage: React.FC = () => {
 
   const handleDeleteEvent = async (eventId: number) => {
     try {
-      await axiosInstance.delete(`/events/delete/${eventId}`, {
+      await axios.delete(`https://attendify-backend-el2r.onrender.com/events/delete/${eventId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -139,10 +147,10 @@ const EventOrganizerPage: React.FC = () => {
       setMessage("Event deleted successfully!");
       fetchMyEvents();
     } catch (err: any) {
-      setMessage(
+      const errorMessage =
         err?.response?.data?.message ||
-          "Failed to delete event. Please try again."
-      );
+        "Failed to delete event. Please try again.";
+      setError(errorMessage);
     }
   };
 
@@ -164,6 +172,10 @@ const EventOrganizerPage: React.FC = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div style={{ color: "red" }}>{error}</div>;
   }
 
   return (
@@ -238,9 +250,7 @@ const EventOrganizerPage: React.FC = () => {
                 {event.isEventActive ? "Active" : "Inactive"}
               </p>
               <button onClick={() => handleEditEvent(event)}>Edit</button>
-              <button onClick={() => handleDeleteEvent(event.id)}>
-                Delete
-              </button>
+              <button onClick={() => handleDeleteEvent(event.id)}>Delete</button>
             </li>
           ))}
         </ul>
