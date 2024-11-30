@@ -61,7 +61,7 @@ const Register: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/signup",
+        "https://attendify-backend-el2r.onrender.com/api/auth/signup",
         formData
       );
       setSuccess(

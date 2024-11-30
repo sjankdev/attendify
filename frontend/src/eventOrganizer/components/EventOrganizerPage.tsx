@@ -17,7 +17,7 @@ const EventOrganizerPage: React.FC = () => {
   const fetchMyEvents = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/events/my-events",
+        "https://attendify-backend-el2r.onrender.com/events/my-events",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -34,7 +34,7 @@ const EventOrganizerPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/event-organizer/home",
+          "https://attendify-backend-el2r.onrender.com/event-organizer/home",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -65,7 +65,7 @@ const EventOrganizerPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/events/create",
+        "https://attendify-backend-el2r.onrender.com/events/create",
         {
           name: eventName,
           description: eventDescription,
@@ -106,7 +106,7 @@ const EventOrganizerPage: React.FC = () => {
 
     try {
       await axios.put(
-        `http://localhost:8080/events/update/${editingEvent.id}`,
+        `https://attendify-backend-el2r.onrender.com/events/update/${editingEvent.id}`,
         {
           name: eventName,
           description: eventDescription,
@@ -139,7 +139,7 @@ const EventOrganizerPage: React.FC = () => {
 
   const handleDeleteEvent = async (eventId: number) => {
     try {
-      await axios.delete(`http://localhost:8080/events/delete/${eventId}`, {
+      await axios.delete(`https://attendify-backend-el2r.onrender.com/events/delete/${eventId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
