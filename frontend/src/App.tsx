@@ -15,7 +15,7 @@ import UnauthorizedPage from "./security/components/UnauthorizedPage";
 
 function App() {
   return (
-    <Router basename="/attendify-frontend">
+    <Router basename="/">
       <div>
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
