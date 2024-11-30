@@ -11,13 +11,10 @@ import Register from "./security/components/Registration";
 import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
 import Homepage from "./public/Homepage";
 import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
-import UnauthorizedPage from "./security/components/UnauthorizedPage";
-import UnauthorizedInterceptor from "./security/components/UnauthorizedInterceptor";
 
 function App() {
   return (
-    <Router basename="/">
-      <UnauthorizedInterceptor />
+    <Router>
       <div>
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
@@ -26,9 +23,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
           <Route path="/event-participant" element={<EventParticipantPage />} />
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          <Route path="/403" element={<UnauthorizedPage />} />
-          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>
