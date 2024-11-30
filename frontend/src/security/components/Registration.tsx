@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchRoles } from "../services/roleService";
-import axios from "axios";
+import axiosInstance from "../../security/api/axiosConfig";
 
 interface Role {
   id: number;
@@ -60,7 +60,7 @@ const Register: React.FC = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "https://attendify-backend-el2r.onrender.com/api/auth/signup",
         formData
       );
