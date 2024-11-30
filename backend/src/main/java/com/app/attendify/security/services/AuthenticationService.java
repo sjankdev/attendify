@@ -43,19 +43,18 @@ public class AuthenticationService {
     }
 
     public User signup(RegisterUserDto input) {
-        RoleEnum roleEnum;
-        try {
-            roleEnum = RoleEnum.valueOf(input.getRole().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Role not found: " + input.getRole());
-        }
+        RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
 
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
 
-        var user = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
+        var user = new User()
+                .setFullName(input.getFullName())
+                .setEmail(input.getEmail())
+                .setPassword(passwordEncoder.encode(input.getPassword()))
+                .setRole(optionalRole.get());
 
         User savedUser = userRepository.save(user);
 
@@ -64,21 +63,15 @@ public class AuthenticationService {
         sendVerificationEmail(savedUser);
         userRepository.save(savedUser);
 
-        if (roleEnum == RoleEnum.EVENT_ORGANIZER) {
-            EventOrganizer eventOrganizer = new EventOrganizer();
-            eventOrganizer.setUser(savedUser);
-            eventOrganizerRepository.save(eventOrganizer);
-        } else if (roleEnum == RoleEnum.EVENT_PARTICIPANT) {
-            EventParticipant eventParticipant = new EventParticipant();
-            eventParticipant.setUser(savedUser);
-            eventParticipantRepository.save(eventParticipant);
-        }
+        EventOrganizer eventOrganizer = new EventOrganizer();
+        eventOrganizer.setUser(savedUser);
+        eventOrganizerRepository.save(eventOrganizer);
 
         return savedUser;
     }
 
     private void sendVerificationEmail(User user) {
-        String verificationUrl = "https://attendify-backend-el2r.onrender.com/api/auth/verify-email?token=" + user.getEmailVerificationToken();
+        String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
@@ -101,6 +94,5 @@ public class AuthenticationService {
 
         return user;
     }
-
 
 }

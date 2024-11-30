@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     email: "",
     password: "",
     fullName: "",
-    role: "",
+    role: "EVENT_ORGANIZER", 
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ const Register: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/signup",
+        "http://localhost:8080/api/auth/signup",
         formData
       );
       setSuccess(
@@ -107,22 +107,6 @@ const Register: React.FC = () => {
             onChange={handleChange}
             required
           />
-        </div>
-        <div>
-          <label>Role:</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleSelectChange}
-            required
-          >
-            <option value="">Select a role</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.name}>
-                {role.name}
-              </option>
-            ))}
-          </select>
         </div>
         <button type="submit">Register</button>
       </form>
