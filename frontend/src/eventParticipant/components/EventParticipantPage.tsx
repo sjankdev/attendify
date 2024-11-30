@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../security/api/axiosConfig";
 
 const EventParticipantPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/event-participant/home",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/event-participant/home", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setMessage(response.data);
-      } catch (err: any) {
-        setError("You are not authorized or something went wrong.");
+      } catch {
       } finally {
         setLoading(false);
       }
@@ -32,15 +27,7 @@ const EventParticipantPage: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  return (
-    <div>
-      {error ? (
-        <div style={{ color: "red" }}>{error}</div>
-      ) : (
-        <div>{message}</div>
-      )}
-    </div>
-  );
+  return <div>{message ? message : "No data available"}</div>;
 };
 
 export default EventParticipantPage;

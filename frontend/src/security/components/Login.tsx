@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../security/api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 
 interface LoginResponse {
@@ -22,13 +22,13 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post<LoginResponse>(
+      const response = await axiosInstance.post<LoginResponse>(
         "https://attendify-backend-el2r.onrender.com/api/auth/login",
         { email, password }
       );
-      localStorage.setItem("token", response.data.token);
-      console.log("Login successful:", response.data);
 
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role);
       if (response.data.role === "EVENT_ORGANIZER") {
         navigate("/event-organizer");
       } else if (response.data.role === "EVENT_PARTICIPANT") {
@@ -36,8 +36,10 @@ const Login: React.FC = () => {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Login failed. Please check your credentials."
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
       );
+
       console.error("Error logging in:", err);
     } finally {
       setLoading(false);
