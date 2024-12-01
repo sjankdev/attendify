@@ -7,8 +7,12 @@ import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.company.services.EmailService;
 import com.app.attendify.company.services.InvitationService;
+import com.app.attendify.security.model.EventParticipant;
+import com.app.attendify.security.model.Role;
+import com.app.attendify.security.model.RoleEnum;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.EventParticipantRepository;
+import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +30,15 @@ public class InvitationController {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final EventParticipantRepository eventParticipantRepository;
+    private final RoleRepository roleRepository;
 
-    public InvitationController(InvitationService invitationService, EmailService emailService, CompanyRepository companyRepository, UserRepository userRepository, EventParticipantRepository eventParticipantRepository) {
+    public InvitationController(InvitationService invitationService, EmailService emailService, CompanyRepository companyRepository, UserRepository userRepository, EventParticipantRepository eventParticipantRepository, RoleRepository roleRepository) {
         this.invitationService = invitationService;
         this.emailService = emailService;
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
         this.eventParticipantRepository = eventParticipantRepository;
+        this.roleRepository = roleRepository;
     }
 
     @PostMapping("/invitation/send")
@@ -68,7 +74,28 @@ public class InvitationController {
         Optional<User> userOptional = userRepository.findByEmail(invitation.getEmail());
 
         if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found. Please register.", "redirect", "true"));
+            User newUser = new User();
+            newUser.setEmail(invitation.getEmail());
+            newUser.setFullName("Default Name");
+            newUser.setPassword("defaultPassword");
+
+            Optional<Role> participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT);
+            if (participantRole.isEmpty()) {
+                throw new RuntimeException("Role not found for participant");
+            }
+            newUser.setRole(participantRole.get());
+
+            userRepository.save(newUser);
+
+            EventParticipant participant = new EventParticipant();
+            participant.setUser(newUser);
+            participant.setCompany(invitation.getCompany());
+
+            eventParticipantRepository.save(participant);
+
+            invitationService.markAsAccepted(invitation);
+
+            return ResponseEntity.ok(Map.of("message", "User created and invitation accepted successfully"));
         }
 
         User user = userOptional.get();
