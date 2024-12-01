@@ -1,14 +1,20 @@
 package com.app.attendify.security.dto;
 
 public class RegisterUserDto {
+    private String fullName;
     private String email;
-
     private String password;
 
-    private String fullName;
+    private String companyName;
+    private String companyDescription;
 
-    private String role;
+    public String getFullName() {
+        return fullName;
+    }
 
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public String getEmail() {
         return email;
@@ -26,19 +32,19 @@ public class RegisterUserDto {
         this.password = password;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
-    public String getRole() {
-        return role;
+    public String getCompanyDescription() {
+        return companyDescription;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setCompanyDescription(String companyDescription) {
+        this.companyDescription = companyDescription;
     }
 }

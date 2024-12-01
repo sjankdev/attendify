@@ -12,6 +12,8 @@ interface RegisterUserDto {
   password: string;
   fullName: string;
   role: string;
+  companyName: string;       // Added companyName
+  companyDescription: string; // Added companyDescription
 }
 
 const Register: React.FC = () => {
@@ -20,6 +22,8 @@ const Register: React.FC = () => {
     password: "",
     fullName: "",
     role: "EVENT_ORGANIZER", 
+    companyName: "",       // Added companyName state
+    companyDescription: "", // Added companyDescription state
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -40,17 +44,10 @@ const Register: React.FC = () => {
     fetchRolesData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      role: e.target.value,
     });
   };
 
@@ -104,6 +101,25 @@ const Register: React.FC = () => {
             type="text"
             name="fullName"
             value={formData.fullName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Company Name:</label>
+          <input
+            type="text"
+            name="companyName"
+            value={formData.companyName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Company Description:</label>
+          <textarea
+            name="companyDescription"
+            value={formData.companyDescription}
             onChange={handleChange}
             required
           />
