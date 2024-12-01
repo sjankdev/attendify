@@ -6,7 +6,6 @@ import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.security.dto.RegisterUserDto;
 import com.app.attendify.security.model.*;
 import com.app.attendify.security.repositories.EventOrganizerRepository;
-import com.app.attendify.security.repositories.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.mail.SimpleMailMessage;
@@ -45,7 +44,6 @@ public class AuthenticationService {
     }
 
     public User signup(RegisterUserDto input) {
-        // 1. Fetch the role (EVENT_ORGANIZER)
         RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
 
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
@@ -53,46 +51,28 @@ public class AuthenticationService {
             throw new RuntimeException("Role not found");
         }
 
-        // 2. Create the user
-        var user = new User()
-                .setFullName(input.getFullName())
-                .setEmail(input.getEmail())
-                .setPassword(passwordEncoder.encode(input.getPassword()))
-                .setRole(optionalRole.get());
+        var user = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
 
-        // 3. Save the user
         User savedUser = userRepository.save(user);
 
-        // 4. Create email verification token and send the email
         String verificationToken = UUID.randomUUID().toString();
         savedUser.setEmailVerificationToken(verificationToken);
         sendVerificationEmail(savedUser);
-        userRepository.save(savedUser);  // Save the user again with the token
+        userRepository.save(savedUser);
 
-        // 5. Create the EventOrganizer for the user
         EventOrganizer eventOrganizer = new EventOrganizer();
         eventOrganizer.setUser(savedUser);
-        eventOrganizerRepository.save(eventOrganizer);  // Save EventOrganizer before creating the company
+        eventOrganizerRepository.save(eventOrganizer);
 
-        // 6. Create the company and set the event organizer as the owner
-        Company company = new Company()
-                .setName(input.getCompanyName())
-                .setDescription(input.getCompanyDescription())
-                .setOwner(eventOrganizer);  // Assign the EventOrganizer to the company
+        Company company = new Company().setName(input.getCompanyName()).setDescription(input.getCompanyDescription()).setOwner(eventOrganizer);
 
-        // 7. Save the company
         companyRepository.save(company);
 
-        // 8. Update the EventOrganizer with the company reference
         eventOrganizer.setCompany(company);
-        eventOrganizerRepository.save(eventOrganizer);  // Ensure the EventOrganizer is associated with the company
+        eventOrganizerRepository.save(eventOrganizer);
 
-        // 9. Return the saved user
         return savedUser;
     }
-
-
-
 
     private void sendVerificationEmail(User user) {
         String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
