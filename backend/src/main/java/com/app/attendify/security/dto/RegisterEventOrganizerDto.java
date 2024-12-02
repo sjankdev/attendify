@@ -1,10 +1,9 @@
 package com.app.attendify.security.dto;
 
-public class RegisterUserDto {
+public class RegisterEventOrganizerDto {
     private String fullName;
     private String email;
     private String password;
-
     private String companyName;
     private String companyDescription;
 

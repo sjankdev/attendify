@@ -3,7 +3,7 @@ package com.app.attendify.security.services;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.security.dto.LoginUserDto;
-import com.app.attendify.security.dto.RegisterUserDto;
+import com.app.attendify.security.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.*;
 import com.app.attendify.security.repositories.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
@@ -20,17 +20,13 @@ import java.util.UUID;
 
 @Service
 public class AuthenticationService {
+
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManager authenticationManager;
-
     private final RoleRepository roleRepository;
     private final EventOrganizerRepository eventOrganizerRepository;
-
     private final CompanyRepository companyRepository;
-
     private final JavaMailSender javaMailSender;
 
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender) {
@@ -43,7 +39,7 @@ public class AuthenticationService {
         this.javaMailSender = javaMailSender;
     }
 
-    public User signup(RegisterUserDto input) {
+    public User registerEventOrganizer(RegisterEventOrganizerDto input) {
         RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
 
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
@@ -51,9 +47,9 @@ public class AuthenticationService {
             throw new RuntimeException("Role not found");
         }
 
-        var user = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
+        var organizerUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
 
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(organizerUser);
 
         String verificationToken = UUID.randomUUID().toString();
         savedUser.setEmailVerificationToken(verificationToken);
@@ -90,13 +86,10 @@ public class AuthenticationService {
 
         User user = userRepository.findByEmail(input.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
-        System.out.println("User email: " + user.getEmail() + " - Email verified: " + user.isEmailVerified());
-
         if (!user.isEmailVerified()) {
             throw new RuntimeException("Email not verified. Please verify your email before logging in.");
         }
 
         return user;
     }
-
 }

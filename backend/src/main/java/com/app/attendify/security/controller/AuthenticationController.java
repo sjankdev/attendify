@@ -1,7 +1,7 @@
 package com.app.attendify.security.controller;
 
 import com.app.attendify.security.dto.LoginUserDto;
-import com.app.attendify.security.dto.RegisterUserDto;
+import com.app.attendify.security.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
 import com.app.attendify.security.response.LoginResponse;
@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RestController
 public class AuthenticationController {
+
     private final JwtService jwtService;
-
     private final AuthenticationService authenticationService;
-
     private final UserRepository userRepository;
 
     public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserRepository userRepository) {
@@ -26,10 +25,10 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
-        User registeredUser = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(registeredUser);
+    @PostMapping("/register-organizer")
+    public ResponseEntity<User> registerEventOrganizer(@RequestBody RegisterEventOrganizerDto registerEventOrganizerDto) {
+        User registeredOrganizer = authenticationService.registerEventOrganizer(registerEventOrganizerDto);
+        return ResponseEntity.ok(registeredOrganizer);
     }
 
     @GetMapping("/verify-email")
@@ -54,7 +53,10 @@ public class AuthenticationController {
 
             String jwtToken = jwtService.generateToken(authenticatedUser);
 
-            LoginResponse loginResponse = new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime()).setRole(authenticatedUser.getRole().getName().name());
+            LoginResponse loginResponse = new LoginResponse()
+                    .setToken(jwtToken)
+                    .setExpiresIn(jwtService.getExpirationTime())
+                    .setRole(authenticatedUser.getRole().getName().name());
 
             return ResponseEntity.ok(loginResponse);
         } catch (RuntimeException e) {
@@ -63,6 +65,4 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
         }
     }
-
-
 }

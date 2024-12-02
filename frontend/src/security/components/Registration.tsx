@@ -12,8 +12,8 @@ interface RegisterUserDto {
   password: string;
   fullName: string;
   role: string;
-  companyName: string;       // Added companyName
-  companyDescription: string; // Added companyDescription
+  companyName: string;
+  companyDescription: string;
 }
 
 const Register: React.FC = () => {
@@ -21,9 +21,9 @@ const Register: React.FC = () => {
     email: "",
     password: "",
     fullName: "",
-    role: "EVENT_ORGANIZER", 
-    companyName: "",       // Added companyName state
-    companyDescription: "", // Added companyDescription state
+    role: "EVENT_ORGANIZER",
+    companyName: "",
+    companyDescription: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,9 @@ const Register: React.FC = () => {
     fetchRolesData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -58,7 +60,7 @@ const Register: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/signup",
+        "http://localhost:8080/api/auth/register-organizer",
         formData
       );
       setSuccess(
