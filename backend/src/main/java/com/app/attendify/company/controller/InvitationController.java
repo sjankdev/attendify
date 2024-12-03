@@ -7,6 +7,7 @@ import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.company.services.EmailService;
 import com.app.attendify.company.services.InvitationService;
+import com.app.attendify.security.dto.EventParticipantRegisterDto;
 import com.app.attendify.security.model.EventParticipant;
 import com.app.attendify.security.model.Role;
 import com.app.attendify.security.model.RoleEnum;
@@ -65,43 +66,73 @@ public class InvitationController {
 
     @GetMapping("/accept")
     public ResponseEntity<Map<String, String>> acceptInvitation(@RequestParam String token) {
-        Invitation invitation = invitationService.getInvitation(token);
+        System.out.println("Received token: " + token);
+        try {
+            Invitation invitation = invitationService.getInvitation(token);
 
-        if (invitation.isAccepted()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Invitation already accepted"));
-        }
+            System.out.println("Invitation found: " + invitation);
 
-        Optional<User> userOptional = userRepository.findByEmail(invitation.getEmail());
-
-        if (userOptional.isEmpty()) {
-            User newUser = new User();
-            newUser.setEmail(invitation.getEmail());
-            newUser.setFullName("Default Name");
-            newUser.setPassword("defaultPassword");
-
-            Optional<Role> participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT);
-            if (participantRole.isEmpty()) {
-                throw new RuntimeException("Role not found for participant");
+            if (invitation.isAccepted()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Invitation already accepted"));
             }
-            newUser.setRole(participantRole.get());
+
+            return ResponseEntity.ok(Map.of("message", "Invitation valid, proceed to registration", "email", invitation.getEmail()));
+        } catch (Exception e) {
+            System.err.println("Error processing token: " + token);
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+        }
+    }
+
+    @PostMapping("/register-participant")
+    public ResponseEntity<String> registerParticipant(@RequestBody EventParticipantRegisterDto registerDto) {
+        try {
+            System.out.println("Received registration request for token: " + registerDto.getToken() + " and email: " + registerDto.getEmail());
+
+            Invitation invitation = invitationService.getInvitation(registerDto.getToken());
+            System.out.println("Fetched invitation: " + invitation);
+
+            if (invitation.isAccepted()) {
+                System.out.println("Invitation already accepted for token: " + registerDto.getToken());
+                return ResponseEntity.badRequest().body("Invitation already accepted");
+            }
+
+            Optional<User> existingUser = userRepository.findByEmail(registerDto.getEmail());
+            if (existingUser.isPresent()) {
+                System.out.println("User already exists for email: " + registerDto.getEmail());
+                return ResponseEntity.badRequest().body("User already exists");
+            }
+
+            System.out.println("Creating new user for email: " + registerDto.getEmail());
+
+            Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
+
+            User newUser = new User();
+            newUser.setEmail(registerDto.getEmail());
+            newUser.setFullName(registerDto.getName());
+            newUser.setPassword(registerDto.getPassword()); // TODO: Hash the password
+            newUser.setRole(participantRole);
 
             userRepository.save(newUser);
+            System.out.println("User created successfully: " + newUser);
 
-            EventParticipant participant = new EventParticipant();
-            participant.setUser(newUser);
-            participant.setCompany(invitation.getCompany());
+            EventParticipant eventParticipant = new EventParticipant();
+            eventParticipant.setUser(newUser);
+            eventParticipant.setCompany(invitation.getCompany());
+            eventParticipantRepository.save(eventParticipant);
 
-            eventParticipantRepository.save(participant);
+            System.out.println("Event participant created successfully: " + eventParticipant);
 
             invitationService.markAsAccepted(invitation);
+            System.out.println("Invitation marked as accepted: " + invitation);
 
-            return ResponseEntity.ok(Map.of("message", "User created and invitation accepted successfully"));
+            return ResponseEntity.ok("Registration successful");
+        } catch (Exception e) {
+            System.err.println("Error during registration: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed");
         }
-
-        User user = userOptional.get();
-        invitationService.markAsAccepted(invitation);
-
-        return ResponseEntity.ok(Map.of("message", "Invitation accepted successfully"));
     }
+
 
 }

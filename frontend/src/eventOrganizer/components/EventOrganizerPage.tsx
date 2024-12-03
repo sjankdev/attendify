@@ -39,7 +39,7 @@ const EventOrganizerPage: React.FC = () => {
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/invitation/send",
-        { email, companyId: 3 },
+        { email, companyId: 1 },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
