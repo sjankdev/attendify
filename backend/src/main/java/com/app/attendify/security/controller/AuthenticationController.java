@@ -1,5 +1,6 @@
 package com.app.attendify.security.controller;
 
+import com.app.attendify.company.model.Company;
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.security.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.User;
@@ -65,4 +66,11 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
         }
     }
+
+    @GetMapping("/company")
+    public ResponseEntity<Company> getLoggedInOrganizerCompany() {
+        Company company = authenticationService.getLoggedInOrganizerCompany();
+        return ResponseEntity.ok(company);
+    }
+
 }

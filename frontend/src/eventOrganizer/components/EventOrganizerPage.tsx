@@ -7,21 +7,22 @@ const EventOrganizerPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/event-organizer/home",
+          "http://localhost:8080/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
-        setMessage(response.data);
+        setCompanyId(response.data.id);
       } catch (err: any) {
-        setError("You are not authorized or something went wrong.");
+        setError("Failed to fetch company information.");
       } finally {
         setLoading(false);
       }
@@ -34,12 +35,17 @@ const EventOrganizerPage: React.FC = () => {
     setSuccessMessage(null);
     setError(null);
 
+    if (!companyId) {
+      setError("Company ID is not available.");
+      return;
+    }
+
     console.log("Sending invitation with email: ", email);
 
     try {
       const response = await axios.post(
         "http://localhost:8080/api/auth/invitation/send",
-        { email, companyId: 1 },
+        { email, companyId },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
