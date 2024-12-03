@@ -38,7 +38,7 @@ const EventParticipantRegister = () => {
         token,
       })
       .then((response) => {
-        navigate("/event-participant");
+        navigate("/login");
       })
       .catch((err) => {
         setError("Error registering participant.");
