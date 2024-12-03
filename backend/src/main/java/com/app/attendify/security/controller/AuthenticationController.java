@@ -1,6 +1,9 @@
 package com.app.attendify.security.controller;
 
+import com.app.attendify.company.dto.InvitationRequestDto;
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Invitation;
+import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
 import com.app.attendify.security.dto.EventParticipantRegisterDto;
 import com.app.attendify.security.dto.LoginUserDto;
@@ -9,10 +12,13 @@ import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
 import com.app.attendify.security.response.LoginResponse;
 import com.app.attendify.security.services.AuthenticationService;
+import com.app.attendify.security.services.InvitationService;
 import com.app.attendify.security.services.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequestMapping("/api/auth")
 @RestController
@@ -22,12 +28,16 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final EventParticipantService eventParticipantService;
+    private final InvitationService invitationService;
+    private final CompanyRepository companyRepository;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserRepository userRepository, EventParticipantService eventParticipantService) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserRepository userRepository, EventParticipantService eventParticipantService, InvitationService invitationService, CompanyRepository companyRepository) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.userRepository = userRepository;
         this.eventParticipantService = eventParticipantService;
+        this.invitationService = invitationService;
+        this.companyRepository = companyRepository;
     }
 
     @PostMapping("/register-organizer")
@@ -77,6 +87,35 @@ public class AuthenticationController {
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setMessage(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
+        }
+    }
+
+    @PostMapping("/invitation/send")
+    public ResponseEntity<String> sendInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
+        String email = invitationRequestDto.getEmail();
+        Integer companyId = invitationRequestDto.getCompanyId();
+
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
+
+        Invitation invitation = invitationService.createInvitation(email, company);
+
+        invitationService.sendInvitationEmail(email, invitation.getToken());
+
+        return ResponseEntity.ok("Invitation sent to " + email);
+    }
+
+    @GetMapping("/accept")
+    public ResponseEntity<Map<String, String>> acceptInvitation(@RequestParam String token) {
+        try {
+            Invitation invitation = invitationService.getInvitation(token);
+
+            if (invitation.isAccepted()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Invitation already accepted"));
+            }
+
+            return ResponseEntity.ok(Map.of("message", "Invitation valid, proceed to registration", "email", invitation.getEmail()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
         }
     }
 

@@ -97,7 +97,7 @@ public class AuthenticationService {
 
     public Company getLoggedInOrganizerCompany() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // The email is the principal (username)
+        String email = authentication.getName();
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 

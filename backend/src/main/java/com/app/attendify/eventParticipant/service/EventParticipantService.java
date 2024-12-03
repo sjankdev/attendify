@@ -1,7 +1,7 @@
 package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Invitation;
-import com.app.attendify.company.services.InvitationService;
+import com.app.attendify.security.services.InvitationService;
 import com.app.attendify.security.dto.EventParticipantRegisterDto;
 import com.app.attendify.security.model.EventParticipant;
 import com.app.attendify.security.model.Role;
