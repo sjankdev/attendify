@@ -17,6 +17,7 @@ import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -32,14 +33,16 @@ public class InvitationController {
     private final UserRepository userRepository;
     private final EventParticipantRepository eventParticipantRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public InvitationController(InvitationService invitationService, EmailService emailService, CompanyRepository companyRepository, UserRepository userRepository, EventParticipantRepository eventParticipantRepository, RoleRepository roleRepository) {
+    public InvitationController(InvitationService invitationService, EmailService emailService, CompanyRepository companyRepository, UserRepository userRepository, EventParticipantRepository eventParticipantRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.invitationService = invitationService;
         this.emailService = emailService;
         this.companyRepository = companyRepository;
         this.userRepository = userRepository;
         this.eventParticipantRepository = eventParticipantRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/invitation/send")
@@ -110,7 +113,10 @@ public class InvitationController {
             User newUser = new User();
             newUser.setEmail(registerDto.getEmail());
             newUser.setFullName(registerDto.getName());
-            newUser.setPassword(registerDto.getPassword()); // TODO: Hash the password
+
+            String hashedPassword = passwordEncoder.encode(registerDto.getPassword());
+            newUser.setPassword(hashedPassword);
+
             newUser.setRole(participantRole);
 
             userRepository.save(newUser);
@@ -133,6 +139,5 @@ public class InvitationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed");
         }
     }
-
 
 }
