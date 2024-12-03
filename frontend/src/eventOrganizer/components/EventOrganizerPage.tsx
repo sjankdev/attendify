@@ -5,46 +5,24 @@ const EventOrganizerPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [eventName, setEventName] = useState<string>("");
-  const [eventDescription, setEventDescription] = useState<string>("");
-  const [eventDate, setEventDate] = useState<string>("");
-  const [eventActive, setEventActive] = useState<boolean>(true);
-
-  const [events, setEvents] = useState<any[]>([]);
-  const [editingEvent, setEditingEvent] = useState<any | null>(null);
-
-  const fetchMyEvents = async () => {
-    try {
-      const response = await axios.get(
-        "https://attendify-backend-el2r.onrender.com/events/my-events",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setEvents(response.data);
-    } catch (err: any) {
-      console.error("Error fetching events:", err);
-    }
-  };
+  const [email, setEmail] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/event-organizer/home",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
-        setMessage(response.data);
-        fetchMyEvents();
+        setCompanyId(response.data.id);
       } catch (err: any) {
-        setError("You are not authorized or something went wrong.");
+        setError("Failed to fetch company information.");
       } finally {
         setLoading(false);
       }
@@ -53,121 +31,36 @@ const EventOrganizerPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleCreateEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!eventName || !eventDescription || !eventDate) {
-      setError("All fields are required.");
+  const handleSendInvitation = async () => {
+    setSuccessMessage(null);
+    setError(null);
+
+    if (!companyId) {
+      setError("Company ID is not available.");
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    console.log("Sending invitation with email: ", email);
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/events/create",
-        {
-          name: eventName,
-          description: eventDescription,
-          eventDate: eventDate,
-          isEventActive: eventActive,
-        },
+        "https://attendify-backend-el2r.onrender.com/api/auth/invitation/send",
+        { email, companyId },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      setMessage("Event created successfully!");
-      setEventName("");
-      setEventDescription("");
-      setEventDate("");
-      fetchMyEvents();
+      setSuccessMessage(response.data);
+
+      console.log(`Invitation sent successfully to: ${email}`);
     } catch (err: any) {
-      const errorMessage =
-        err?.response?.data?.message ||
-        "Failed to create event. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+      console.error("Error sending invitation: ", err);
+      setError(err.response?.data || "Failed to send the invitation.");
     }
-  };
-
-  const handleUpdateEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!eventName || !eventDescription || !eventDate) {
-      setError("All fields are required.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      await axios.put(
-        `https://attendify-backend-el2r.onrender.com/events/update/${editingEvent.id}`,
-        {
-          name: eventName,
-          description: eventDescription,
-          eventDate: eventDate,
-          isEventActive: eventActive,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      setMessage("Event updated successfully!");
-      setEventName("");
-      setEventDescription("");
-      setEventDate("");
-      setEventActive(true);
-      setEditingEvent(null);
-      fetchMyEvents();
-    } catch (err: any) {
-      const errorMessage =
-        err?.response?.data?.message ||
-        "Failed to update event. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteEvent = async (eventId: number) => {
-    try {
-      await axios.delete(`https://attendify-backend-el2r.onrender.com/events/delete/${eventId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      setMessage("Event deleted successfully!");
-      fetchMyEvents();
-    } catch (err: any) {
-      const errorMessage =
-        err?.response?.data?.message ||
-        "Failed to delete event. Please try again.";
-      setError(errorMessage);
-    }
-  };
-
-  const handleEditEvent = (event: any) => {
-    setEditingEvent(event);
-    setEventName(event.name);
-    setEventDescription(event.description);
-    setEventDate(event.eventDate);
-    setEventActive(event.isEventActive);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingEvent(null);
-    setEventName("");
-    setEventDescription("");
-    setEventDate("");
-    setEventActive(true);
   };
 
   if (loading) {
@@ -181,82 +74,38 @@ const EventOrganizerPage: React.FC = () => {
   return (
     <div>
       {message && <div>{message}</div>}
+      <p>Hello event organizer</p>
 
-      <h3>{editingEvent ? "Edit Event" : "Create an Event"}</h3>
-      <form onSubmit={editingEvent ? handleUpdateEvent : handleCreateEvent}>
-        <div>
-          <label>Event Name</label>
-          <input
-            type="text"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Event Description</label>
-          <textarea
-            value={eventDescription}
-            onChange={(e) => setEventDescription(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Event Date</label>
-          <input
-            type="date"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Status</label>
-          <select
-            value={eventActive ? "active" : "inactive"}
-            onChange={(e) => setEventActive(e.target.value === "active")}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-
-        <button type="submit">
-          {editingEvent ? "Update Event" : "Create Event"}
+      <div>
+        <h3>Invite Participant</h3>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter participant's email"
+          style={{ padding: "10px", width: "300px" }}
+        />
+        <button
+          onClick={handleSendInvitation}
+          style={{
+            padding: "10px 20px",
+            marginLeft: "10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Send Invitation
         </button>
-        {editingEvent && (
-          <button type="button" onClick={handleCancelEdit}>
-            Cancel
-          </button>
-        )}
-      </form>
+      </div>
 
-      <h3>Your Events</h3>
-      {events.length > 0 ? (
-        <ul>
-          {events.map((event) => (
-            <li key={event.id}>
-              <strong>{event.name}</strong>
-              <p>{event.description}</p>
-              <p>
-                <strong>Event Date:</strong>{" "}
-                {new Date(event.eventDate).toLocaleString()}
-              </p>
-              <p>
-                <strong>Status:</strong>{" "}
-                {event.isEventActive ? "Active" : "Inactive"}
-              </p>
-              <button onClick={() => handleEditEvent(event)}>Edit</button>
-              <button onClick={() => handleDeleteEvent(event.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No events found.</p>
+      {successMessage && (
+        <div style={{ color: "green", marginTop: "10px" }}>
+          {successMessage}
+        </div>
       )}
+      {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
     </div>
   );
 };
