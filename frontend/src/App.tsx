@@ -12,6 +12,7 @@ import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
 import Homepage from "./public/Homepage";
 import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
 import EventParticipantRegister from "./security/components/EventParticipantRegister";
+import InvitationPage from "./eventOrganizer/components/InvitationPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
           <Route path="/event-participant" element={<EventParticipantPage />} />
           <Route path="/register-participant" element={<EventParticipantRegister />} /> 
+          <Route path="/event-organizer/invitations" element={<InvitationPage />} />
         </Routes>
       </div>
     </Router>
