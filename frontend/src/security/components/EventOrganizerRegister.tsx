@@ -12,14 +12,18 @@ interface RegisterUserDto {
   password: string;
   fullName: string;
   role: string;
+  companyName: string;
+  companyDescription: string;
 }
 
-const Register: React.FC = () => {
+const EventOrganizerRegister: React.FC = () => {
   const [formData, setFormData] = useState<RegisterUserDto>({
     email: "",
     password: "",
     fullName: "",
-    role: "",
+    role: "EVENT_ORGANIZER",
+    companyName: "",
+    companyDescription: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -40,17 +44,12 @@ const Register: React.FC = () => {
     fetchRolesData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      role: e.target.value,
     });
   };
 
@@ -61,7 +60,7 @@ const Register: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/signup",
+        "http://localhost:8080/api/auth/register-organizer",
         formData
       );
       setSuccess(
@@ -109,20 +108,23 @@ const Register: React.FC = () => {
           />
         </div>
         <div>
-          <label>Role:</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleSelectChange}
+          <label>Company Name:</label>
+          <input
+            type="text"
+            name="companyName"
+            value={formData.companyName}
+            onChange={handleChange}
             required
-          >
-            <option value="">Select a role</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.name}>
-                {role.name}
-              </option>
-            ))}
-          </select>
+          />
+        </div>
+        <div>
+          <label>Company Description:</label>
+          <textarea
+            name="companyDescription"
+            value={formData.companyDescription}
+            onChange={handleChange}
+            required
+          />
         </div>
         <button type="submit">Register</button>
       </form>
@@ -130,4 +132,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default EventOrganizerRegister;
