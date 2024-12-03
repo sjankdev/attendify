@@ -1,7 +1,10 @@
 package com.app.attendify.security.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.event.model.Event;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class EventOrganizer {
@@ -16,6 +19,9 @@ public class EventOrganizer {
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
+
+    @OneToMany(mappedBy = "organizer")
+    private List<Event> events;
 
     public Integer getId() {
         return id;
@@ -43,4 +49,14 @@ public class EventOrganizer {
         this.company = company;
         return this;
     }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public EventOrganizer setEvents(List<Event> events) {
+        this.events = events;
+        return this;
+    }
+
 }
