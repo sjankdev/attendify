@@ -1,6 +1,9 @@
 package com.app.attendify.eventParticipant.service;
 
+import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
+import com.app.attendify.event.model.Event;
+import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.security.services.InvitationService;
 import com.app.attendify.security.dto.EventParticipantRegisterDto;
 import com.app.attendify.security.model.EventParticipant;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,14 +28,16 @@ public class EventParticipantService {
     private final EventParticipantRepository eventParticipantRepository;
     private final InvitationService invitationService;
     private final PasswordEncoder passwordEncoder;
+    private final EventRepository eventRepository;
 
     @Autowired
-    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder) {
+    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.eventParticipantRepository = eventParticipantRepository;
         this.invitationService = invitationService;
         this.passwordEncoder = passwordEncoder;
+        this.eventRepository = eventRepository;
     }
 
     public void registerEventParticipant(EventParticipantRegisterDto input) {
@@ -72,4 +78,15 @@ public class EventParticipantService {
 
         return eventParticipantRepository.save(eventParticipant);
     }
+
+    public List<Event> getEventsForCurrentUser(User user) {
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser(user);
+
+        if (eventParticipant != null && eventParticipant.getCompany() != null) {
+            return eventRepository.findByCompany(eventParticipant.getCompany());
+        } else {
+            return List.of();
+        }
+    }
+
 }
