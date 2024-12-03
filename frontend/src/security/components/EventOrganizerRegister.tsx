@@ -16,7 +16,7 @@ interface RegisterUserDto {
   companyDescription: string;
 }
 
-const Register: React.FC = () => {
+const EventOrganizerRegister: React.FC = () => {
   const [formData, setFormData] = useState<RegisterUserDto>({
     email: "",
     password: "",
@@ -132,4 +132,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default EventOrganizerRegister;
