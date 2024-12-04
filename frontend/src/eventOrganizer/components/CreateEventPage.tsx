@@ -43,7 +43,7 @@ const CreateEventPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/event-organizer/create-event",
+        "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/create-event",
         { name, description, location, organizerId },
         {
           headers: {
