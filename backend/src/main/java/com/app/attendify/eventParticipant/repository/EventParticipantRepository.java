@@ -1,6 +1,6 @@
-package com.app.attendify.security.repositories;
+package com.app.attendify.eventParticipant.repository;
 
-import com.app.attendify.security.model.EventParticipant;
+import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

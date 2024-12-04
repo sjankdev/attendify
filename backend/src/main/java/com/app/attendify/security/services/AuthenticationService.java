@@ -2,10 +2,11 @@ package com.app.attendify.security.services;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.repository.CompanyRepository;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.security.dto.LoginUserDto;
-import com.app.attendify.security.dto.RegisterEventOrganizerDto;
+import com.app.attendify.eventOrganizer.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.*;
-import com.app.attendify.security.repositories.EventOrganizerRepository;
+import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.mail.SimpleMailMessage;

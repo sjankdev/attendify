@@ -1,24 +1,23 @@
-package com.app.attendify.event.service;
+package com.app.attendify.eventOrganizer.services;
 
-import com.app.attendify.company.model.Company;
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.repository.EventRepository;
-import com.app.attendify.security.model.EventOrganizer;
-import com.app.attendify.security.repositories.EventOrganizerRepository;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
+import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class EventService {
+public class EventOrganizerService {
 
-    private final EventRepository eventRepository;
     private final EventOrganizerRepository eventOrganizerRepository;
+    private final EventRepository eventRepository;
 
-    public EventService(EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
-        this.eventRepository = eventRepository;
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository) {
         this.eventOrganizerRepository = eventOrganizerRepository;
+        this.eventRepository = eventRepository;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -35,4 +34,5 @@ public class EventService {
                 .setOrganizer(organizer);
         return eventRepository.save(event);
     }
+
 }

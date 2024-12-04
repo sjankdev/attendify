@@ -1,11 +1,14 @@
-package com.app.attendify.security.model;
+package com.app.attendify.eventOrganizer.model;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
-public class EventParticipant {
+public class EventOrganizer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -18,15 +21,14 @@ public class EventParticipant {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id", referencedColumnName = "id")
-    private Event event;
+    @OneToMany(mappedBy = "organizer")
+    private List<Event> events;
 
     public Integer getId() {
         return id;
     }
 
-    public EventParticipant setId(Integer id) {
+    public EventOrganizer setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -35,7 +37,7 @@ public class EventParticipant {
         return user;
     }
 
-    public EventParticipant setUser(User user) {
+    public EventOrganizer setUser(User user) {
         this.user = user;
         return this;
     }
@@ -44,17 +46,17 @@ public class EventParticipant {
         return company;
     }
 
-    public EventParticipant setCompany(Company company) {
+    public EventOrganizer setCompany(Company company) {
         this.company = company;
         return this;
     }
 
-    public Event getEvent() {
-        return event;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public EventParticipant setEvent(Event event) {
-        this.event = event;
+    public EventOrganizer setEvents(List<Event> events) {
+        this.events = events;
         return this;
     }
 

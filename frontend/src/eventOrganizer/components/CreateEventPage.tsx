@@ -43,7 +43,7 @@ const CreateEventPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/events/create",
+        "http://localhost:8080/api/auth/event-organizer/create-event",
         { name, description, location, organizerId },
         {
           headers: {

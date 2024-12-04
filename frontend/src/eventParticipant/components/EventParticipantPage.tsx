@@ -16,7 +16,7 @@ const EventParticipantPage: React.FC = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/auth/events/list", 
+          "http://localhost:8080/api/auth/event-participant/list-events", 
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

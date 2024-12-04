@@ -1,4 +1,4 @@
-package com.app.attendify.security.services;
+package com.app.attendify.company.services;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;

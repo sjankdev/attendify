@@ -1,16 +1,15 @@
 package com.app.attendify.eventParticipant.service;
 
-import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.repository.EventRepository;
-import com.app.attendify.security.services.InvitationService;
-import com.app.attendify.security.dto.EventParticipantRegisterDto;
-import com.app.attendify.security.model.EventParticipant;
+import com.app.attendify.company.services.InvitationService;
+import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
+import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.Role;
 import com.app.attendify.security.model.RoleEnum;
 import com.app.attendify.security.model.User;
-import com.app.attendify.security.repositories.EventParticipantRepository;
+import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
