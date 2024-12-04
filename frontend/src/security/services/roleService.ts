@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://attendify-backend-el2r.onrender.com/event-participant/api/auth/roles';
+const API_URL = 'https://attendify-backend-el2r.onrender.com/api/auth/roles';
 
 export const fetchRoles = async () => {
   try {
