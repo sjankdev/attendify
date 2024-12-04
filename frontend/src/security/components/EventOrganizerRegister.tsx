@@ -62,7 +62,7 @@ const EventOrganizerRegister: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/register-organizer",
+        "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
         formData
       );
       setSuccess(
