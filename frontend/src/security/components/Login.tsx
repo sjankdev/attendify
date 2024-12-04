@@ -23,7 +23,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "https://attendify-backend-el2r.onrender.com/api/auth/login",
+        "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/login",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
@@ -36,12 +36,17 @@ const Login: React.FC = () => {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Login failed. Please check your credentials."
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
       );
       console.error("Error logging in:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRegisterRedirect = () => {
+    navigate("/register-eventOrganizer");
   };
 
   return (
@@ -71,6 +76,10 @@ const Login: React.FC = () => {
         </button>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
+      <div style={{ marginTop: "10px" }}>
+        <p>Don't have an account?</p>
+        <button onClick={handleRegisterRedirect}>Register</button>
+      </div>
     </div>
   );
 };

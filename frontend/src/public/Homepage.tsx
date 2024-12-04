@@ -10,7 +10,7 @@ const Homepage: React.FC = () => {
         <Link to="/login">
           <button>Login</button>
         </Link>
-        <Link to="/register">
+        <Link to="/register-eventOrganizer">
           <button>Register</button>
         </Link>
       </div>

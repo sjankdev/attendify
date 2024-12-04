@@ -1,7 +1,7 @@
 package com.app.attendify.company.model;
 
-import com.app.attendify.security.model.EventOrganizer;
-import com.app.attendify.security.model.EventParticipant;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
+import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.persistence.*;
 import java.util.List;
 

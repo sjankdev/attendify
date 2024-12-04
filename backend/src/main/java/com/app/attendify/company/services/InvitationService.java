@@ -3,6 +3,8 @@ package com.app.attendify.company.services;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.InvitationRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -10,10 +12,41 @@ import java.util.UUID;
 
 @Service
 public class InvitationService {
-    private final InvitationRepository invitationRepository;
 
-    public InvitationService(InvitationRepository invitationRepository) {
+    private final InvitationRepository invitationRepository;
+    private final JavaMailSender mailSender;
+
+    public InvitationService(InvitationRepository invitationRepository, JavaMailSender mailSender) {
         this.invitationRepository = invitationRepository;
+        this.mailSender = mailSender;
+    }
+
+    public void sendInvitationEmail(String toEmail, String token) {
+        System.out.println("sendInvitationEmail called with email: " + toEmail + " and token: " + token);
+
+        String subject = "You're Invited!";
+        String invitationLink = "https://attendify-frontend.onrender.com/register-participant?token=" + token;
+        String message = "Click the following link to complete your registration: " + invitationLink;
+
+        System.out.println("Email content: ");
+        System.out.println("Subject: " + subject);
+        System.out.println("Message: " + message);
+
+        try {
+            SimpleMailMessage email = new SimpleMailMessage();
+            email.setTo(toEmail);
+            email.setSubject(subject);
+            email.setText(message);
+
+            System.out.println("Sending email to: " + toEmail);
+
+            mailSender.send(email);
+
+            System.out.println("Email sent successfully to: " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send email: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public Invitation createInvitation(String email, Company company) {

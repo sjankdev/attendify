@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchRoles } from "../services/roleService";
 import axios from "axios";
 
@@ -29,6 +30,7 @@ const EventOrganizerRegister: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRolesData = async () => {
@@ -60,7 +62,7 @@ const EventOrganizerRegister: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
+        "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/register-organizer",
         formData
       );
       setSuccess(
@@ -69,6 +71,10 @@ const EventOrganizerRegister: React.FC = () => {
     } catch (error: any) {
       setError(error.response?.data?.message || "Registration failed");
     }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate("/login");
   };
 
   return (
@@ -128,6 +134,10 @@ const EventOrganizerRegister: React.FC = () => {
         </div>
         <button type="submit">Register</button>
       </form>
+      <div style={{ marginTop: "10px" }}>
+        <p>Already have an account?</p>
+        <button onClick={handleLoginRedirect}>Login</button>
+      </div>
     </div>
   );
 };

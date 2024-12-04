@@ -1,13 +1,13 @@
 package com.app.attendify.event.model;
 
-import com.app.attendify.security.model.EventOrganizer;
+import com.app.attendify.company.model.Company;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
+import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -18,16 +18,16 @@ public class Event {
     @Column(nullable = false)
     private String description;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date eventDate;
+    @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
 
     @ManyToOne
-    @JoinColumn(name = "event_organizer_id", referencedColumnName = "id", nullable = false)
-    private EventOrganizer eventOrganizer;
+    @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+    private EventOrganizer organizer;
 
-    @Column(nullable = false)
-    private Boolean isEventActive = true;
+    @OneToMany(mappedBy = "event")
+    private List<EventParticipant> participants;
 
     public Integer getId() {
         return id;
@@ -56,35 +56,30 @@ public class Event {
         return this;
     }
 
-    public Date getEventDate() {
-        return eventDate;
+    public Company getCompany() {
+        return company;
     }
 
-    public Event setEventDate(Date eventDate) {
-        this.eventDate = eventDate;
+    public Event setCompany(Company company) {
+        this.company = company;
         return this;
     }
 
-    public EventOrganizer getEventOrganizer() {
-        return eventOrganizer;
+    public EventOrganizer getOrganizer() {
+        return organizer;
     }
 
-    public Event setEventOrganizer(EventOrganizer eventOrganizer) {
-        this.eventOrganizer = eventOrganizer;
+    public Event setOrganizer(EventOrganizer organizer) {
+        this.organizer = organizer;
         return this;
     }
 
-    public Boolean getIsEventActive() {
-        return isEventActive;
+    public List<EventParticipant> getParticipants() {
+        return participants;
     }
 
-    public Event setIsEventActive(Boolean isEventActive) {
-        this.isEventActive = isEventActive;
+    public Event setParticipants(List<EventParticipant> participants) {
+        this.participants = participants;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" + "id=" + id + ", name='" + name + '\'' + ", description='" + description + '\'' + ", eventDate=" + eventDate + ", eventOrganizer=" + eventOrganizer + ", isEventActive=" + isEventActive + '}';
     }
 }

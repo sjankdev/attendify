@@ -1,4 +1,4 @@
-package com.app.attendify.security.dto;
+package com.app.attendify.eventParticipant.dto;
 
 public class EventParticipantRegisterDto {
     private String name;

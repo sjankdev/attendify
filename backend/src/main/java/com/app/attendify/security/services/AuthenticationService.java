@@ -2,10 +2,11 @@ package com.app.attendify.security.services;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.repository.CompanyRepository;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.security.dto.LoginUserDto;
-import com.app.attendify.security.dto.RegisterEventOrganizerDto;
+import com.app.attendify.eventOrganizer.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.*;
-import com.app.attendify.security.repositories.EventOrganizerRepository;
+import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.mail.SimpleMailMessage;
@@ -73,7 +74,7 @@ public class AuthenticationService {
     }
 
     private void sendVerificationEmail(User user) {
-        String verificationUrl = "https://attendify-backend-el2r.onrender.com/api/auth/verify-email?token=" + user.getEmailVerificationToken();
+        String verificationUrl = "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/verify-email?token=" + user.getEmailVerificationToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
@@ -97,7 +98,7 @@ public class AuthenticationService {
 
     public Company getLoggedInOrganizerCompany() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // The email is the principal (username)
+        String email = authentication.getName();
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
