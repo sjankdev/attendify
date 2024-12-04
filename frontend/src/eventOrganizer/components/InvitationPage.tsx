@@ -16,7 +16,7 @@ const InvitationPage: React.FC = () => {
     const fetchCompanyData = async () => {
       try {
         const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
