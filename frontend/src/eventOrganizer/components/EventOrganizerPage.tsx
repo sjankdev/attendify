@@ -65,6 +65,12 @@ const EventOrganizerPage: React.FC = () => {
   };
 
   const handleUpdateEvent = async (eventId: number) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) =>
+        event.id === eventId ? { ...event, ...updatedEvent } : event
+      )
+    );
+
     try {
       const response = await fetch(
         `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
@@ -80,13 +86,21 @@ const EventOrganizerPage: React.FC = () => {
 
       if (response.ok) {
         const updatedEventData = await response.json();
+
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id === eventId ? updatedEventData : event
           )
         );
+
         setIsEditing(false);
+        setUpdatedEvent({
+          name: "",
+          description: "",
+          location: "",
+        });
         setCurrentEvent(null);
+
         console.log(`Event with ID ${eventId} updated successfully`);
       } else {
         console.error("Failed to update event");
