@@ -20,6 +20,9 @@ public class Event {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+    private String location;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonIgnore
@@ -57,6 +60,15 @@ public class Event {
 
     public Event setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public Event setLocation(String location) {
+        this.location = location;
         return this;
     }
 

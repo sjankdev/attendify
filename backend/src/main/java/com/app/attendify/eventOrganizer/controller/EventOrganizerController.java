@@ -2,6 +2,7 @@ package com.app.attendify.eventOrganizer.controller;
 
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import jakarta.validation.Valid;
@@ -37,6 +38,18 @@ public class EventOrganizerController {
     public ResponseEntity<Event> createEvent(@Valid @RequestBody CreateEventRequest request) {
         Event event = eventOrganizerService.createEvent(request);
         return ResponseEntity.ok(event);
+    }
+
+    @PutMapping("/update-event/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<Event> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
+        try {
+            Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
+            return ResponseEntity.ok(updatedEvent);
+        } catch (Exception e) {
+            logger.error("Error updating event", e);
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     @GetMapping("/my-events")

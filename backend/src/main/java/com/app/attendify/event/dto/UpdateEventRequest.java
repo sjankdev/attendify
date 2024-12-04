@@ -1,24 +1,14 @@
 package com.app.attendify.event.dto;
 
-public class EventDTO {
-    private Integer id;
+public class UpdateEventRequest {
     private String name;
     private String description;
     private String location;
 
-    public EventDTO(Integer id, String name, String description, String location) {
-        this.id = id;
+    public UpdateEventRequest(String name, String description, String location) {
         this.name = name;
         this.description = description;
         this.location = location;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -4,6 +4,13 @@ import { useNavigate } from "react-router-dom";
 const EventOrganizerPage: React.FC = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState<any[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<any>(null);
+  const [updatedEvent, setUpdatedEvent] = useState({
+    name: "",
+    description: "",
+    location: "",
+  });
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -20,7 +27,6 @@ const EventOrganizerPage: React.FC = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched events:", data);
           setEvents(data);
         } else {
           console.error("Failed to fetch events");
@@ -56,6 +62,56 @@ const EventOrganizerPage: React.FC = () => {
     } catch (error) {
       console.error("Error deleting event:", error);
     }
+  };
+
+  const handleUpdateEvent = async (eventId: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(updatedEvent),
+        }
+      );
+
+      if (response.ok) {
+        const updatedEventData = await response.json();
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === eventId ? updatedEventData : event
+          )
+        );
+        setIsEditing(false);
+        setCurrentEvent(null);
+        console.log(`Event with ID ${eventId} updated successfully`);
+      } else {
+        console.error("Failed to update event");
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUpdatedEvent((prevEvent) => ({
+      ...prevEvent,
+      [name]: value,
+    }));
+  };
+
+  const handleEditEvent = (event: any) => {
+    setIsEditing(true);
+    setCurrentEvent(event);
+    setUpdatedEvent({
+      name: event.name,
+      description: event.description,
+      location: event.location,
+    });
   };
 
   const handleGoToInvitations = () => {
@@ -104,7 +160,9 @@ const EventOrganizerPage: React.FC = () => {
           <ul>
             {events.map((event) => (
               <li key={event.id}>
-                {event.name} - {event.description}
+                <strong>{event.name}</strong> - {event.description}
+                <br />
+                <span>Location: {event.location}</span>
                 <button
                   onClick={() => handleDeleteEvent(event.id)}
                   style={{
@@ -118,11 +176,74 @@ const EventOrganizerPage: React.FC = () => {
                 >
                   Delete
                 </button>
+                <button
+                  onClick={() => handleEditEvent(event)}
+                  style={{
+                    marginLeft: "10px",
+                    padding: "5px 10px",
+                    backgroundColor: "#ffc107",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Edit
+                </button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {isEditing && currentEvent && (
+        <div>
+          <h3>Edit Event</h3>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUpdateEvent(currentEvent.id);
+            }}
+          >
+            <div>
+              <label>Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={updatedEvent.name}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Description:</label>
+              <input
+                type="text"
+                name="description"
+                value={updatedEvent.description}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Location:</label>
+              <input
+                type="text"
+                name="location"
+                value={updatedEvent.location}
+                onChange={handleInputChange}
+              />
+            </div>
+            <button type="submit" style={{ backgroundColor: "#007bff" }}>
+              Update Event
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              style={{ marginLeft: "10px", backgroundColor: "#dc3545" }}
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
