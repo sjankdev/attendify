@@ -1,6 +1,7 @@
 package com.app.attendify.eventOrganizer.services;
 
 import com.app.attendify.event.dto.CreateEventRequest;
+import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EventOrganizerService {
@@ -51,14 +53,14 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<Event> getEventsByOrganizer() {
+    public List<EventDTO> getEventsByOrganizer() {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
             logger.info("Fetching events for organizer: {}", email);
 
             User user = userRepository.findByEmail(email).orElseThrow(() -> {
-                logger.error("User not found for username: {}", email);
+                logger.error("User not found for email: {}", email);
                 return new IllegalArgumentException("User not found");
             });
 
@@ -67,8 +69,10 @@ public class EventOrganizerService {
                 return new IllegalArgumentException("Organizer not found");
             });
 
-            logger.info("Found {} events for organizer: {}", organizer.getEvents().size(), email);
-            return organizer.getEvents();
+            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription())).collect(Collectors.toList());
+
+            logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
+            return eventDTOs;
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);
             throw new RuntimeException("Error fetching events for organizer", e);

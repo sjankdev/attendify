@@ -3,7 +3,9 @@ package com.app.attendify.event.model;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.model.EventParticipant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -20,10 +22,12 @@ public class Event {
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
+    @JsonIgnore
     private Company company;
 
     @ManyToOne
     @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+    @JsonIgnore
     private EventOrganizer organizer;
 
     @OneToMany(mappedBy = "event")

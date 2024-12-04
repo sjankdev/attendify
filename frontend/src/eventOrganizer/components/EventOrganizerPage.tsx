@@ -20,6 +20,7 @@ const EventOrganizerPage: React.FC = () => {
         );
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched events:", data);
           setEvents(data);
         } else {
           console.error("Failed to fetch events");
@@ -31,6 +32,8 @@ const EventOrganizerPage: React.FC = () => {
     fetchEvents();
   }, []);
 
+  console.log("Current events state:", events);
+
   const handleGoToInvitations = () => {
     navigate("/event-organizer/invitations");
   };
@@ -38,6 +41,8 @@ const EventOrganizerPage: React.FC = () => {
   const handleGoToCreateEvent = () => {
     navigate("/event-organizer/create-event");
   };
+
+  console.log("Events:", events);
 
   return (
     <div>
