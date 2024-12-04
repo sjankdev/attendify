@@ -16,7 +16,7 @@ const EventParticipantPage: React.FC = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/event-participant/list-events", 
+          "https://attendify-backend-el2r.onrender.com/api/auth/event-participant/list-events", 
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
