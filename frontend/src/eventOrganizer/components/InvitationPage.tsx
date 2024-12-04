@@ -47,7 +47,7 @@ const InvitationPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/event-participant/api/auth/invitation/send",
+        "https://attendify-backend-el2r.onrender.com/api/auth/invitation/send",
         { email, companyId },
         {
           headers: {
