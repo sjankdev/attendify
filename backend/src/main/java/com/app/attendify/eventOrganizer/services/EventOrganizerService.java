@@ -78,4 +78,40 @@ public class EventOrganizerService {
             throw new RuntimeException("Error fetching events for organizer", e);
         }
     }
+
+    @Transactional
+    public void deleteEvent(int eventId) {
+        try {
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+            logger.info("Deleting event for organizer: {}", email);
+
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                logger.error("User not found for email: {}", email);
+                return new IllegalArgumentException("User not found");
+            });
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+                logger.error("Event organizer not found for user: {}", email);
+                return new IllegalArgumentException("Organizer not found");
+            });
+
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+                logger.error("Event not found for ID: {}", eventId);
+                return new IllegalArgumentException("Event not found");
+            });
+
+            if (!event.getOrganizer().equals(organizer)) {
+                throw new IllegalArgumentException("Event does not belong to the current organizer");
+            }
+
+            eventRepository.delete(event);
+            logger.info("Event with ID: {} deleted successfully", eventId);
+        } catch (Exception e) {
+            logger.error("Error deleting event", e);
+            throw new RuntimeException("Error deleting event", e);
+        }
+    }
+
+
 }

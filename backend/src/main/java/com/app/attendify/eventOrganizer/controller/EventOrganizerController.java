@@ -51,4 +51,16 @@ public class EventOrganizerController {
         }
     }
 
+    @DeleteMapping("/delete-event/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
+        try {
+            eventOrganizerService.deleteEvent(eventId);
+            return ResponseEntity.ok("Event deleted successfully.");
+        } catch (Exception e) {
+            logger.error("Error deleting event", e);
+            return ResponseEntity.status(500).body("Error deleting event");
+        }
+    }
+
 }
