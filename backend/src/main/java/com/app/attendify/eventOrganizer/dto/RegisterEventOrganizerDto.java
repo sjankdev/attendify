@@ -1,4 +1,4 @@
-package com.app.attendify.security.dto;
+package com.app.attendify.eventOrganizer.dto;
 
 public class RegisterEventOrganizerDto {
     private String fullName;
