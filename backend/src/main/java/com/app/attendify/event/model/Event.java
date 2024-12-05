@@ -3,7 +3,9 @@ package com.app.attendify.event.model;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.model.EventParticipant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -18,12 +20,17 @@ public class Event {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+    private String location;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
+    @JsonIgnore
     private Company company;
 
     @ManyToOne
     @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+    @JsonIgnore
     private EventOrganizer organizer;
 
     @OneToMany(mappedBy = "event")
@@ -53,6 +60,15 @@ public class Event {
 
     public Event setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public Event setLocation(String location) {
+        this.location = location;
         return this;
     }
 
