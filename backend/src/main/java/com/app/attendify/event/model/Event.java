@@ -33,7 +33,7 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @OneToMany(mappedBy = "event")
+    @ManyToMany(mappedBy = "events")
     private List<EventParticipant> participants;
 
     public Integer getId() {
@@ -94,8 +94,7 @@ public class Event {
         return participants;
     }
 
-    public Event setParticipants(List<EventParticipant> participants) {
+    public void setParticipants(List<EventParticipant> participants) {
         this.participants = participants;
-        return this;
     }
 }

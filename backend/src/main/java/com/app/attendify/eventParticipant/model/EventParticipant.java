@@ -5,6 +5,8 @@ import com.app.attendify.event.model.Event;
 import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class EventParticipant {
     @Id
@@ -19,9 +21,9 @@ public class EventParticipant {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id", referencedColumnName = "id")
-    private Event event;
+    @ManyToMany
+    @JoinTable(name = "participant_event", joinColumns = @JoinColumn(name = "participant_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> events;
 
     public Integer getId() {
         return id;
@@ -50,13 +52,12 @@ public class EventParticipant {
         return this;
     }
 
-    public Event getEvent() {
-        return event;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public EventParticipant setEvent(Event event) {
-        this.event = event;
-        return this;
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 
 }

@@ -14,6 +14,7 @@ import com.app.attendify.security.model.User;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,6 +98,7 @@ public class EventParticipantService {
         return events.stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null)).collect(Collectors.toList());
     }
 
+    @Transactional
     public void joinEvent(int eventId, String userEmail) {
         log.info("Received request to join event with ID: {}", eventId);
         try {
@@ -112,12 +114,12 @@ public class EventParticipantService {
                 throw new RuntimeException("You cannot join an event outside your company");
             }
 
-            if (eventParticipant.getEvent() != null && eventParticipant.getEvent().getId().equals(eventId)) {
+            if (eventParticipant.getEvents().contains(event)) {
                 log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
                 throw new RuntimeException("You have already joined this event");
             }
 
-            eventParticipant.setEvent(event);
+            eventParticipant.getEvents().add(event);
             eventParticipantRepository.save(eventParticipant);
 
             log.info("Successfully joined event with ID: {}", eventId);
