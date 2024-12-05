@@ -5,12 +5,16 @@ public class EventDTO {
     private String name;
     private String description;
     private String location;
+    private String companyName;
+    private String organizerName;
 
-    public EventDTO(Integer id, String name, String description, String location) {
+    public EventDTO(Integer id, String name, String description, String location, String companyName, String organizerName) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;
+        this.companyName = companyName;
+        this.organizerName = organizerName;
     }
 
     public Integer getId() {
@@ -43,5 +47,21 @@ public class EventDTO {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getOrganizerName() {
+        return organizerName;
+    }
+
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
     }
 }

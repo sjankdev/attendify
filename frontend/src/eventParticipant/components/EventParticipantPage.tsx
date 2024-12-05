@@ -1,63 +1,65 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-interface Event {
-  id: number;
-  name: string;
-  description: string;
-}
-
 const EventParticipantPage: React.FC = () => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [events, setEvents] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
+      const token = localStorage.getItem("token");
+      console.log("Authorization Token:", token);
+
+      if (!token) {
+        console.error("No token found");
+        setError("No token found. Please log in.");
+        return;
+      }
+
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/auth/event-participant/list-events", 
+          "http://localhost:8080/api/auth/event-participant/my-events",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
-        setEvents(response.data); 
-      } catch (err: any) {
-        setError("Something went wrong or you are not authorized.");
-      } finally {
-        setLoading(false);
+
+        console.log("Backend response:", response);
+
+        if (response.data && response.data.length > 0) {
+          setEvents(response.data);
+        } else {
+          setError("No events found for you.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+        setError("Failed to fetch events.");
       }
     };
 
     fetchEvents();
-  }, []); 
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  }, []);
 
   return (
     <div>
+      <h1>Your Events</h1>
       {error ? (
-        <div style={{ color: "red" }}>{error}</div>
+        <p>{error}</p>
       ) : (
-        <div>
-          <h2>Events</h2>
-          <ul>
-            {events.length > 0 ? (
-              events.map((event) => (
-                <li key={event.id}>
-                  <h3>{event.name}</h3>
-                  <p>{event.description}</p>
-                </li>
-              ))
-            ) : (
-              <p>No events found for your company.</p>
-            )}
-          </ul>
-        </div>
+        <ul>
+          {events.map((event, index) => (
+            <li key={index}>
+              <h3>{event.name}</h3>
+              <p>{event.description}</p>
+              <p>Location: {event.location}</p>
+              <p>Company: {event.company}</p>
+              <p>Organizer: {event.organizerName || "No organizer"}</p>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
