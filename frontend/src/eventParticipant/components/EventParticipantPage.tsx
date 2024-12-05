@@ -18,7 +18,7 @@ const EventParticipantPage: React.FC = () => {
 
       try {
         const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/api/auth/event-participant/my-events",
+          "http://localhost:8080/api/auth/event-participant/my-events",
           {
             headers: {
               Authorization: `Bearer ${token}`,
