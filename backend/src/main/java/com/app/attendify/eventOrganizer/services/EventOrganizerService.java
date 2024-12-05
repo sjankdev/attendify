@@ -103,7 +103,7 @@ public class EventOrganizerService {
                 return new IllegalArgumentException("Organizer not found");
             });
 
-            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : null, event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null)).collect(Collectors.toList());
+            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer")).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
             return eventDTOs;

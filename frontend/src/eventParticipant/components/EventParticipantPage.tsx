@@ -8,7 +8,7 @@ const EventParticipantPage: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       const token = localStorage.getItem("token");
-      console.log("Authorization Token:", token);
+      console.log("Authorization Token:", token);  
 
       if (!token) {
         console.error("No token found");
@@ -17,17 +17,14 @@ const EventParticipantPage: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/auth/event-participant/my-events",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:8080/api/auth/event-participant/my-events", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-        console.log("Backend response:", response);
+        console.log("Backend response:", response);  
 
         if (response.data && response.data.length > 0) {
           setEvents(response.data);
@@ -35,7 +32,7 @@ const EventParticipantPage: React.FC = () => {
           setError("No events found for you.");
         }
       } catch (err) {
-        console.error("Failed to fetch events:", err);
+        console.error("Failed to fetch events:", err);  
         setError("Failed to fetch events.");
       }
     };
@@ -55,8 +52,8 @@ const EventParticipantPage: React.FC = () => {
               <h3>{event.name}</h3>
               <p>{event.description}</p>
               <p>Location: {event.location}</p>
-              <p>Company: {event.company}</p>
-              <p>Organizer: {event.organizerName || "No organizer"}</p>
+              <p>Company: {event.companyName}</p>
+              <p>Organizer: {event.organizerName || "No organizer"}</p> 
             </li>
           ))}
         </ul>
