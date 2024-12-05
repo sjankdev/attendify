@@ -14,13 +14,12 @@ import com.app.attendify.security.model.User;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import jakarta.transaction.Transactional;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 public class EventParticipantService {
 
     private static final Logger log = LoggerFactory.getLogger(EventParticipantService.class);
-
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -63,7 +61,6 @@ public class EventParticipantService {
         invitationService.markAsAccepted(invitation);
     }
 
-
     private Invitation validateInvitation(String token) {
         Invitation invitation = invitationService.getInvitation(token);
         if (invitation.isAccepted()) {
@@ -72,7 +69,6 @@ public class EventParticipantService {
         return invitation;
     }
 
-
     private User createUser(EventParticipantRegisterDto input) {
         Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -80,7 +76,6 @@ public class EventParticipantService {
 
         return userRepository.save(newUser);
     }
-
 
     private EventParticipant createEventParticipant(User user, Invitation invitation) {
         EventParticipant eventParticipant = new EventParticipant().setUser(user).setCompany(invitation.getCompany());
@@ -91,15 +86,48 @@ public class EventParticipantService {
     public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
         EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
-        Company company = eventParticipant.getCompany();
-
-        if (company == null) {
+        Company participantCompany = eventParticipant.getCompany();
+        if (participantCompany == null) {
             throw new RuntimeException("The participant does not belong to any company.");
         }
 
-        List<Event> events = eventRepository.findByCompany(company);
+        log.info("Participant company: {}", participantCompany.getName());
+
+        List<Event> events = eventRepository.findByCompany(participantCompany);
 
         return events.stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null)).collect(Collectors.toList());
     }
+
+    @Transactional
+    public void joinEvent(int eventId, String userEmail) {
+        log.info("Received request to join event with ID: {}", eventId);
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
+            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+
+            Company participantCompany = eventParticipant.getCompany();
+            Company eventCompany = event.getCompany();
+
+            if (participantCompany == null || eventCompany == null || !participantCompany.getId().equals(eventCompany.getId())) {
+                log.error("Participant company does not match event company. Participant email: {}, Event ID: {}", userEmail, eventId);
+                throw new RuntimeException("You cannot join an event outside your company");
+            }
+
+            if (eventParticipant.getEvents().contains(event)) {
+                log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
+                throw new RuntimeException("You have already joined this event");
+            }
+
+            eventParticipant.getEvents().add(event);
+            eventParticipantRepository.save(eventParticipant);
+
+            log.info("Successfully joined event with ID: {}", eventId);
+        } catch (Exception e) {
+            log.error("Error while joining event with ID: {}: {}", eventId, e.getMessage());
+            throw new RuntimeException("Error while joining event: " + e.getMessage());
+        }
+    }
+
 
 }
