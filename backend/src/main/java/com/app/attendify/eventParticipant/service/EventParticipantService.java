@@ -107,25 +107,20 @@ public class EventParticipantService {
             Company participantCompany = eventParticipant.getCompany();
             Company eventCompany = event.getCompany();
 
-            log.info("Participant company: {}", participantCompany != null ? participantCompany.getName() : "No company found");
-            log.info("Event company: {}", eventCompany != null ? eventCompany.getName() : "No company found");
-
-            log.info("Participant company instance: {}", participantCompany);
-            log.info("Event company instance: {}", eventCompany);
-
-            log.info("Participant company ID: {}, Event company ID: {}", participantCompany.getId(), eventCompany.getId());
-
             if (participantCompany == null || eventCompany == null || !participantCompany.getId().equals(eventCompany.getId())) {
                 log.error("Participant company does not match event company. Participant email: {}, Event ID: {}", userEmail, eventId);
                 throw new RuntimeException("You cannot join an event outside your company");
             }
 
-            eventParticipant.setEvent(event);
+            if (eventParticipant.getEvent() != null && eventParticipant.getEvent().getId().equals(eventId)) {
+                log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
+                throw new RuntimeException("You have already joined this event");
+            }
 
+            eventParticipant.setEvent(event);
             eventParticipantRepository.save(eventParticipant);
 
             log.info("Successfully joined event with ID: {}", eventId);
-
         } catch (Exception e) {
             log.error("Error while joining event with ID: {}: {}", eventId, e.getMessage());
             throw new RuntimeException("Error while joining event: " + e.getMessage());

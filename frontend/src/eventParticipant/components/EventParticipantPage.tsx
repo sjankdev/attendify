@@ -26,9 +26,21 @@ const EventParticipantPage: React.FC = () => {
       );
       console.log("Event joined successfully:", response.data);
       setError(null);
-    } catch (err) {
+      alert("Successfully joined the event!");
+    } catch (err: any) {
       console.error("Error joining event:", err);
-      setError("Error joining event.");
+      if (err.response && err.response.data) {
+        const errorMessage = err.response.data;
+        if (errorMessage.includes("already joined this event")) {
+          setError("You have already joined this event.");
+        } else if (errorMessage.includes("cannot join an event outside your company")) {
+          setError("You cannot join an event outside your company.");
+        } else {
+          setError("Error joining event. Please try again later.");
+        }
+      } else {
+        setError("Error joining event. Please check your connection.");
+      }
     }
   };
 
@@ -66,7 +78,7 @@ const EventParticipantPage: React.FC = () => {
   return (
     <div>
       <h1>Your Events</h1>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <ul>
         {events.map((event) => (
           <li key={event.id}>
