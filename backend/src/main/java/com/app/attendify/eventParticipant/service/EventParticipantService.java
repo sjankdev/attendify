@@ -1,6 +1,8 @@
 package com.app.attendify.eventParticipant.service;
 
+import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
+import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.company.services.InvitationService;
@@ -13,14 +15,22 @@ import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EventParticipantService {
+
+    private static final Logger log = LoggerFactory.getLogger(EventParticipantService.class);
+
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -78,14 +88,18 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
-    public List<Event> getEventsForCurrentUser(User user) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser(user);
+    public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
-        if (eventParticipant != null && eventParticipant.getCompany() != null) {
-            return eventRepository.findByCompany(eventParticipant.getCompany());
-        } else {
-            return List.of();
+        Company company = eventParticipant.getCompany();
+
+        if (company == null) {
+            throw new RuntimeException("The participant does not belong to any company.");
         }
+
+        List<Event> events = eventRepository.findByCompany(company);
+
+        return events.stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null)).collect(Collectors.toList());
     }
 
 }
