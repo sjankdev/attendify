@@ -2,7 +2,6 @@ package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
-import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -110,4 +109,12 @@ public class Event {
     public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
         this.participantEvents = participantEvents;
     }
+
+    public Integer getAvailableSlots() {
+        if (attendeeLimit == null) {
+            return Integer.MAX_VALUE;
+        }
+        return attendeeLimit - participantEvents.size();
+    }
+
 }

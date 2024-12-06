@@ -86,6 +86,7 @@ const EventParticipantPage: React.FC = () => {
             <p>{event.description}</p>
             <p>Location: {event.location}</p>
             <p>Company: {event.companyName}</p>
+            <p>Available Seats: {event.availableSeats}</p>
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
             </button>
