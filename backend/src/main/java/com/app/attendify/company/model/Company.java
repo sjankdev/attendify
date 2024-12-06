@@ -3,6 +3,7 @@ package com.app.attendify.company.model;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -67,5 +68,18 @@ public class Company {
     public Company setParticipants(List<EventParticipant> participants) {
         this.participants = participants;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Company company = (Company) o;
+        return id != null && id.equals(company.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * (id != null ? id.hashCode() : 0);
     }
 }

@@ -1,14 +1,12 @@
 package com.app.attendify.eventParticipant.controller;
 
 import com.app.attendify.event.dto.EventDTO;
-import com.app.attendify.event.model.Event;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +34,22 @@ public class EventParticipantController {
         try {
             String currentUserEmail = getCurrentUserEmail();
             List<EventDTO> events = eventParticipantService.getEventsForCurrentParticipant(currentUserEmail);
-
             return ResponseEntity.ok(events);
         } catch (Exception e) {
+            logger.error("Failed to fetch events for the participant", e);
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @PostMapping("/join-event/{eventId}")
+    public ResponseEntity<String> joinEvent(@PathVariable int eventId) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+            eventParticipantService.joinEvent(eventId, currentUserEmail);
+            return ResponseEntity.ok("Successfully joined event.");
+        } catch (Exception e) {
+            logger.error("Error while joining event", e);
+            return ResponseEntity.status(500).body("Error while joining event: " + e.getMessage());
         }
     }
 
@@ -47,5 +57,4 @@ public class EventParticipantController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
-
 }

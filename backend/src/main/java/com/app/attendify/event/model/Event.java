@@ -2,10 +2,10 @@ package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
-import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,6 +23,9 @@ public class Event {
     @Column(nullable = false)
     private String location;
 
+    @Column(nullable = true)
+    private Integer attendeeLimit;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonIgnore
@@ -33,8 +36,8 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @OneToMany(mappedBy = "event")
-    private List<EventParticipant> participants;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -72,6 +75,15 @@ public class Event {
         return this;
     }
 
+    public Integer getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public Event setAttendeeLimit(Integer attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+        return this;
+    }
+
     public Company getCompany() {
         return company;
     }
@@ -90,12 +102,19 @@ public class Event {
         return this;
     }
 
-    public List<EventParticipant> getParticipants() {
-        return participants;
+    public List<ParticipantEvent> getParticipantEvents() {
+        return participantEvents;
     }
 
-    public Event setParticipants(List<EventParticipant> participants) {
-        this.participants = participants;
-        return this;
+    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
+        this.participantEvents = participantEvents;
     }
+
+    public Integer getAvailableSlots() {
+        if (attendeeLimit == null) {
+            return null;
+        }
+        return attendeeLimit - participantEvents.size();
+    }
+
 }

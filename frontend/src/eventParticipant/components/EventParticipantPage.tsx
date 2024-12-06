@@ -5,13 +5,56 @@ const EventParticipantPage: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const handleJoinEvent = async (eventId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/join-event/${eventId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Event joined successfully:", response.data);
+      setError(null);
+      alert("Successfully joined the event!");
+    } catch (err: any) {
+      console.error("Error joining event:", err);
+      if (err.response && err.response.data) {
+        const errorMessage = err.response.data;
+
+        if (errorMessage.includes("already joined this event")) {
+          setError("You have already joined this event.");
+        } else if (
+          errorMessage.includes("cannot join an event outside your company")
+        ) {
+          setError("You cannot join an event outside your company.");
+        } else if (
+          errorMessage.includes("This event has reached its attendee limit")
+        ) {
+          setError("This event has reached its attendee limit.");
+        } else {
+          setError("Error joining event. Please try again later.");
+        }
+      } else {
+        setError("Error joining event. Please check your connection.");
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchEvents = async () => {
       const token = localStorage.getItem("token");
-      console.log("Authorization Token:", token);
-
       if (!token) {
-        console.error("No token found");
         setError("No token found. Please log in.");
         return;
       }
@@ -22,20 +65,16 @@ const EventParticipantPage: React.FC = () => {
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
             },
           }
         );
 
-        console.log("Backend response:", response);
-
         if (response.data && response.data.length > 0) {
           setEvents(response.data);
         } else {
-          setError("No events found for you.");
+          setError("No events found.");
         }
       } catch (err) {
-        console.error("Failed to fetch events:", err);
         setError("Failed to fetch events.");
       }
     };
@@ -46,21 +85,24 @@ const EventParticipantPage: React.FC = () => {
   return (
     <div>
       <h1>Your Events</h1>
-      {error ? (
-        <p>{error}</p>
-      ) : (
-        <ul>
-          {events.map((event, index) => (
-            <li key={index}>
-              <h3>{event.name}</h3>
-              <p>{event.description}</p>
-              <p>Location: {event.location}</p>
-              <p>Company: {event.companyName}</p>
-              <p>Organizer: {event.organizerName || "No organizer"}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <ul>
+        {events.map((event) => (
+          <li key={event.id}>
+            <h3>{event.name}</h3>
+            <p>{event.description}</p>
+            <p>Location: {event.location}</p>
+            <p>Company: {event.companyName}</p>
+            <p>
+              Available Seats:{" "}
+              {event.availableSeats != null ? event.availableSeats : "No limit"}
+            </p>
+            <button onClick={() => handleJoinEvent(event.id)}>
+              Join Event
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

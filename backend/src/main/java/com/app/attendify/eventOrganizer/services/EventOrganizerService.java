@@ -4,9 +4,12 @@ import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.ParticipantEvent;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
+import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,7 +47,8 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit());
+
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
         } catch (Exception e) {
@@ -103,7 +107,10 @@ public class EventOrganizerService {
                 return new IllegalArgumentException("Organizer not found");
             });
 
-            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer")).collect(Collectors.toList());
+            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
+                Integer availableSeats = event.getAvailableSlots();
+                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats);
+            }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
             return eventDTOs;
@@ -147,5 +154,52 @@ public class EventOrganizerService {
         }
     }
 
+    @Transactional
+    public List<EventParticipantDTO> getParticipantsByEvent(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+                logger.error("Event not found for ID: {}", eventId);
+                return new IllegalArgumentException("Event not found");
+            });
+
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                logger.error("User not found for email: {}", email);
+                return new IllegalArgumentException("User not found");
+            });
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+                logger.error("Event organizer not found for user: {}", email);
+                return new IllegalArgumentException("Organizer not found");
+            });
+
+            if (!event.getOrganizer().equals(organizer)) {
+                throw new IllegalArgumentException("Event does not belong to the current organizer");
+            }
+
+            return event.getParticipantEvents().stream().map(participantEvent -> {
+                EventParticipant participant = participantEvent.getParticipant();
+                return new EventParticipantDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error retrieving participants for event", e);
+            throw new RuntimeException("Error retrieving participants for event", e);
+        }
+    }
+
+    public Integer getAvailableSlotsForEvent(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+                logger.error("Event not found for ID: {}", eventId);
+                return new IllegalArgumentException("Event not found");
+            });
+
+            return event.getAvailableSlots();
+        } catch (Exception e) {
+            logger.error("Error calculating available slots for event", e);
+            throw new RuntimeException("Error calculating available slots for event", e);
+        }
+    }
 
 }
