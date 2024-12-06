@@ -27,7 +27,27 @@ const EventOrganizerPage: React.FC = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          setEvents(data);
+          const eventsWithParticipants = await Promise.all(
+            data.map(async (event: any) => {
+              const participantsResponse = await fetch(
+                `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
+                {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }
+              );
+              if (participantsResponse.ok) {
+                const participants = await participantsResponse.json();
+                return { ...event, participants };
+              } else {
+                return event;
+              }
+            })
+          );
+          setEvents(eventsWithParticipants);
         } else {
           console.error("Failed to fetch events");
         }
@@ -183,7 +203,23 @@ const EventOrganizerPage: React.FC = () => {
                   {event.availableSeats != null
                     ? event.availableSeats
                     : "No limit"}
-                </span>{" "}
+                </span>
+                <br />
+                <div>
+                  <h4>Participants:</h4>
+                  {event.participants && event.participants.length > 0 ? (
+                    <ul>
+                      {event.participants.map((participant: any) => (
+                        <li key={participant.participantEmail}>
+                          {participant.participantName} -{" "}
+                          {participant.participantEmail}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No participants joined yet.</p>
+                  )}
+                </div>
                 <button
                   onClick={() => handleDeleteEvent(event.id)}
                   style={{
