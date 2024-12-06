@@ -127,7 +127,7 @@ public class EventParticipantService {
                 throw new RuntimeException("You have already joined this event");
             }
 
-            if (event.getAvailableSlots() <= 0) {
+            if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
                 log.error("Event has no available slots. Event ID: {}", eventId);
                 throw new RuntimeException("This event has reached its attendee limit");
             }
@@ -141,6 +141,5 @@ public class EventParticipantService {
             throw new RuntimeException("Error while joining event: " + e.getMessage());
         }
     }
-
 
 }
