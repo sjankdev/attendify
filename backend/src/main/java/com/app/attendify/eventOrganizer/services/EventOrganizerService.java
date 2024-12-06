@@ -44,7 +44,8 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit());
+
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
         } catch (Exception e) {

@@ -17,6 +17,8 @@ public class CreateEventRequest {
     @NotNull
     private Integer organizerId;
 
+    private Integer attendeeLimit;
+
     public String getName() {
         return name;
     }
@@ -52,4 +54,14 @@ public class CreateEventRequest {
         this.organizerId = organizerId;
         return this;
     }
+
+    public Integer getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public CreateEventRequest setAttendeeLimit(Integer attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+        return this;
+    }
 }
+

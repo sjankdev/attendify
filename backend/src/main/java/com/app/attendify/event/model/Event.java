@@ -24,6 +24,9 @@ public class Event {
     @Column(nullable = false)
     private String location;
 
+    @Column(nullable = true)
+    private Integer attendeeLimit;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonIgnore
@@ -70,6 +73,15 @@ public class Event {
 
     public Event setLocation(String location) {
         this.location = location;
+        return this;
+    }
+
+    public Integer getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public Event setAttendeeLimit(Integer attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
         return this;
     }
 
