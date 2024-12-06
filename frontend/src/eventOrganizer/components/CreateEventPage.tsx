@@ -17,7 +17,7 @@ const CreateEventPage: React.FC = () => {
     const fetchOrganizerDetails = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -53,7 +53,7 @@ const CreateEventPage: React.FC = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8080/api/auth/event-organizer/create-event",
+        "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/create-event",
         eventData,
         {
           headers: {
