@@ -31,10 +31,17 @@ const EventParticipantPage: React.FC = () => {
       console.error("Error joining event:", err);
       if (err.response && err.response.data) {
         const errorMessage = err.response.data;
+
         if (errorMessage.includes("already joined this event")) {
           setError("You have already joined this event.");
-        } else if (errorMessage.includes("cannot join an event outside your company")) {
+        } else if (
+          errorMessage.includes("cannot join an event outside your company")
+        ) {
           setError("You cannot join an event outside your company.");
+        } else if (
+          errorMessage.includes("This event has reached its attendee limit")
+        ) {
+          setError("This event has reached its attendee limit.");
         } else {
           setError("Error joining event. Please try again later.");
         }
@@ -86,6 +93,10 @@ const EventParticipantPage: React.FC = () => {
             <p>{event.description}</p>
             <p>Location: {event.location}</p>
             <p>Company: {event.companyName}</p>
+            <p>
+              Available Seats:{" "}
+              {event.availableSeats != null ? event.availableSeats : "No limit"}
+            </p>
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
             </button>

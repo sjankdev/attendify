@@ -2,7 +2,6 @@ package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
-import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -23,6 +22,9 @@ public class Event {
 
     @Column(nullable = false)
     private String location;
+
+    @Column(nullable = true)
+    private Integer attendeeLimit;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -73,6 +75,15 @@ public class Event {
         return this;
     }
 
+    public Integer getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public Event setAttendeeLimit(Integer attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+        return this;
+    }
+
     public Company getCompany() {
         return company;
     }
@@ -98,4 +109,12 @@ public class Event {
     public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
         this.participantEvents = participantEvents;
     }
+
+    public Integer getAvailableSlots() {
+        if (attendeeLimit == null) {
+            return null;
+        }
+        return attendeeLimit - participantEvents.size();
+    }
+
 }

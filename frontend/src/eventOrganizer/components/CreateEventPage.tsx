@@ -7,6 +7,8 @@ const CreateEventPage: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [organizerId, setOrganizerId] = useState<number | null>(null);
+  const [attendeeLimit, setAttendeeLimit] = useState<number | null>(null);
+  const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -42,9 +44,17 @@ const CreateEventPage: React.FC = () => {
     }
 
     try {
+      const eventData = {
+        name,
+        description,
+        location,
+        organizerId,
+        attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+      };
+
       const response = await axios.post(
         "http://localhost:8080/api/auth/event-organizer/create-event",
-        { name, description, location, organizerId },
+        eventData,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -57,6 +67,8 @@ const CreateEventPage: React.FC = () => {
       setName("");
       setDescription("");
       setLocation("");
+      setAttendeeLimit(null);
+      setIsAttendeeLimitChecked(false);
     } catch (err: any) {
       console.error("Error creating event: ", err);
       setError(err.response?.data?.message || "Failed to create the event.");
@@ -113,6 +125,32 @@ const CreateEventPage: React.FC = () => {
           placeholder="Enter event location"
           style={{ padding: "10px", width: "300px" }}
         />
+      </div>
+
+      <div style={{ marginBottom: "10px" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={isAttendeeLimitChecked}
+            onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+          />
+          Set Attendee Limit
+        </label>
+        {isAttendeeLimitChecked && (
+          <div style={{ marginTop: "10px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Attendee Limit:
+            </label>
+            <input
+              type="number"
+              value={attendeeLimit ?? ""}
+              onChange={(e) => setAttendeeLimit(Number(e.target.value))}
+              placeholder="Enter attendee limit"
+              style={{ padding: "10px", width: "300px" }}
+              min="1"
+            />
+          </div>
+        )}
       </div>
 
       <button

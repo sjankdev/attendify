@@ -87,6 +87,7 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
+    @Transactional
     public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
         EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
@@ -99,20 +100,22 @@ public class EventParticipantService {
 
         List<Event> events = eventRepository.findByCompany(participantCompany);
 
-        return events.stream().map(event -> new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null)).collect(Collectors.toList());
+        return events.stream().map(event -> {
+            Integer availableSeats = event.getAvailableSlots();
+            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null, availableSeats);
+        }).collect(Collectors.toList());
     }
+
 
     @Transactional
     public void joinEvent(int eventId, String userEmail) {
         log.info("Received request to join event with ID: {}", eventId);
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-
             EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
             Company participantCompany = eventParticipant.getCompany();
             Company eventCompany = event.getCompany();
-
             if (participantCompany == null || eventCompany == null || !participantCompany.getId().equals(eventCompany.getId())) {
                 log.error("Participant company does not match event company. Participant email: {}, Event ID: {}", userEmail, eventId);
                 throw new RuntimeException("You cannot join an event outside your company");
@@ -122,6 +125,11 @@ public class EventParticipantService {
             if (alreadyJoined) {
                 log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
                 throw new RuntimeException("You have already joined this event");
+            }
+
+            if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+                log.error("Event has no available slots. Event ID: {}", eventId);
+                throw new RuntimeException("This event has reached its attendee limit");
             }
 
             ParticipantEvent participantEvent = new ParticipantEvent(eventParticipant, event);
