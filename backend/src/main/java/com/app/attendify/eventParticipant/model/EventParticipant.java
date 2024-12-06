@@ -1,10 +1,11 @@
 package com.app.attendify.eventParticipant.model;
 
 import com.app.attendify.company.model.Company;
-import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.ParticipantEvent;
 import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,9 +22,8 @@ public class EventParticipant {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
-    @ManyToMany
-    @JoinTable(name = "participant_event", joinColumns = @JoinColumn(name = "participant_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> events;
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -52,12 +52,11 @@ public class EventParticipant {
         return this;
     }
 
-    public List<Event> getEvents() {
-        return events;
+    public List<ParticipantEvent> getParticipantEvents() {
+        return participantEvents;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
+        this.participantEvents = participantEvents;
     }
-
 }

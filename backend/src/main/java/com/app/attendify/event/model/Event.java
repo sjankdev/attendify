@@ -6,6 +6,7 @@ import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,8 +34,8 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @ManyToMany(mappedBy = "events")
-    private List<EventParticipant> participants;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -90,11 +91,11 @@ public class Event {
         return this;
     }
 
-    public List<EventParticipant> getParticipants() {
-        return participants;
+    public List<ParticipantEvent> getParticipantEvents() {
+        return participantEvents;
     }
 
-    public void setParticipants(List<EventParticipant> participants) {
-        this.participants = participants;
+    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
+        this.participantEvents = participantEvents;
     }
 }
