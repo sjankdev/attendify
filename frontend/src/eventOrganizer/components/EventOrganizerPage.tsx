@@ -178,7 +178,12 @@ const EventOrganizerPage: React.FC = () => {
                 <br />
                 <span>Location: {event.location}</span>
                 <br />
-                <span>Available Seats: {event.availableSeats}</span>{" "}
+                <span>
+                  Available Seats:{" "}
+                  {event.availableSeats != null
+                    ? event.availableSeats
+                    : "No limit"}
+                </span>{" "}
                 <button
                   onClick={() => handleDeleteEvent(event.id)}
                   style={{

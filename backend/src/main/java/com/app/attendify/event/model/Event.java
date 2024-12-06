@@ -112,7 +112,7 @@ public class Event {
 
     public Integer getAvailableSlots() {
         if (attendeeLimit == null) {
-            return Integer.MAX_VALUE;
+            return null;
         }
         return attendeeLimit - participantEvents.size();
     }
