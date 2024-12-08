@@ -4,7 +4,6 @@ import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
-import com.app.attendify.event.model.ParticipantEvent;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
@@ -19,6 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,7 +49,11 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(request.getEventDate());
+            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+
+            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
+
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime);
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -56,7 +62,6 @@ public class EventOrganizerService {
             throw new RuntimeException("Error creating event", e);
         }
     }
-
 
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
@@ -82,7 +87,11 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(request.getEventDate());
+            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+
+            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
+
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime);
 
             event = eventRepository.save(event);
 

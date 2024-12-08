@@ -169,7 +169,7 @@ const EventOrganizerPage: React.FC = () => {
       name: event.name,
       description: event.description,
       location: event.location,
-      eventDate: event.eventDate ? event.eventDate.split("T")[0] : "",
+      eventDate: event.eventDate ? new Date(event.eventDate).toISOString() : "",
       attendeeLimit: event.attendeeLimit || "",
     });
   };
@@ -319,7 +319,7 @@ const EventOrganizerPage: React.FC = () => {
             <div>
               <label>Event Date:</label>
               <input
-                type="date"
+                type="datetime-local"
                 name="eventDate"
                 value={updatedEvent.eventDate}
                 onChange={handleInputChange}
