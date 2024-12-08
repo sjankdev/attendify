@@ -40,7 +40,7 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
     public Integer getId() {

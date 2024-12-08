@@ -82,7 +82,7 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation());
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(request.getEventDate());
 
             event = eventRepository.save(event);
 
@@ -112,9 +112,9 @@ public class EventOrganizerService {
 
             List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate());
+                Integer attendeeLimit = event.getAttendeeLimit();
+                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit);
             }).collect(Collectors.toList());
-
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
             return eventDTOs;
@@ -123,6 +123,7 @@ public class EventOrganizerService {
             throw new RuntimeException("Error fetching events for organizer", e);
         }
     }
+
 
     @Transactional
     public void deleteEvent(int eventId) {

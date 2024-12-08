@@ -10,6 +10,8 @@ const EventOrganizerPage: React.FC = () => {
     name: "",
     description: "",
     location: "",
+    eventDate: "",
+    attendeeLimit: "",
   });
 
   useEffect(() => {
@@ -98,6 +100,10 @@ const EventOrganizerPage: React.FC = () => {
 
   const handleUpdateEvent = async (eventId: number) => {
     try {
+      const formattedEventDate = updatedEvent.eventDate
+        ? new Date(updatedEvent.eventDate).toISOString()
+        : null;
+
       const response = await fetch(
         `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
         {
@@ -106,17 +112,20 @@ const EventOrganizerPage: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify(updatedEvent),
+          body: JSON.stringify({
+            ...updatedEvent,
+            eventDate: formattedEventDate,
+          }),
         }
       );
-  
+
       if (!response.ok) {
         console.error("Failed to update event:", response.status);
         const text = await response.text();
         console.error("Response body:", text);
         return;
       }
-  
+
       const responseText = await response.text();
       if (responseText) {
         const updatedEventData = JSON.parse(responseText);
@@ -131,6 +140,8 @@ const EventOrganizerPage: React.FC = () => {
           name: "",
           description: "",
           location: "",
+          eventDate: "",
+          attendeeLimit: "",
         });
         setCurrentEvent(null);
         console.log(`Event with ID ${eventId} updated successfully`);
@@ -141,13 +152,12 @@ const EventOrganizerPage: React.FC = () => {
       console.error("Error updating event:", error);
     }
   };
-  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUpdatedEvent((prevEvent) => ({
       ...prevEvent,
-      [name]: value,
+      [name]: name === "attendeeLimit" ? parseInt(value, 10) : value,
     }));
   };
 
@@ -159,6 +169,8 @@ const EventOrganizerPage: React.FC = () => {
       name: event.name,
       description: event.description,
       location: event.location,
+      eventDate: event.eventDate ? event.eventDate.split("T")[0] : "",
+      attendeeLimit: event.attendeeLimit || "",
     });
   };
 
@@ -301,6 +313,24 @@ const EventOrganizerPage: React.FC = () => {
                 type="text"
                 name="location"
                 value={updatedEvent.location}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Event Date:</label>
+              <input
+                type="date"
+                name="eventDate"
+                value={updatedEvent.eventDate}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Attendee Limit:</label>
+              <input
+                type="number"
+                name="attendeeLimit"
+                value={updatedEvent.attendeeLimit}
                 onChange={handleInputChange}
               />
             </div>

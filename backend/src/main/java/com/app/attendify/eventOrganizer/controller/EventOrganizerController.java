@@ -48,7 +48,7 @@ public class EventOrganizerController {
         try {
             Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
 
-            EventDTO eventDTO = new EventDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate());
+            EventDTO eventDTO = new EventDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit());
 
             return ResponseEntity.ok(eventDTO);
         } catch (Exception e) {
