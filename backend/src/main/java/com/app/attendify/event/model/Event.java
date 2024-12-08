@@ -5,6 +5,7 @@ import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class Event {
 
     @Column(nullable = true)
     private Integer attendeeLimit;
+
+    @Column(nullable = false)
+    private LocalDateTime eventDate;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -81,6 +85,15 @@ public class Event {
 
     public Event setAttendeeLimit(Integer attendeeLimit) {
         this.attendeeLimit = attendeeLimit;
+        return this;
+    }
+
+    public LocalDateTime getEventDate() {
+        return eventDate;
+    }
+
+    public Event setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
         return this;
     }
 

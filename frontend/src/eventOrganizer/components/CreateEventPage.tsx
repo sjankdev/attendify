@@ -8,7 +8,9 @@ const CreateEventPage: React.FC = () => {
   const [location, setLocation] = useState<string>("");
   const [organizerId, setOrganizerId] = useState<number | null>(null);
   const [attendeeLimit, setAttendeeLimit] = useState<number | null>(null);
-  const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] = useState<boolean>(false);
+  const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
+    useState<boolean>(false);
+  const [eventDate, setEventDate] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -50,8 +52,8 @@ const CreateEventPage: React.FC = () => {
         location,
         organizerId,
         attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+        eventDate: eventDate ? new Date(eventDate).toISOString() : null,
       };
-
       const response = await axios.post(
         "http://localhost:8080/api/auth/event-organizer/create-event",
         eventData,
@@ -153,6 +155,17 @@ const CreateEventPage: React.FC = () => {
         )}
       </div>
 
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{ display: "block", marginBottom: "5px" }}>
+          Event Date:
+        </label>
+        <input
+          type="datetime-local"
+          value={eventDate}
+          onChange={(e) => setEventDate(e.target.value)}
+          style={{ padding: "10px", width: "300px" }}
+        />
+      </div>
       <button
         onClick={handleCreateEvent}
         style={{

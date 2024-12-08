@@ -3,6 +3,8 @@ package com.app.attendify.event.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+
 public class CreateEventRequest {
 
     @NotNull
@@ -18,6 +20,10 @@ public class CreateEventRequest {
     private Integer organizerId;
 
     private Integer attendeeLimit;
+
+    @NotNull
+    private LocalDateTime eventDate;
+
 
     public String getName() {
         return name;
@@ -63,5 +69,16 @@ public class CreateEventRequest {
         this.attendeeLimit = attendeeLimit;
         return this;
     }
+
+    public LocalDateTime getEventDate() {
+        return eventDate;
+    }
+
+    public CreateEventRequest setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
+        return this;
+    }
+
+
 }
 

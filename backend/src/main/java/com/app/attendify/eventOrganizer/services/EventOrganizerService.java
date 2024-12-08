@@ -47,7 +47,7 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(request.getEventDate());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -56,6 +56,7 @@ public class EventOrganizerService {
             throw new RuntimeException("Error creating event", e);
         }
     }
+
 
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
