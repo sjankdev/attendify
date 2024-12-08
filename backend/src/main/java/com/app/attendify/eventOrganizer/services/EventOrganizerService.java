@@ -53,7 +53,7 @@ public class EventOrganizerService {
 
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime);
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -91,7 +91,7 @@ public class EventOrganizerService {
 
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime);
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline());
 
             event = eventRepository.save(event);
 
@@ -122,7 +122,9 @@ public class EventOrganizerService {
             List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
                 Integer attendeeLimit = event.getAttendeeLimit();
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit);
+                LocalDateTime joinDeadline = event.getJoinDeadline();
+
+                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline);
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
@@ -132,7 +134,6 @@ public class EventOrganizerService {
             throw new RuntimeException("Error fetching events for organizer", e);
         }
     }
-
 
     @Transactional
     public void deleteEvent(int eventId) {

@@ -13,12 +13,12 @@ public class EventDTO {
     private String organizerName;
     private Integer availableSeats;
     private Integer attendeeLimit;
+    private LocalDateTime joinDeadline;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
 
-    public EventDTO(Integer id, String name, String description, String location, String companyName, String organizerName,
-                    Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit) {
+    public EventDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -28,6 +28,7 @@ public class EventDTO {
         this.availableSeats = availableSeats;
         this.eventDate = eventDate;
         this.attendeeLimit = attendeeLimit;
+        this.joinDeadline = joinDeadline;
     }
 
     public Integer getId() {
@@ -108,5 +109,13 @@ public class EventDTO {
 
     public void setEventDate(LocalDateTime eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
+
+    public void setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
     }
 }

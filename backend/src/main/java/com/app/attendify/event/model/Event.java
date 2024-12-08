@@ -30,6 +30,9 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @Column(nullable = true)
+    private LocalDateTime joinDeadline;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonIgnore
@@ -94,6 +97,15 @@ public class Event {
 
     public Event setEventDate(LocalDateTime eventDate) {
         this.eventDate = eventDate;
+        return this;
+    }
+
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
+
+    public Event setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
         return this;
     }
 

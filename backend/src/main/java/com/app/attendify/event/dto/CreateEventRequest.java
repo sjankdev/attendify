@@ -24,6 +24,7 @@ public class CreateEventRequest {
     @NotNull
     private LocalDateTime eventDate;
 
+    private LocalDateTime joinDeadline;
 
     public String getName() {
         return name;
@@ -79,6 +80,12 @@ public class CreateEventRequest {
         return this;
     }
 
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
 
+    public void setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
+    }
 }
 

@@ -11,6 +11,7 @@ const CreateEventPage: React.FC = () => {
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
   const [eventDate, setEventDate] = useState<string>("");
+  const [joinDeadline, setJoinDeadline] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -45,6 +46,15 @@ const CreateEventPage: React.FC = () => {
       return;
     }
 
+    if (
+      eventDate &&
+      joinDeadline &&
+      new Date(joinDeadline) >= new Date(eventDate)
+    ) {
+      setError("Join deadline must be before the event date.");
+      return;
+    }
+
     try {
       const eventData = {
         name,
@@ -53,7 +63,11 @@ const CreateEventPage: React.FC = () => {
         organizerId,
         attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
         eventDate: eventDate ? new Date(eventDate).toISOString() : null,
+        joinDeadline: joinDeadline
+          ? new Date(joinDeadline).toISOString()
+          : null,
       };
+
       const response = await axios.post(
         "http://localhost:8080/api/auth/event-organizer/create-event",
         eventData,
@@ -71,6 +85,8 @@ const CreateEventPage: React.FC = () => {
       setLocation("");
       setAttendeeLimit(null);
       setIsAttendeeLimitChecked(false);
+      setEventDate("");
+      setJoinDeadline("");
     } catch (err: any) {
       console.error("Error creating event: ", err);
       setError(err.response?.data?.message || "Failed to create the event.");
@@ -130,6 +146,30 @@ const CreateEventPage: React.FC = () => {
       </div>
 
       <div style={{ marginBottom: "10px" }}>
+        <label style={{ display: "block", marginBottom: "5px" }}>
+          Event Date:
+        </label>
+        <input
+          type="datetime-local"
+          value={eventDate}
+          onChange={(e) => setEventDate(e.target.value)}
+          style={{ padding: "10px", width: "300px" }}
+        />
+      </div>
+
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{ display: "block", marginBottom: "5px" }}>
+          Join Deadline:
+        </label>
+        <input
+          type="datetime-local"
+          value={joinDeadline}
+          onChange={(e) => setJoinDeadline(e.target.value)}
+          style={{ padding: "10px", width: "300px" }}
+        />
+      </div>
+
+      <div style={{ marginBottom: "10px" }}>
         <label>
           <input
             type="checkbox"
@@ -153,18 +193,6 @@ const CreateEventPage: React.FC = () => {
             />
           </div>
         )}
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Event Date:
-        </label>
-        <input
-          type="datetime-local"
-          value={eventDate}
-          onChange={(e) => setEventDate(e.target.value)}
-          style={{ padding: "10px", width: "300px" }}
-        />
       </div>
       <button
         onClick={handleCreateEvent}
