@@ -44,10 +44,13 @@ public class EventOrganizerController {
 
     @PutMapping("/update-event/{eventId}")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<Event> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
+    public ResponseEntity<EventDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
         try {
             Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
-            return ResponseEntity.ok(updatedEvent);
+
+            EventDTO eventDTO = new EventDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate());
+
+            return ResponseEntity.ok(eventDTO);
         } catch (Exception e) {
             logger.error("Error updating event", e);
             return ResponseEntity.status(500).body(null);

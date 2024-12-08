@@ -10,7 +10,6 @@ const EventOrganizerPage: React.FC = () => {
     name: "",
     description: "",
     location: "",
-    eventDate: "",
   });
 
   useEffect(() => {
@@ -110,8 +109,20 @@ const EventOrganizerPage: React.FC = () => {
           body: JSON.stringify(updatedEvent),
         }
       );
-      if (response.ok) {
-        const updatedEventData = await response.json();
+  
+      // Check if the response body is empty
+      if (!response.ok) {
+        console.error("Failed to update event:", response.status);
+        const text = await response.text();
+        console.error("Response body:", text);
+        return;
+      }
+  
+      // Try to parse JSON only if response is not empty
+      const responseText = await response.text();
+      if (responseText) {
+        const updatedEventData = JSON.parse(responseText);
+        console.log("Updated event data:", updatedEventData);
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id === eventId ? { ...event, ...updatedEventData } : event
@@ -122,17 +133,17 @@ const EventOrganizerPage: React.FC = () => {
           name: "",
           description: "",
           location: "",
-          eventDate: "",
         });
         setCurrentEvent(null);
         console.log(`Event with ID ${eventId} updated successfully`);
       } else {
-        console.error("Failed to update event");
+        console.error("No response body returned from the server.");
       }
     } catch (error) {
       console.error("Error updating event:", error);
     }
   };
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -145,19 +156,13 @@ const EventOrganizerPage: React.FC = () => {
   const handleEditEvent = (event: any) => {
     setIsEditing(true);
     setCurrentEvent(event);
-  
-    const eventDate = new Date(event.eventDate);
-    const date = eventDate.toISOString().split("T")[0];
-    const time = eventDate.toISOString().split("T")[1].slice(0, 5);
-  
+
     setUpdatedEvent({
       name: event.name,
       description: event.description,
       location: event.location,
-      eventDate: `${date}T${time}`, 
     });
   };
-  
 
   const handleGoToInvitations = () => {
     navigate("/event-organizer/invitations");
@@ -298,15 +303,6 @@ const EventOrganizerPage: React.FC = () => {
                 type="text"
                 name="location"
                 value={updatedEvent.location}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label>Date and Time:</label>
-              <input
-                type="datetime-local"
-                name="eventDate"
-                value={updatedEvent.eventDate}
                 onChange={handleInputChange}
               />
             </div>

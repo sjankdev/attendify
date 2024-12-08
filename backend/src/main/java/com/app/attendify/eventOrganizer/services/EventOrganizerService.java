@@ -84,7 +84,9 @@ public class EventOrganizerService {
 
             event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation());
 
-            return eventRepository.save(event);
+            event = eventRepository.save(event);
+
+            return event;
         } catch (Exception e) {
             logger.error("Error updating event", e);
             throw new RuntimeException("Error updating event", e);
