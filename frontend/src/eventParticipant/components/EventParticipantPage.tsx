@@ -70,7 +70,21 @@ const EventParticipantPage: React.FC = () => {
         );
 
         if (response.data && response.data.length > 0) {
-          setEvents(response.data);
+          const formattedEvents = response.data.map((event: any) => {
+            const eventDate = new Date(event.eventDate);
+            event.eventDate = eventDate.toLocaleString("en-GB", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            });
+            return event;
+          });
+
+          setEvents(formattedEvents);
         } else {
           setError("No events found.");
         }
@@ -93,6 +107,7 @@ const EventParticipantPage: React.FC = () => {
             <p>{event.description}</p>
             <p>Location: {event.location}</p>
             <p>Company: {event.companyName}</p>
+            <p>Date & Time: {event.eventDate}</p>
             <p>
               Available Seats:{" "}
               {event.availableSeats != null ? event.availableSeats : "No limit"}
