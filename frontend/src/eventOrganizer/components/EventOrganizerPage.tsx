@@ -110,7 +110,6 @@ const EventOrganizerPage: React.FC = () => {
         }
       );
   
-      // Check if the response body is empty
       if (!response.ok) {
         console.error("Failed to update event:", response.status);
         const text = await response.text();
@@ -118,7 +117,6 @@ const EventOrganizerPage: React.FC = () => {
         return;
       }
   
-      // Try to parse JSON only if response is not empty
       const responseText = await response.text();
       if (responseText) {
         const updatedEventData = JSON.parse(responseText);
