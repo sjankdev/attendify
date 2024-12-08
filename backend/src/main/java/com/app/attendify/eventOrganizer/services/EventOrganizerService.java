@@ -110,8 +110,9 @@ public class EventOrganizerService {
 
             List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats);
+                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate());
             }).collect(Collectors.toList());
+
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
             return eventDTOs;

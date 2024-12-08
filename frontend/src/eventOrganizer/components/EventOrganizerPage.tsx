@@ -10,6 +10,7 @@ const EventOrganizerPage: React.FC = () => {
     name: "",
     description: "",
     location: "",
+    eventDate: "",
   });
 
   useEffect(() => {
@@ -47,7 +48,20 @@ const EventOrganizerPage: React.FC = () => {
               }
             })
           );
-          setEvents(eventsWithParticipants);
+          setEvents(
+            eventsWithParticipants.map((event) => ({
+              ...event,
+              eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }),
+            }))
+          );
         } else {
           console.error("Failed to fetch events");
         }
@@ -70,7 +84,6 @@ const EventOrganizerPage: React.FC = () => {
           },
         }
       );
-
       if (response.ok) {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== eventId)
@@ -85,12 +98,6 @@ const EventOrganizerPage: React.FC = () => {
   };
 
   const handleUpdateEvent = async (eventId: number) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === eventId ? { ...event, ...updatedEvent } : event
-      )
-    );
-
     try {
       const response = await fetch(
         `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
@@ -103,24 +110,21 @@ const EventOrganizerPage: React.FC = () => {
           body: JSON.stringify(updatedEvent),
         }
       );
-
       if (response.ok) {
         const updatedEventData = await response.json();
-
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
-            event.id === eventId ? updatedEventData : event
+            event.id === eventId ? { ...event, ...updatedEventData } : event
           )
         );
-
         setIsEditing(false);
         setUpdatedEvent({
           name: "",
           description: "",
           location: "",
+          eventDate: "",
         });
         setCurrentEvent(null);
-
         console.log(`Event with ID ${eventId} updated successfully`);
       } else {
         console.error("Failed to update event");
@@ -141,12 +145,19 @@ const EventOrganizerPage: React.FC = () => {
   const handleEditEvent = (event: any) => {
     setIsEditing(true);
     setCurrentEvent(event);
+  
+    const eventDate = new Date(event.eventDate);
+    const date = eventDate.toISOString().split("T")[0];
+    const time = eventDate.toISOString().split("T")[1].slice(0, 5);
+  
     setUpdatedEvent({
       name: event.name,
       description: event.description,
       location: event.location,
+      eventDate: `${date}T${time}`, 
     });
   };
+  
 
   const handleGoToInvitations = () => {
     navigate("/event-organizer/invitations");
@@ -197,6 +208,8 @@ const EventOrganizerPage: React.FC = () => {
                 <strong>{event.name}</strong> - {event.description}
                 <br />
                 <span>Location: {event.location}</span>
+                <br />
+                <span>Date: {event.eventDate}</span>
                 <br />
                 <span>
                   Available Seats:{" "}
@@ -285,6 +298,15 @@ const EventOrganizerPage: React.FC = () => {
                 type="text"
                 name="location"
                 value={updatedEvent.location}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Date and Time:</label>
+              <input
+                type="datetime-local"
+                name="eventDate"
+                value={updatedEvent.eventDate}
                 onChange={handleInputChange}
               />
             </div>
