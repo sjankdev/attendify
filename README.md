@@ -1,15 +1,49 @@
-# Event Management Platform
+# Attendify 🎉  
+**Attendify** is an event management platform designed for both organizers and participants, simplifying the process of managing and attending events.  
 
-This is a platform designed to help companies manage their internal events. The system allows event organizers to create events, manage participants, and access event statistics. Participants can register for events after receiving an email invite from the event organizer.
+---
 
-## Features
-- **Registration and Login**: Users can register and log in using JWT authentication.
-- **Role Management**: Different roles are supported, including event organizers and participants.
-- **Event Management**: Event organizers can create, update, and delete events. Participants can view and register for events they are invited to.
-- **Email Invitations**: Event organizers can invite participants via email, and participants can register upon accepting the invite.
+## Features 🚀  
+### For Organizers:  
+- **Event Management**: Create, update, delete, and manage events.  
+- **Participant Insights**: View participants who joined your events.  
+- **Account Setup**:  
+  - Register through a form and verify your email upon registration.  
+  - Add company information during registration.  
 
-## Tech Stack
-- **Backend**: Spring Boot (Java)
-- **Frontend**: React, TypeScript
-- **Database**: PostgreSQL
-- **Hosting**: Render
+### For Participants:  
+- **Invitation-Only Access**:  
+  - Join the platform via an email invite sent by the organizer.  
+  - Complete registration through the provided invite link.  
+- **Event Interaction**:  
+  - View events from your associated company.  
+  - Join events, track deadlines, check available seats, and more.  
+
+---
+
+## Tech Stack 🛠️  
+- **Backend**: Spring Boot  
+- **Frontend**: React + TypeScript  
+- **Database**: PostgreSQL  
+- **Hosting**: Render  
+
+---
+
+## How It Works 🖥️  
+
+### For Organizers:  
+1. **Register**: Fill out the registration form and verify your email.  
+2. **Add Company Info**: Provide details about your company during registration.  
+3. **Manage Events**: Create, update, or delete events and track participant engagement.  
+
+### For Participants:  
+1. **Receive Invite**: Get an invite from an organizer via email.  
+2. **Join Platform**: Use the invite link to register and be linked to the organizer's company.  
+3. **Engage**: View and join events, keeping track of deadlines and seat availability.  
+
+---
+
+## Deployment 🌐  
+The app is hosted on **Render**, ensuring a seamless experience for all users.  
+
+---
