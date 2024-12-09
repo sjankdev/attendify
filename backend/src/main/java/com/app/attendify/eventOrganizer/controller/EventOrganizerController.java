@@ -2,6 +2,7 @@ package com.app.attendify.eventOrganizer.controller;
 
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.event.dto.EventUpdateDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
@@ -44,12 +45,12 @@ public class EventOrganizerController {
 
     @PutMapping("/update-event/{eventId}")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<EventDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
+    public ResponseEntity<EventUpdateDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
         Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
 
-        EventDTO eventDTO = new EventDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline());
+        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline());
 
-        return ResponseEntity.ok(eventDTO);
+        return ResponseEntity.ok(eventUpdateDTO);
     }
 
     @GetMapping("/my-events")

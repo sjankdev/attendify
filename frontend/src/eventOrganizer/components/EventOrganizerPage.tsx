@@ -20,7 +20,7 @@ const EventOrganizerPage: React.FC = () => {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events",
+          "http://localhost:8080/api/auth/event-organizer/my-events",
           {
             method: "GET",
             headers: {
@@ -34,7 +34,7 @@ const EventOrganizerPage: React.FC = () => {
           const eventsWithParticipants = await Promise.all(
             data.map(async (event: any) => {
               const participantsResponse = await fetch(
-                `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${event.id}/participants`,
+                `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
                 {
                   method: "GET",
                   headers: {
@@ -89,7 +89,7 @@ const EventOrganizerPage: React.FC = () => {
   const handleDeleteEvent = async (eventId: number) => {
     try {
       const response = await fetch(
-        `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/delete-event/${eventId}`,
+        `http://localhost:8080/api/auth/event-organizer/delete-event/${eventId}`,
         {
           method: "DELETE",
           headers: {
@@ -114,6 +114,11 @@ const EventOrganizerPage: React.FC = () => {
   };
 
   const handleUpdateEvent = async (eventId: number) => {
+    if (updatedEvent.attendeeLimit < currentEvent.participants.length) {
+      setError("Attendee limit cannot be lower than the current number of participants.");
+      return;
+    }
+
     if (updatedEvent.joinDeadline && updatedEvent.eventDate) {
       if (
         new Date(updatedEvent.joinDeadline) >= new Date(updatedEvent.eventDate)
@@ -132,7 +137,7 @@ const EventOrganizerPage: React.FC = () => {
         : null;
 
       const response = await fetch(
-        `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/update-event/${eventId}`,
+        `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
         {
           method: "PUT",
           headers: {
@@ -261,13 +266,12 @@ const EventOrganizerPage: React.FC = () => {
                 <br />
                 <span>Date: {event.eventDate}</span>
                 <br />
-                <span>Join Deadline: {event.joinDeadline}</span>{" "}
-                {/* Display joinDeadline */}
+                <span>Join Deadline: {event.joinDeadline}</span>
                 <br />
                 <span>
-                  Available Seats:{" "}
-                  {event.availableSeats != null
-                    ? event.availableSeats
+                  Joined/Limit:{" "}
+                  {event.participants != null && event.attendeeLimit != null
+                    ? `${event.participants.length}/${event.attendeeLimit}`
                     : "No limit"}
                 </span>
                 <br />
@@ -364,7 +368,7 @@ const EventOrganizerPage: React.FC = () => {
               />
             </div>
             <div>
-              <label>Join Deadline:</label> {/* Added joinDeadline input */}
+              <label>Join Deadline:</label>
               <input
                 type="datetime-local"
                 name="joinDeadline"
@@ -393,7 +397,6 @@ const EventOrganizerPage: React.FC = () => {
             </button>
           </form>
           {error && <div style={{ color: "red" }}>{error}</div>}{" "}
-          {/* Display error */}
         </div>
       )}
     </div>
