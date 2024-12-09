@@ -261,13 +261,13 @@ const EventOrganizerPage: React.FC = () => {
                 <br />
                 <span>Date: {event.eventDate}</span>
                 <br />
-                <span>Join Deadline: {event.joinDeadline}</span>{" "}
-                {/* Display joinDeadline */}
+                <span>Join Deadline: {event.joinDeadline}</span>
                 <br />
                 <span>
-                  Available Seats:{" "}
-                  {event.availableSeats != null
-                    ? event.availableSeats
+                  Joined/Limit:{" "}
+                  {event.joinedParticipants != null &&
+                  event.attendeeLimit != null
+                    ? `${event.joinedParticipants}/${event.attendeeLimit}`
                     : "No limit"}
                 </span>
                 <br />
@@ -364,7 +364,7 @@ const EventOrganizerPage: React.FC = () => {
               />
             </div>
             <div>
-              <label>Join Deadline:</label> {/* Added joinDeadline input */}
+              <label>Join Deadline:</label>
               <input
                 type="datetime-local"
                 name="joinDeadline"
@@ -393,7 +393,6 @@ const EventOrganizerPage: React.FC = () => {
             </button>
           </form>
           {error && <div style={{ color: "red" }}>{error}</div>}{" "}
-          {/* Display error */}
         </div>
       )}
     </div>

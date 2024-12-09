@@ -103,7 +103,7 @@ public class EventParticipantService {
         return events.stream().map(event -> {
             Integer availableSeats = event.getAvailableSlots();
             Integer attendeeLimit = event.getAttendeeLimit();
-            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany().getName(), event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : null, availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline());
+            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size());
         }).collect(Collectors.toList());
     }
 

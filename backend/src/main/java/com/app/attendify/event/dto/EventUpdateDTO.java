@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
-public class EventDTO {
+public class EventUpdateDTO {
     private Integer id;
     private String name;
     private String description;
@@ -14,12 +14,11 @@ public class EventDTO {
     private Integer availableSeats;
     private Integer attendeeLimit;
     private LocalDateTime joinDeadline;
-    private Integer joinedParticipants;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
 
-    public EventDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants) {
+    public EventUpdateDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,7 +29,6 @@ public class EventDTO {
         this.eventDate = eventDate;
         this.attendeeLimit = attendeeLimit;
         this.joinDeadline = joinDeadline;
-        this.joinedParticipants = joinedParticipants;
     }
 
     public Integer getId() {
@@ -119,14 +117,6 @@ public class EventDTO {
 
     public void setJoinDeadline(LocalDateTime joinDeadline) {
         this.joinDeadline = joinDeadline;
-    }
-
-    public Integer getJoinedParticipants() {
-        return joinedParticipants;
-    }
-
-    public void setJoinedParticipants(Integer joinedParticipants) {
-        this.joinedParticipants = joinedParticipants;
     }
 
 }
