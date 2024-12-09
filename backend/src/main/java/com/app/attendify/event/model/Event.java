@@ -5,6 +5,7 @@ import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,12 @@ public class Event {
     @Column(nullable = true)
     private Integer attendeeLimit;
 
+    @Column(nullable = false)
+    private LocalDateTime eventDate;
+
+    @Column(nullable = true)
+    private LocalDateTime joinDeadline;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonIgnore
@@ -36,7 +43,7 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
     public Integer getId() {
@@ -81,6 +88,24 @@ public class Event {
 
     public Event setAttendeeLimit(Integer attendeeLimit) {
         this.attendeeLimit = attendeeLimit;
+        return this;
+    }
+
+    public LocalDateTime getEventDate() {
+        return eventDate;
+    }
+
+    public Event setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
+        return this;
+    }
+
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
+
+    public Event setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
         return this;
     }
 

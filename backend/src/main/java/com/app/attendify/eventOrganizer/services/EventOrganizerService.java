@@ -4,7 +4,6 @@ import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
-import com.app.attendify.event.model.ParticipantEvent;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
@@ -19,6 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,7 +49,11 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit());
+            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+
+            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
+
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -81,9 +87,17 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation());
+            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            return eventRepository.save(event);
+            ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
+
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime);
+
+            event = eventRepository.save(event);
+
+            return event;
         } catch (Exception e) {
             logger.error("Error updating event", e);
             throw new RuntimeException("Error updating event", e);
@@ -109,7 +123,10 @@ public class EventOrganizerService {
 
             List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats);
+                Integer attendeeLimit = event.getAttendeeLimit();
+                LocalDateTime joinDeadline = event.getJoinDeadline();
+
+                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline);
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);

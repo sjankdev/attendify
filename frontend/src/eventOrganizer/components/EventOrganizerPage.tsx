@@ -10,7 +10,11 @@ const EventOrganizerPage: React.FC = () => {
     name: "",
     description: "",
     location: "",
+    eventDate: "",
+    joinDeadline: "",
+    attendeeLimit: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -47,7 +51,31 @@ const EventOrganizerPage: React.FC = () => {
               }
             })
           );
-          setEvents(eventsWithParticipants);
+          setEvents(
+            eventsWithParticipants.map((event) => ({
+              ...event,
+              eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }),
+              joinDeadline: event.joinDeadline
+                ? new Date(event.joinDeadline).toLocaleString("en-GB", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })
+                : "No Deadline",
+            }))
+          );
         } else {
           console.error("Failed to fetch events");
         }
@@ -70,28 +98,39 @@ const EventOrganizerPage: React.FC = () => {
           },
         }
       );
-
       if (response.ok) {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== eventId)
         );
         console.log(`Event with ID ${eventId} deleted successfully`);
       } else {
+        setError("Failed to delete event");
         console.error("Failed to delete event");
       }
     } catch (error) {
+      setError("Error deleting event");
       console.error("Error deleting event:", error);
     }
   };
 
   const handleUpdateEvent = async (eventId: number) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === eventId ? { ...event, ...updatedEvent } : event
-      )
-    );
+    if (updatedEvent.joinDeadline && updatedEvent.eventDate) {
+      if (
+        new Date(updatedEvent.joinDeadline) >= new Date(updatedEvent.eventDate)
+      ) {
+        setError("Join deadline must be before the event date.");
+        return;
+      }
+    }
 
     try {
+      const formattedEventDate = updatedEvent.eventDate
+        ? new Date(updatedEvent.eventDate).toISOString()
+        : null;
+      const formattedJoinDeadline = updatedEvent.joinDeadline
+        ? new Date(updatedEvent.joinDeadline).toISOString()
+        : null;
+
       const response = await fetch(
         `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/update-event/${eventId}`,
         {
@@ -100,32 +139,48 @@ const EventOrganizerPage: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify(updatedEvent),
+          body: JSON.stringify({
+            ...updatedEvent,
+            eventDate: formattedEventDate,
+            joinDeadline: formattedJoinDeadline,
+          }),
         }
       );
 
-      if (response.ok) {
-        const updatedEventData = await response.json();
+      if (!response.ok) {
+        setError("Failed to update event");
+        const text = await response.text();
+        console.error("Response body:", text);
+        return;
+      }
 
+      const responseText = await response.text();
+      if (responseText) {
+        const updatedEventData = JSON.parse(responseText);
+        console.log("Updated event data:", updatedEventData);
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
-            event.id === eventId ? updatedEventData : event
+            event.id === eventId ? { ...event, ...updatedEventData } : event
           )
         );
-
         setIsEditing(false);
         setUpdatedEvent({
           name: "",
           description: "",
           location: "",
+          eventDate: "",
+          joinDeadline: "",
+          attendeeLimit: "",
         });
         setCurrentEvent(null);
-
+        setError(null);
         console.log(`Event with ID ${eventId} updated successfully`);
       } else {
-        console.error("Failed to update event");
+        setError("No response body returned from the server.");
+        console.error("No response body returned from the server.");
       }
     } catch (error) {
+      setError("Error updating event");
       console.error("Error updating event:", error);
     }
   };
@@ -134,17 +189,23 @@ const EventOrganizerPage: React.FC = () => {
     const { name, value } = e.target;
     setUpdatedEvent((prevEvent) => ({
       ...prevEvent,
-      [name]: value,
+      [name]: name === "attendeeLimit" ? parseInt(value, 10) : value,
     }));
   };
 
   const handleEditEvent = (event: any) => {
     setIsEditing(true);
     setCurrentEvent(event);
+
     setUpdatedEvent({
       name: event.name,
       description: event.description,
       location: event.location,
+      eventDate: event.eventDate ? new Date(event.eventDate).toISOString() : "",
+      joinDeadline: event.joinDeadline
+        ? new Date(event.joinDeadline).toISOString()
+        : "",
+      attendeeLimit: event.attendeeLimit || "",
     });
   };
 
@@ -197,6 +258,11 @@ const EventOrganizerPage: React.FC = () => {
                 <strong>{event.name}</strong> - {event.description}
                 <br />
                 <span>Location: {event.location}</span>
+                <br />
+                <span>Date: {event.eventDate}</span>
+                <br />
+                <span>Join Deadline: {event.joinDeadline}</span>{" "}
+                {/* Display joinDeadline */}
                 <br />
                 <span>
                   Available Seats:{" "}
@@ -288,6 +354,33 @@ const EventOrganizerPage: React.FC = () => {
                 onChange={handleInputChange}
               />
             </div>
+            <div>
+              <label>Event Date:</label>
+              <input
+                type="datetime-local"
+                name="eventDate"
+                value={updatedEvent.eventDate}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Join Deadline:</label> {/* Added joinDeadline input */}
+              <input
+                type="datetime-local"
+                name="joinDeadline"
+                value={updatedEvent.joinDeadline}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Attendee Limit:</label>
+              <input
+                type="number"
+                name="attendeeLimit"
+                value={updatedEvent.attendeeLimit}
+                onChange={handleInputChange}
+              />
+            </div>
             <button type="submit" style={{ backgroundColor: "#007bff" }}>
               Update Event
             </button>
@@ -299,6 +392,8 @@ const EventOrganizerPage: React.FC = () => {
               Cancel
             </button>
           </form>
+          {error && <div style={{ color: "red" }}>{error}</div>}{" "}
+          {/* Display error */}
         </div>
       )}
     </div>
