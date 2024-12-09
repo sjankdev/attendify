@@ -20,7 +20,7 @@ const EventOrganizerPage: React.FC = () => {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/auth/event-organizer/my-events",
+          "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events",
           {
             method: "GET",
             headers: {
@@ -34,7 +34,7 @@ const EventOrganizerPage: React.FC = () => {
           const eventsWithParticipants = await Promise.all(
             data.map(async (event: any) => {
               const participantsResponse = await fetch(
-                `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
+                `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${event.id}/participants`,
                 {
                   method: "GET",
                   headers: {
@@ -89,7 +89,7 @@ const EventOrganizerPage: React.FC = () => {
   const handleDeleteEvent = async (eventId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/auth/event-organizer/delete-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/delete-event/${eventId}`,
         {
           method: "DELETE",
           headers: {
@@ -132,7 +132,7 @@ const EventOrganizerPage: React.FC = () => {
         : null;
 
       const response = await fetch(
-        `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/update-event/${eventId}`,
         {
           method: "PUT",
           headers: {
