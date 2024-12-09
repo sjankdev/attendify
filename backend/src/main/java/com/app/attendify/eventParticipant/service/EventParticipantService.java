@@ -87,23 +87,35 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
-    @Transactional
     public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
         Company participantCompany = eventParticipant.getCompany();
         if (participantCompany == null) {
             throw new RuntimeException("The participant does not belong to any company.");
         }
 
-        log.info("Participant company: {}", participantCompany.getName());
-
         List<Event> events = eventRepository.findByCompany(participantCompany);
 
         return events.stream().map(event -> {
             Integer availableSeats = event.getAvailableSlots();
             Integer attendeeLimit = event.getAttendeeLimit();
-            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size());
+            Integer joinedParticipants = event.getParticipantEvents().size();
+
+            return new EventDTO(
+                    event.getId(),
+                    event.getName(),
+                    event.getDescription(),
+                    event.getLocation(),
+                    event.getCompany() != null ? event.getCompany().getName() : "No company",
+                    event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                    availableSeats,
+                    event.getEventDate(),
+                    attendeeLimit,
+                    event.getJoinDeadline(),
+                    joinedParticipants
+            );
         }).collect(Collectors.toList());
     }
 

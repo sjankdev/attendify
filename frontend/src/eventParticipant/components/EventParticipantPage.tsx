@@ -110,7 +110,9 @@ const EventParticipantPage: React.FC = () => {
             <p>Date & Time: {event.eventDate}</p>
             <p>
               Available Seats:{" "}
-              {event.availableSeats != null ? event.availableSeats : "No limit"}
+              {event.joinedParticipants !== null && event.attendeeLimit !== null
+                ? `${event.joinedParticipants}/${event.attendeeLimit}`
+                : "No limit"}
             </p>
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
