@@ -114,6 +114,11 @@ const EventOrganizerPage: React.FC = () => {
   };
 
   const handleUpdateEvent = async (eventId: number) => {
+    if (updatedEvent.attendeeLimit < currentEvent.participants.length) {
+      setError("Attendee limit cannot be lower than the current number of participants.");
+      return;
+    }
+
     if (updatedEvent.joinDeadline && updatedEvent.eventDate) {
       if (
         new Date(updatedEvent.joinDeadline) >= new Date(updatedEvent.eventDate)
@@ -265,9 +270,8 @@ const EventOrganizerPage: React.FC = () => {
                 <br />
                 <span>
                   Joined/Limit:{" "}
-                  {event.joinedParticipants != null &&
-                  event.attendeeLimit != null
-                    ? `${event.joinedParticipants}/${event.attendeeLimit}`
+                  {event.participants != null && event.attendeeLimit != null
+                    ? `${event.participants.length}/${event.attendeeLimit}`
                     : "No limit"}
                 </span>
                 <br />
