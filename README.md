@@ -1,6 +1,8 @@
 # Attendify 🎉  
 **Attendify** is an event management platform designed for both organizers and participants, simplifying the process of managing and attending events.  
 
+[Visit Attendify Here](https://attendify-frontend.onrender.com/home) 🌐  
+
 ---
 
 ## Features 🚀  
