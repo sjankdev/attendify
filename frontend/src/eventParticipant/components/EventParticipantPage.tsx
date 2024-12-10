@@ -27,72 +27,90 @@ const EventParticipantPage: React.FC = () => {
       console.log("Event joined successfully:", response.data);
       setError(null);
       alert("Successfully joined the event!");
+      fetchEvents();
     } catch (err: any) {
       console.error("Error joining event:", err);
-      if (err.response && err.response.data) {
-        const errorMessage = err.response.data;
+      setError(
+        err.response?.data ||
+          "Error joining event. Please check your connection."
+      );
+    }
+  };
 
-        if (errorMessage.includes("already joined this event")) {
-          setError("You have already joined this event.");
-        } else if (
-          errorMessage.includes("cannot join an event outside your company")
-        ) {
-          setError("You cannot join an event outside your company.");
-        } else if (
-          errorMessage.includes("This event has reached its attendee limit")
-        ) {
-          setError("This event has reached its attendee limit.");
-        } else {
-          setError("Error joining event. Please try again later.");
+  const handleUnjoinEvent = async (eventId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:8080/api/auth/event-participant/unjoin-event/${eventId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+      console.log("Event unjoined successfully:", response.data);
+      setError(null);
+      alert("Successfully unjoined the event!");
+      fetchEvents();
+    } catch (err: any) {
+      console.error("Error unjoining event:", err);
+      setError(
+        err.response?.data ||
+          "Error unjoining event. Please check your connection."
+      );
+    }
+  };
+
+  const fetchEvents = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/api/auth/event-participant/my-events",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+        const formattedEvents = response.data.map((event: any) => {
+          const eventDate = new Date(event.eventDate);
+          event.eventDate = eventDate.toLocaleString("en-GB", {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          return event;
+        });
+
+        setEvents(formattedEvents);
+        setError(null);
       } else {
-        setError("Error joining event. Please check your connection.");
+        setError("No events found.");
       }
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+      setError("Failed to fetch events.");
     }
   };
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("No token found. Please log in.");
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/auth/event-participant/my-events",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.data && response.data.length > 0) {
-          const formattedEvents = response.data.map((event: any) => {
-            const eventDate = new Date(event.eventDate);
-            event.eventDate = eventDate.toLocaleString("en-GB", {
-              weekday: "short",
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            });
-            return event;
-          });
-
-          setEvents(formattedEvents);
-        } else {
-          setError("No events found.");
-        }
-      } catch (err) {
-        setError("Failed to fetch events.");
-      }
-    };
-
     fetchEvents();
   }, []);
 
@@ -116,6 +134,12 @@ const EventParticipantPage: React.FC = () => {
             </p>
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
+            </button>
+            <button
+              onClick={() => handleUnjoinEvent(event.id)}
+              style={{ marginLeft: "10px" }}
+            >
+              Unjoin Event
             </button>
           </li>
         ))}

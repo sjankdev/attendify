@@ -53,6 +53,23 @@ public class EventParticipantController {
         }
     }
 
+    @DeleteMapping("/unjoin-event/{eventId}")
+    public ResponseEntity<String> unjoinEvent(@PathVariable Integer eventId) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+            logger.info("Received unjoin request. User email: {}, Event ID: {}", currentUserEmail, eventId);
+
+            eventParticipantService.unjoinEvent(eventId, currentUserEmail);
+
+            logger.info("User {} successfully unjoined event ID {}", currentUserEmail, eventId);
+            return ResponseEntity.ok("Successfully unjoined the event.");
+        } catch (Exception e) {
+            logger.error("Error while unjoining event. Event ID: {}, Error: {}", eventId, e.getMessage(), e);
+            return ResponseEntity.status(500).body("Error while unjoining event: " + e.getMessage());
+        }
+    }
+
+
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();

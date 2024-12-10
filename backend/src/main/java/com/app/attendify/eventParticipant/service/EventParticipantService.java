@@ -88,8 +88,7 @@ public class EventParticipantService {
     }
 
     public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
-                .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
         Company participantCompany = eventParticipant.getCompany();
         if (participantCompany == null) {
@@ -103,19 +102,7 @@ public class EventParticipantService {
             Integer attendeeLimit = event.getAttendeeLimit();
             Integer joinedParticipants = event.getParticipantEvents().size();
 
-            return new EventDTO(
-                    event.getId(),
-                    event.getName(),
-                    event.getDescription(),
-                    event.getLocation(),
-                    event.getCompany() != null ? event.getCompany().getName() : "No company",
-                    event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                    availableSeats,
-                    event.getEventDate(),
-                    attendeeLimit,
-                    event.getJoinDeadline(),
-                    joinedParticipants
-            );
+            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants);
         }).collect(Collectors.toList());
     }
 
@@ -153,5 +140,36 @@ public class EventParticipantService {
             throw new RuntimeException("Error while joining event: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public void unjoinEvent(Integer eventId, String userEmail) {
+        log.info("Attempting to unjoin event. User email: {}, Event ID: {}", userEmail, eventId);
+
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> {
+            log.error("No EventParticipant found for user email: {}", userEmail);
+            return new RuntimeException("Participant not found for the current user");
+        });
+
+        log.info("Participant found: {} (ID: {})", eventParticipant.getUser().getFullName(), eventParticipant.getId());
+
+        boolean isJoined = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        if (!isJoined) {
+            log.warn("Participant with ID {} is not joined to event ID {}", eventParticipant.getId(), eventId);
+            throw new RuntimeException("You are not joined to this event.");
+        }
+
+        log.info("Participant with ID {} is confirmed to be joined to event ID {}", eventParticipant.getId(), eventId);
+
+        participantEventRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+
+        boolean stillExists = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        if (stillExists) {
+            log.error("Failed to delete association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
+            throw new RuntimeException("Failed to unjoin the event. Please try again.");
+        }
+
+        log.info("Successfully removed association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
+    }
+
 
 }
