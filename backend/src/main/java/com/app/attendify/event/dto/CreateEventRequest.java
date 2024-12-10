@@ -26,6 +26,8 @@ public class CreateEventRequest {
 
     private LocalDateTime joinDeadline;
 
+    private boolean joinApproval;
+
     public String getName() {
         return name;
     }
@@ -87,5 +89,15 @@ public class CreateEventRequest {
     public void setJoinDeadline(LocalDateTime joinDeadline) {
         this.joinDeadline = joinDeadline;
     }
+
+    public boolean isJoinApproval() {
+        return joinApproval;
+    }
+
+    public CreateEventRequest setJoinApproval(boolean joinApproval) {
+        this.joinApproval = joinApproval;
+        return this;
+    }
+
 }
 

@@ -12,6 +12,7 @@ const CreateEventPage: React.FC = () => {
     useState<boolean>(false);
   const [eventDate, setEventDate] = useState<string>("");
   const [joinDeadline, setJoinDeadline] = useState<string>("");
+  const [joinApproval, setJoinApproval] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ const CreateEventPage: React.FC = () => {
         joinDeadline: joinDeadline
           ? new Date(joinDeadline).toISOString()
           : null,
+        joinApproval,
       };
 
       const response = await axios.post(
@@ -87,6 +89,7 @@ const CreateEventPage: React.FC = () => {
       setIsAttendeeLimitChecked(false);
       setEventDate("");
       setJoinDeadline("");
+      setJoinApproval(false);
     } catch (err: any) {
       console.error("Error creating event: ", err);
       setError(err.response?.data?.message || "Failed to create the event.");
@@ -194,6 +197,18 @@ const CreateEventPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <div style={{ marginBottom: "10px" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={joinApproval}
+            onChange={(e) => setJoinApproval(e.target.checked)}
+          />
+          Require Join Approval
+        </label>
+      </div>
+
       <button
         onClick={handleCreateEvent}
         style={{

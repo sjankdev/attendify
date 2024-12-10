@@ -13,6 +13,7 @@ const EventOrganizerPage: React.FC = () => {
     eventDate: "",
     joinDeadline: "",
     attendeeLimit: "",
+    joinApproval: false,
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -115,7 +116,9 @@ const EventOrganizerPage: React.FC = () => {
 
   const handleUpdateEvent = async (eventId: number) => {
     if (updatedEvent.attendeeLimit < currentEvent.participants.length) {
-      setError("Attendee limit cannot be lower than the current number of participants.");
+      setError(
+        "Attendee limit cannot be lower than the current number of participants."
+      );
       return;
     }
 
@@ -176,6 +179,7 @@ const EventOrganizerPage: React.FC = () => {
           eventDate: "",
           joinDeadline: "",
           attendeeLimit: "",
+          joinApproval: false,
         });
         setCurrentEvent(null);
         setError(null);
@@ -211,6 +215,7 @@ const EventOrganizerPage: React.FC = () => {
         ? new Date(event.joinDeadline).toISOString()
         : "",
       attendeeLimit: event.attendeeLimit || "",
+      joinApproval: event.joinApproval || false,
     });
   };
 
@@ -273,6 +278,10 @@ const EventOrganizerPage: React.FC = () => {
                   {event.participants != null && event.attendeeLimit != null
                     ? `${event.participants.length}/${event.attendeeLimit}`
                     : "No limit"}
+                </span>
+                <br />
+                <span>
+                  Join Approval: {event.joinApproval ? "Enabled" : "Disabled"}
                 </span>
                 <br />
                 <div>
@@ -385,18 +394,27 @@ const EventOrganizerPage: React.FC = () => {
                 onChange={handleInputChange}
               />
             </div>
-            <button type="submit" style={{ backgroundColor: "#007bff" }}>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  name="joinApproval"
+                  checked={updatedEvent.joinApproval}
+                  onChange={(e) =>
+                    setUpdatedEvent({
+                      ...updatedEvent,
+                      joinApproval: e.target.checked,
+                    })
+                  }
+                />
+                Join Approval
+              </label>
+            </div>
+            <button type="submit" style={{ padding: "10px 20px" }}>
               Update Event
             </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              style={{ marginLeft: "10px", backgroundColor: "#dc3545" }}
-            >
-              Cancel
-            </button>
+            {error && <div style={{ color: "red" }}>{error}</div>}
           </form>
-          {error && <div style={{ color: "red" }}>{error}</div>}{" "}
         </div>
       )}
     </div>

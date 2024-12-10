@@ -43,6 +43,9 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
+    @Column(nullable = false)
+    private boolean joinApproval;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ParticipantEvent> participantEvents = new ArrayList<>();
 
@@ -133,6 +136,15 @@ public class Event {
 
     public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
         this.participantEvents = participantEvents;
+    }
+
+    public boolean isJoinApproval() {
+        return joinApproval;
+    }
+
+    public Event setJoinApproval(boolean joinApproval) {
+        this.joinApproval = joinApproval;
+        return this;
     }
 
     public Integer getAvailableSlots() {
