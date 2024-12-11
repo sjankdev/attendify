@@ -4,10 +4,10 @@ import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.model.Event;
-import com.app.attendify.event.model.ParticipantEvent;
+import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.company.services.InvitationService;
-import com.app.attendify.event.repository.ParticipantEventRepository;
+import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.Role;
@@ -38,17 +38,17 @@ public class EventParticipantService {
     private final InvitationService invitationService;
     private final PasswordEncoder passwordEncoder;
     private final EventRepository eventRepository;
-    private final ParticipantEventRepository participantEventRepository;
+    private final EventAttendanceRepository eventAttendanceRepository;
 
     @Autowired
-    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository, ParticipantEventRepository participantEventRepository) {
+    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.eventParticipantRepository = eventParticipantRepository;
         this.invitationService = invitationService;
         this.passwordEncoder = passwordEncoder;
         this.eventRepository = eventRepository;
-        this.participantEventRepository = participantEventRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
     }
 
     public void registerEventParticipant(EventParticipantRegisterDto input) {
@@ -120,7 +120,7 @@ public class EventParticipantService {
                 throw new RuntimeException("You cannot join an event outside your company");
             }
 
-            boolean alreadyJoined = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+            boolean alreadyJoined = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
             if (alreadyJoined) {
                 log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
                 throw new RuntimeException("You have already joined this event");
@@ -131,8 +131,8 @@ public class EventParticipantService {
                 throw new RuntimeException("This event has reached its attendee limit");
             }
 
-            ParticipantEvent participantEvent = new ParticipantEvent(eventParticipant, event);
-            participantEventRepository.save(participantEvent);
+            EventAttendance eventAttendance = new EventAttendance(eventParticipant, event);
+            eventAttendanceRepository.save(eventAttendance);
 
             log.info("Successfully joined event with ID: {}", eventId);
         } catch (Exception e) {
@@ -152,7 +152,7 @@ public class EventParticipantService {
 
         log.info("Participant found: {} (ID: {})", eventParticipant.getUser().getFullName(), eventParticipant.getId());
 
-        boolean isJoined = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        boolean isJoined = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
         if (!isJoined) {
             log.warn("Participant with ID {} is not joined to event ID {}", eventParticipant.getId(), eventId);
             throw new RuntimeException("You are not joined to this event.");
@@ -160,9 +160,9 @@ public class EventParticipantService {
 
         log.info("Participant with ID {} is confirmed to be joined to event ID {}", eventParticipant.getId(), eventId);
 
-        participantEventRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        eventAttendanceRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
 
-        boolean stillExists = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        boolean stillExists = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
         if (stillExists) {
             log.error("Failed to delete association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
             throw new RuntimeException("Failed to unjoin the event. Please try again.");

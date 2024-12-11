@@ -47,7 +47,7 @@ public class Event {
     private boolean joinApproval;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ParticipantEvent> participantEvents = new ArrayList<>();
+    private List<EventAttendance> eventAttendances = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -130,12 +130,12 @@ public class Event {
         return this;
     }
 
-    public List<ParticipantEvent> getParticipantEvents() {
-        return participantEvents;
+    public List<EventAttendance> getParticipantEvents() {
+        return eventAttendances;
     }
 
-    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
-        this.participantEvents = participantEvents;
+    public void setParticipantEvents(List<EventAttendance> eventAttendances) {
+        this.eventAttendances = eventAttendances;
     }
 
     public boolean isJoinApproval() {
@@ -151,7 +151,7 @@ public class Event {
         if (attendeeLimit == null) {
             return null;
         }
-        return attendeeLimit - participantEvents.size();
+        return attendeeLimit - eventAttendances.size();
     }
 
 }

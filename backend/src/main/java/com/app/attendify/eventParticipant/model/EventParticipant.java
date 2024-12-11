@@ -1,7 +1,7 @@
 package com.app.attendify.eventParticipant.model;
 
 import com.app.attendify.company.model.Company;
-import com.app.attendify.event.model.ParticipantEvent;
+import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
@@ -23,7 +23,7 @@ public class EventParticipant {
     private Company company;
 
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ParticipantEvent> participantEvents = new ArrayList<>();
+    private List<EventAttendance> eventAttendances = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -52,11 +52,11 @@ public class EventParticipant {
         return this;
     }
 
-    public List<ParticipantEvent> getParticipantEvents() {
-        return participantEvents;
+    public List<EventAttendance> getParticipantEvents() {
+        return eventAttendances;
     }
 
-    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
-        this.participantEvents = participantEvents;
+    public void setParticipantEvents(List<EventAttendance> eventAttendances) {
+        this.eventAttendances = eventAttendances;
     }
 }

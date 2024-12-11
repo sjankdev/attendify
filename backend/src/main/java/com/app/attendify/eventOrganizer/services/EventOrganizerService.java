@@ -7,7 +7,8 @@ import com.app.attendify.event.model.Event;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
-import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -179,7 +180,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventParticipantDTO> getParticipantsByEvent(int eventId) {
+    public List<EventAttendanceDTO> getParticipantsByEvent(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
@@ -204,7 +205,7 @@ public class EventOrganizerService {
 
             return event.getParticipantEvents().stream().map(participantEvent -> {
                 EventParticipant participant = participantEvent.getParticipant();
-                return new EventParticipantDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
+                return new EventAttendanceDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);

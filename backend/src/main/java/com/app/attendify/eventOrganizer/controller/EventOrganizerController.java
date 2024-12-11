@@ -5,8 +5,9 @@ import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.EventUpdateDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
-import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -79,9 +80,9 @@ public class EventOrganizerController {
 
     @GetMapping("/my-events/{eventId}/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventParticipantDTO>> getEventParticipants(@PathVariable int eventId) {
+    public ResponseEntity<List<EventAttendanceDTO>> getEventParticipants(@PathVariable int eventId) {
         try {
-            List<EventParticipantDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
+            List<EventAttendanceDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);

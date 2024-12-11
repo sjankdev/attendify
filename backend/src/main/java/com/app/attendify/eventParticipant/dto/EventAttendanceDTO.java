@@ -1,10 +1,10 @@
 package com.app.attendify.eventParticipant.dto;
 
-public class EventParticipantDTO {
+public class EventAttendanceDTO {
     private String participantName;
     private String participantEmail;
 
-    public EventParticipantDTO(String participantName, String participantEmail) {
+    public EventAttendanceDTO(String participantName, String participantEmail) {
         this.participantName = participantName;
         this.participantEmail = participantEmail;
     }
