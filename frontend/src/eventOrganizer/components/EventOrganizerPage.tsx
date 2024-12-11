@@ -1,127 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { deleteEvent, updateEvent, fetchEventsWithParticipants } from "../services/eventOrganizerService";
+import { Event, Participant } from "../../types/eventTypes"; 
 
 const EventOrganizerPage: React.FC = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
-  const [updatedEvent, setUpdatedEvent] = useState({
+  const [updatedEvent, setUpdatedEvent] = useState<Partial<Event>>({
     name: "",
     description: "",
     location: "",
     eventDate: "",
     joinDeadline: "",
-    attendeeLimit: "",
+    attendeeLimit: undefined,
     joinApproval: false,
   });
+  
+  
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const loadEvents = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/auth/event-organizer/my-events",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const eventsWithParticipants = await Promise.all(
-            data.map(async (event: any) => {
-              const participantsResponse = await fetch(
-                `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
-                {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                }
-              );
-              if (participantsResponse.ok) {
-                const participants = await participantsResponse.json();
-                return { ...event, participants };
-              } else {
-                return event;
-              }
-            })
-          );
-          setEvents(
-            eventsWithParticipants.map((event) => ({
-              ...event,
-              eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
-                weekday: "short",
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              }),
-              joinDeadline: event.joinDeadline
-                ? new Date(event.joinDeadline).toLocaleString("en-GB", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                  })
-                : "No Deadline",
-            }))
-          );
-        } else {
-          console.error("Failed to fetch events");
-        }
+        const events = await fetchEventsWithParticipants();
+        setEvents(events);
       } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error("Failed to load events:", error);
       }
     };
-    fetchEvents();
+    loadEvents();
   }, []);
 
   const handleDeleteEvent = async (eventId: number) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/auth/event-organizer/delete-event/${eventId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+    const success = await deleteEvent(eventId);
+    if (success) {
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== eventId)
       );
-      if (response.ok) {
-        setEvents((prevEvents) =>
-          prevEvents.filter((event) => event.id !== eventId)
-        );
-        console.log(`Event with ID ${eventId} deleted successfully`);
-      } else {
-        setError("Failed to delete event");
-        console.error("Failed to delete event");
-      }
-    } catch (error) {
-      setError("Error deleting event");
-      console.error("Error deleting event:", error);
+    } else {
+      setError("Failed to delete event");
     }
   };
-
+  
   const handleUpdateEvent = async (eventId: number) => {
-    if (updatedEvent.attendeeLimit < currentEvent.participants.length) {
+    if ((updatedEvent.attendeeLimit ?? 0) < (currentEvent.participants?.length ?? 0)) {
       setError(
         "Attendee limit cannot be lower than the current number of participants."
       );
       return;
     }
-
+    
+  
     if (updatedEvent.joinDeadline && updatedEvent.eventDate) {
       if (
         new Date(updatedEvent.joinDeadline) >= new Date(updatedEvent.eventDate)
@@ -130,67 +61,28 @@ const EventOrganizerPage: React.FC = () => {
         return;
       }
     }
-
-    try {
-      const formattedEventDate = updatedEvent.eventDate
-        ? new Date(updatedEvent.eventDate).toISOString()
-        : null;
-      const formattedJoinDeadline = updatedEvent.joinDeadline
-        ? new Date(updatedEvent.joinDeadline).toISOString()
-        : null;
-
-      const response = await fetch(
-        `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            ...updatedEvent,
-            eventDate: formattedEventDate,
-            joinDeadline: formattedJoinDeadline,
-          }),
-        }
+  
+    const updatedEventData = await updateEvent(eventId, updatedEvent);
+    if (updatedEventData) {
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === eventId ? { ...event, ...updatedEventData } : event
+        )
       );
-
-      if (!response.ok) {
-        setError("Failed to update event");
-        const text = await response.text();
-        console.error("Response body:", text);
-        return;
-      }
-
-      const responseText = await response.text();
-      if (responseText) {
-        const updatedEventData = JSON.parse(responseText);
-        console.log("Updated event data:", updatedEventData);
-        setEvents((prevEvents) =>
-          prevEvents.map((event) =>
-            event.id === eventId ? { ...event, ...updatedEventData } : event
-          )
-        );
-        setIsEditing(false);
-        setUpdatedEvent({
-          name: "",
-          description: "",
-          location: "",
-          eventDate: "",
-          joinDeadline: "",
-          attendeeLimit: "",
-          joinApproval: false,
-        });
-        setCurrentEvent(null);
-        setError(null);
-        console.log(`Event with ID ${eventId} updated successfully`);
-      } else {
-        setError("No response body returned from the server.");
-        console.error("No response body returned from the server.");
-      }
-    } catch (error) {
-      setError("Error updating event");
-      console.error("Error updating event:", error);
+      setIsEditing(false);
+      setUpdatedEvent({
+        name: "",
+        description: "",
+        location: "",
+        eventDate: "",
+        joinDeadline: "",
+        attendeeLimit: undefined,
+        joinApproval: false,
+      });
+      setCurrentEvent(null);
+      setError(null);
+    } else {
+      setError("Failed to update event");
     }
   };
 
