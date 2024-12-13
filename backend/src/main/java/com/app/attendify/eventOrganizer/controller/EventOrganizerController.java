@@ -1,13 +1,13 @@
 package com.app.attendify.eventOrganizer.controller;
 
 import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.EventUpdateDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
-import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
-import com.app.attendify.eventParticipant.model.EventParticipant;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,17 +48,17 @@ public class EventOrganizerController {
     public ResponseEntity<EventUpdateDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
         Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
 
-        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline());
+        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval());
 
         return ResponseEntity.ok(eventUpdateDTO);
     }
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventDTO>> getOrganizerEvents() {
+    public ResponseEntity<List<EventForOrganizersDTO>> getOrganizerEvents() {
         try {
-            List<EventDTO> events = eventOrganizerService.getEventsByOrganizer();
-            return ResponseEntity.ok(events);
+            List<EventForOrganizersDTO> eventForOrganizersDTOS = eventOrganizerService.getEventsByOrganizer();
+            return ResponseEntity.ok(eventForOrganizersDTOS);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
             return ResponseEntity.status(500).body(null);
@@ -77,11 +77,24 @@ public class EventOrganizerController {
         }
     }
 
+    @PutMapping("/events/{eventId}/participants/{participantId}/status")
+    public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
+        try {
+            eventOrganizerService.reviewJoinRequest(eventId, participantId, status);
+            logger.info("Join request updated: Event ID={}, Participant ID={}, New Status={}", eventId, participantId, status);
+            return ResponseEntity.ok("Join request updated successfully");
+        } catch (RuntimeException e) {
+            logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
     @GetMapping("/my-events/{eventId}/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventParticipantDTO>> getEventParticipants(@PathVariable int eventId) {
+    public ResponseEntity<List<EventAttendanceDTO>> getEventParticipants(@PathVariable int eventId) {
         try {
-            List<EventParticipantDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
+            List<EventAttendanceDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);

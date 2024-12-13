@@ -2,12 +2,13 @@ package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
-import com.app.attendify.event.model.ParticipantEvent;
+import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.company.services.InvitationService;
-import com.app.attendify.event.repository.ParticipantEventRepository;
+import com.app.attendify.event.repository.EventAttendanceRepository;
+import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.Role;
@@ -38,17 +39,17 @@ public class EventParticipantService {
     private final InvitationService invitationService;
     private final PasswordEncoder passwordEncoder;
     private final EventRepository eventRepository;
-    private final ParticipantEventRepository participantEventRepository;
+    private final EventAttendanceRepository eventAttendanceRepository;
 
     @Autowired
-    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository, ParticipantEventRepository participantEventRepository) {
+    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.eventParticipantRepository = eventParticipantRepository;
         this.invitationService = invitationService;
         this.passwordEncoder = passwordEncoder;
         this.eventRepository = eventRepository;
-        this.participantEventRepository = participantEventRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
     }
 
     public void registerEventParticipant(EventParticipantRegisterDto input) {
@@ -87,8 +88,9 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
-    public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+    public List<EventForParticipantsDTO> getEventsForCurrentParticipant(String currentUserEmail) {
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
         Company participantCompany = eventParticipant.getCompany();
         if (participantCompany == null) {
@@ -98,48 +100,56 @@ public class EventParticipantService {
         List<Event> events = eventRepository.findByCompany(participantCompany);
 
         return events.stream().map(event -> {
+            EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
+            String status = attendance != null ? attendance.getStatus().name() : "NOT_JOINED";
+
             Integer availableSeats = event.getAvailableSlots();
             Integer attendeeLimit = event.getAttendeeLimit();
             Integer joinedParticipants = event.getParticipantEvents().size();
 
-            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants);
+            return new EventForParticipantsDTO(
+                    event.getId(),
+                    event.getName(),
+                    event.getDescription(),
+                    event.getLocation(),
+                    event.getCompany() != null ? event.getCompany().getName() : "No company",
+                    event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                    availableSeats,
+                    event.getEventDate(),
+                    attendeeLimit,
+                    event.getJoinDeadline(),
+                    joinedParticipants,
+                    event.isJoinApproval(),
+                    status
+            );
         }).collect(Collectors.toList());
     }
+
 
     @Transactional
     public void joinEvent(int eventId, String userEmail) {
         log.info("Received request to join event with ID: {}", eventId);
-        try {
-            Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
-            Company participantCompany = eventParticipant.getCompany();
-            Company eventCompany = event.getCompany();
-            if (participantCompany == null || eventCompany == null || !participantCompany.getId().equals(eventCompany.getId())) {
-                log.error("Participant company does not match event company. Participant email: {}, Event ID: {}", userEmail, eventId);
-                throw new RuntimeException("You cannot join an event outside your company");
-            }
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
-            boolean alreadyJoined = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
-            if (alreadyJoined) {
-                log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
-                throw new RuntimeException("You have already joined this event");
-            }
-
-            if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
-                log.error("Event has no available slots. Event ID: {}", eventId);
-                throw new RuntimeException("This event has reached its attendee limit");
-            }
-
-            ParticipantEvent participantEvent = new ParticipantEvent(eventParticipant, event);
-            participantEventRepository.save(participantEvent);
-
-            log.info("Successfully joined event with ID: {}", eventId);
-        } catch (Exception e) {
-            log.error("Error while joining event with ID: {}: {}", eventId, e.getMessage());
-            throw new RuntimeException("Error while joining event: " + e.getMessage());
+        if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+            throw new RuntimeException("This event has reached its attendee limit");
         }
+
+        if (eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId)) {
+            throw new RuntimeException("You have already joined this event");
+        }
+
+        AttendanceStatus status = event.isJoinApproval() ? AttendanceStatus.PENDING : AttendanceStatus.ACCEPTED;
+
+        EventAttendance eventAttendance = new EventAttendance(eventParticipant, event);
+        eventAttendance.setStatus(status);
+        eventAttendanceRepository.save(eventAttendance);
+
+        log.info("Successfully {}joined event with ID: {}", status == AttendanceStatus.ACCEPTED ? "" : "requested to ", eventId);
     }
+
 
     @Transactional
     public void unjoinEvent(Integer eventId, String userEmail) {
@@ -152,7 +162,7 @@ public class EventParticipantService {
 
         log.info("Participant found: {} (ID: {})", eventParticipant.getUser().getFullName(), eventParticipant.getId());
 
-        boolean isJoined = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        boolean isJoined = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
         if (!isJoined) {
             log.warn("Participant with ID {} is not joined to event ID {}", eventParticipant.getId(), eventId);
             throw new RuntimeException("You are not joined to this event.");
@@ -160,9 +170,9 @@ public class EventParticipantService {
 
         log.info("Participant with ID {} is confirmed to be joined to event ID {}", eventParticipant.getId(), eventId);
 
-        participantEventRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        eventAttendanceRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
 
-        boolean stillExists = participantEventRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
+        boolean stillExists = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
         if (stillExists) {
             log.error("Failed to delete association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
             throw new RuntimeException("Failed to unjoin the event. Please try again.");
@@ -170,6 +180,5 @@ public class EventParticipantService {
 
         log.info("Successfully removed association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
     }
-
 
 }

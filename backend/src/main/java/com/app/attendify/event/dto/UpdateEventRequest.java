@@ -9,14 +9,16 @@ public class UpdateEventRequest {
     private Integer attendeeLimit;
     private LocalDateTime eventDate;
     private LocalDateTime joinDeadline;
+    private boolean joinApproval;
 
-    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventDate, LocalDateTime joinDeadline) {
+    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventDate, LocalDateTime joinDeadline, boolean joinApproval) {
         this.name = name;
         this.description = description;
         this.location = location;
         this.attendeeLimit = attendeeLimit;
         this.eventDate = eventDate;
         this.joinDeadline = joinDeadline;
+        this.joinApproval = joinApproval;
     }
 
     public String getName() {
@@ -65,5 +67,13 @@ public class UpdateEventRequest {
 
     public void joinDeadline(LocalDateTime joinDeadline) {
         this.joinDeadline = joinDeadline;
+    }
+
+    public boolean isJoinApproval() {
+        return joinApproval;
+    }
+
+    public void setJoinApproval(boolean joinApproval) {
+        this.joinApproval = joinApproval;
     }
 }

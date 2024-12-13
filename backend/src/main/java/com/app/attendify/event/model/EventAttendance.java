@@ -1,11 +1,12 @@
 package com.app.attendify.event.model;
 
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.persistence.*;
 
 
 @Entity
-public class ParticipantEvent {
+public class EventAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -18,9 +19,13 @@ public class ParticipantEvent {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    public ParticipantEvent() {}
+    @Enumerated(EnumType.STRING)
+    private AttendanceStatus status;
 
-    public ParticipantEvent(EventParticipant participant, Event event) {
+    public EventAttendance() {
+    }
+
+    public EventAttendance(EventParticipant participant, Event event) {
         this.participant = participant;
         this.event = event;
     }
@@ -47,5 +52,13 @@ public class ParticipantEvent {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public AttendanceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AttendanceStatus status) {
+        this.status = status;
     }
 }

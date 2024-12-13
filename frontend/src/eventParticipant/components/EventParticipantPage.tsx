@@ -126,6 +126,7 @@ const EventParticipantPage: React.FC = () => {
             <p>Location: {event.location}</p>
             <p>Company: {event.companyName}</p>
             <p>Date & Time: {event.eventDate}</p>
+            <p>Status: {event.status}</p>
             <p>
               Available Seats:{" "}
               {event.joinedParticipants !== null && event.attendeeLimit !== null

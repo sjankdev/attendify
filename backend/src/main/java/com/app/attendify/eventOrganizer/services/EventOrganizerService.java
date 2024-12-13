@@ -1,13 +1,16 @@
 package com.app.attendify.eventOrganizer.services;
 
 import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
-import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -33,11 +36,13 @@ public class EventOrganizerService {
     private final EventOrganizerRepository eventOrganizerRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventAttendanceRepository eventAttendanceRepository;
 
-    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository) {
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository) {
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -53,7 +58,7 @@ public class EventOrganizerService {
 
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -62,6 +67,7 @@ public class EventOrganizerService {
             throw new RuntimeException("Error creating event", e);
         }
     }
+
 
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
@@ -99,7 +105,7 @@ public class EventOrganizerService {
             ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime);
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
 
             event = eventRepository.save(event);
 
@@ -111,7 +117,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventDTO> getEventsByOrganizer() {
+    public List<EventForOrganizersDTO> getEventsByOrganizer() {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -127,16 +133,16 @@ public class EventOrganizerService {
                 return new IllegalArgumentException("Organizer not found");
             });
 
-            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
+            List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size());
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval());
             }).collect(Collectors.toList());
 
-            logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
-            return eventDTOs;
+            logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
+            return eventForOrganizersDTOS;
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);
             throw new RuntimeException("Error fetching events for organizer", e);
@@ -178,7 +184,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventParticipantDTO> getParticipantsByEvent(int eventId) {
+    public List<EventAttendanceDTO> getParticipantsByEvent(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
@@ -203,12 +209,39 @@ public class EventOrganizerService {
 
             return event.getParticipantEvents().stream().map(participantEvent -> {
                 EventParticipant participant = participantEvent.getParticipant();
-                return new EventParticipantDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
+                int participantId = participant.getId();
+                String participantName = participant.getUser().getFullName();
+                String participantEmail = participant.getUser().getEmail();
+                AttendanceStatus status = participantEvent.getStatus();
+
+                logger.info("Participant details - ID: {}, Name: {}, Email: {}, Status: {}", participantId, participantName, participantEmail, status);
+
+                return new EventAttendanceDTO(participantName, participantEmail, participantId, status);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
             throw new RuntimeException("Error retrieving participants for event", e);
         }
+    }
+
+    @Transactional
+    public void reviewJoinRequest(int eventId, int participantId, AttendanceStatus newStatus) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.isJoinApproval()) {
+            throw new RuntimeException("Join requests do not require approval for this event");
+        }
+
+        EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(participantId, eventId).orElseThrow(() -> new RuntimeException("No join request found for this participant and event"));
+
+        if (newStatus == AttendanceStatus.ACCEPTED && event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+            throw new RuntimeException("Event has no available slots");
+        }
+
+        attendance.setStatus(newStatus);
+        eventAttendanceRepository.save(attendance);
+
+        logger.info("Updated join request to status: {}", newStatus);
     }
 
     public Integer getAvailableSlotsForEvent(int eventId) {
