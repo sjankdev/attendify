@@ -2,13 +2,13 @@ package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
-import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.event.repository.EventAttendanceRepository;
+import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.Role;
@@ -88,8 +88,9 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
-    public List<EventDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+    public List<EventForParticipantsDTO> getEventsForCurrentParticipant(String currentUserEmail) {
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
         Company participantCompany = eventParticipant.getCompany();
         if (participantCompany == null) {
@@ -99,13 +100,31 @@ public class EventParticipantService {
         List<Event> events = eventRepository.findByCompany(participantCompany);
 
         return events.stream().map(event -> {
+            EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
+            String status = attendance != null ? attendance.getStatus().name() : "NOT_JOINED";
+
             Integer availableSeats = event.getAvailableSlots();
             Integer attendeeLimit = event.getAttendeeLimit();
             Integer joinedParticipants = event.getParticipantEvents().size();
 
-            return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants, event.isJoinApproval());
+            return new EventForParticipantsDTO(
+                    event.getId(),
+                    event.getName(),
+                    event.getDescription(),
+                    event.getLocation(),
+                    event.getCompany() != null ? event.getCompany().getName() : "No company",
+                    event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                    availableSeats,
+                    event.getEventDate(),
+                    attendeeLimit,
+                    event.getJoinDeadline(),
+                    joinedParticipants,
+                    event.isJoinApproval(),
+                    status
+            );
         }).collect(Collectors.toList());
     }
+
 
     @Transactional
     public void joinEvent(int eventId, String userEmail) {

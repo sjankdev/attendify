@@ -1,6 +1,6 @@
 package com.app.attendify.eventParticipant.controller;
 
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,11 +30,11 @@ public class EventParticipantController {
     }
 
     @GetMapping("/my-events")
-    public ResponseEntity<List<EventDTO>> getMyEvents() {
+    public ResponseEntity<List<EventForParticipantsDTO>> getMyEvents() {
         try {
             String currentUserEmail = getCurrentUserEmail();
-            List<EventDTO> events = eventParticipantService.getEventsForCurrentParticipant(currentUserEmail);
-            return ResponseEntity.ok(events);
+            List<EventForParticipantsDTO> eventForParticipantsDTOS = eventParticipantService.getEventsForCurrentParticipant(currentUserEmail);
+            return ResponseEntity.ok(eventForParticipantsDTOS);
         } catch (Exception e) {
             logger.error("Failed to fetch events for the participant", e);
             return ResponseEntity.status(500).body(null);

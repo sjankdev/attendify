@@ -1,15 +1,13 @@
 package com.app.attendify.eventOrganizer.controller;
 
 import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.EventUpdateDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
-import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
-import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,10 +55,10 @@ public class EventOrganizerController {
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventDTO>> getOrganizerEvents() {
+    public ResponseEntity<List<EventForOrganizersDTO>> getOrganizerEvents() {
         try {
-            List<EventDTO> events = eventOrganizerService.getEventsByOrganizer();
-            return ResponseEntity.ok(events);
+            List<EventForOrganizersDTO> eventForOrganizersDTOS = eventOrganizerService.getEventsByOrganizer();
+            return ResponseEntity.ok(eventForOrganizersDTOS);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
             return ResponseEntity.status(500).body(null);

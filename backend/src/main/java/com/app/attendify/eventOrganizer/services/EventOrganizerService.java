@@ -1,7 +1,7 @@
 package com.app.attendify.eventOrganizer.services;
 
 import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
@@ -10,7 +10,6 @@ import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
-import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
@@ -118,7 +117,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventDTO> getEventsByOrganizer() {
+    public List<EventForOrganizersDTO> getEventsByOrganizer() {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -134,16 +133,16 @@ public class EventOrganizerService {
                 return new IllegalArgumentException("Organizer not found");
             });
 
-            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
+            List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
                 Integer availableSeats = event.getAvailableSlots();
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval());
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval());
             }).collect(Collectors.toList());
 
-            logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
-            return eventDTOs;
+            logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
+            return eventForOrganizersDTOS;
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);
             throw new RuntimeException("Error fetching events for organizer", e);
