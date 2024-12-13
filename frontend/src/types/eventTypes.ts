@@ -2,7 +2,9 @@ export interface Participant {
   participantId: number;
   participantName: string;
   participantEmail: string;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
 }
+
 
 export interface Event {
   id: number;
@@ -13,5 +15,5 @@ export interface Event {
   joinDeadline?: string;
   attendeeLimit?: number;
   joinApproval: boolean;
-  participants?: Participant[]; 
+  participants?: Participant[];
 }

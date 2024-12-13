@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchEventsWithParticipants,
   deleteEvent,
+  reviewJoinRequest,
 } from "../services/eventOrganizerService";
-import { Event } from "../../types/eventTypes";
+import { Event, Participant } from "../../types/eventTypes";
 
 const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +34,35 @@ const ListEventsPage: React.FC = () => {
       );
     } else {
       setError("Failed to delete event.");
+    }
+  };
+
+  const handleReviewJoinRequest = async (
+    eventId: number,
+    participantId: number,
+    status: "ACCEPTED" | "REJECTED"
+  ) => {
+    setLoading(true);
+    const success = await reviewJoinRequest(eventId, participantId, status);
+    setLoading(false);
+
+    if (success) {
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id === eventId
+            ? {
+                ...event,
+                participants: event.participants?.map((participant) =>
+                  participant.participantId === participantId
+                    ? { ...participant, status }
+                    : participant
+                ),
+              }
+            : event
+        )
+      );
+    } else {
+      setError("Failed to update join request.");
     }
   };
 
@@ -68,10 +99,41 @@ const ListEventsPage: React.FC = () => {
                 <h4>Participants:</h4>
                 {event.participants && event.participants.length > 0 ? (
                   <ul>
-                    {event.participants.map((participant: any) => (
-                      <li key={participant.participantEmail}>
+                    {event.participants.map((participant: Participant) => (
+                      <li key={participant.participantId}>
                         {participant.participantName} -{" "}
                         {participant.participantEmail}
+                        <br />
+                        <span>Status: {participant.status}</span>
+                        <br />
+                        {participant.status === "PENDING" && (
+                          <div>
+                            <button
+                              disabled={loading}
+                              onClick={() =>
+                                handleReviewJoinRequest(
+                                  event.id,
+                                  participant.participantId,
+                                  "ACCEPTED"
+                                )
+                              }
+                            >
+                              Approve
+                            </button>
+                            <button
+                              disabled={loading}
+                              onClick={() =>
+                                handleReviewJoinRequest(
+                                  event.id,
+                                  participant.participantId,
+                                  "REJECTED"
+                                )
+                              }
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>

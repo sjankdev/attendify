@@ -4,6 +4,7 @@ import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.EventUpdateDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
@@ -77,6 +78,19 @@ public class EventOrganizerController {
             return ResponseEntity.status(500).body("Error deleting event");
         }
     }
+
+    @PutMapping("/events/{eventId}/participants/{participantId}/status")
+    public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
+        try {
+            eventOrganizerService.reviewJoinRequest(eventId, participantId, status);
+            logger.info("Join request updated: Event ID={}, Participant ID={}, New Status={}", eventId, participantId, status);
+            return ResponseEntity.ok("Join request updated successfully");
+        } catch (RuntimeException e) {
+            logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     @GetMapping("/my-events/{eventId}/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")

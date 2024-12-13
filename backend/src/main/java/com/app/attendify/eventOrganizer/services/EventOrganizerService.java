@@ -3,7 +3,10 @@ package com.app.attendify.eventOrganizer.services;
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.dto.EventDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
@@ -34,11 +37,13 @@ public class EventOrganizerService {
     private final EventOrganizerRepository eventOrganizerRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventAttendanceRepository eventAttendanceRepository;
 
-    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository) {
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository) {
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -208,15 +213,36 @@ public class EventOrganizerService {
                 int participantId = participant.getId();
                 String participantName = participant.getUser().getFullName();
                 String participantEmail = participant.getUser().getEmail();
+                AttendanceStatus status = participantEvent.getStatus();
 
-                logger.info("Participant details - ID: {}, Name: {}, Email: {}", participantId, participantName, participantEmail);
+                logger.info("Participant details - ID: {}, Name: {}, Email: {}, Status: {}", participantId, participantName, participantEmail, status);
 
-                return new EventAttendanceDTO(participantName, participantEmail, participantId);
+                return new EventAttendanceDTO(participantName, participantEmail, participantId, status);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
             throw new RuntimeException("Error retrieving participants for event", e);
         }
+    }
+
+    @Transactional
+    public void reviewJoinRequest(int eventId, int participantId, AttendanceStatus newStatus) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.isJoinApproval()) {
+            throw new RuntimeException("Join requests do not require approval for this event");
+        }
+
+        EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(participantId, eventId).orElseThrow(() -> new RuntimeException("No join request found for this participant and event"));
+
+        if (newStatus == AttendanceStatus.ACCEPTED && event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+            throw new RuntimeException("Event has no available slots");
+        }
+
+        attendance.setStatus(newStatus);
+        eventAttendanceRepository.save(attendance);
+
+        logger.info("Updated join request to status: {}", newStatus);
     }
 
     public Integer getAvailableSlotsForEvent(int eventId) {

@@ -144,3 +144,41 @@ export const updateEvent = async (
     return null;
   }
 };
+
+export const reviewJoinRequest = async (
+  eventId: number,
+  participantId: number,
+  status: "ACCEPTED" | "REJECTED"
+): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/auth/event-organizer/events/${eventId}/participants/${participantId}/status?status=${status}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      console.log(
+        `Successfully updated join request for participant ${participantId} in event ${eventId} to ${status}`
+      );
+      return true;
+    } else {
+      const error = await response.text();
+      console.error(
+        `Failed to update join request for participant ${participantId}: ${error}`
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(
+      `Error occurred while updating join request for participant ${participantId}:`,
+      error
+    );
+    return false;
+  }
+};

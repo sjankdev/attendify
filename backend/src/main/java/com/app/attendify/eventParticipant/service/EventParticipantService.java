@@ -3,6 +3,7 @@ package com.app.attendify.eventParticipant.service;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.event.repository.EventRepository;
@@ -109,37 +110,27 @@ public class EventParticipantService {
     @Transactional
     public void joinEvent(int eventId, String userEmail) {
         log.info("Received request to join event with ID: {}", eventId);
-        try {
-            Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
-            Company participantCompany = eventParticipant.getCompany();
-            Company eventCompany = event.getCompany();
-            if (participantCompany == null || eventCompany == null || !participantCompany.getId().equals(eventCompany.getId())) {
-                log.error("Participant company does not match event company. Participant email: {}, Event ID: {}", userEmail, eventId);
-                throw new RuntimeException("You cannot join an event outside your company");
-            }
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
-            boolean alreadyJoined = eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId);
-            if (alreadyJoined) {
-                log.error("Participant has already joined this event. Participant email: {}, Event ID: {}", userEmail, eventId);
-                throw new RuntimeException("You have already joined this event");
-            }
-
-            if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
-                log.error("Event has no available slots. Event ID: {}", eventId);
-                throw new RuntimeException("This event has reached its attendee limit");
-            }
-
-            EventAttendance eventAttendance = new EventAttendance(eventParticipant, event);
-            eventAttendanceRepository.save(eventAttendance);
-
-            log.info("Successfully joined event with ID: {}", eventId);
-        } catch (Exception e) {
-            log.error("Error while joining event with ID: {}: {}", eventId, e.getMessage());
-            throw new RuntimeException("Error while joining event: " + e.getMessage());
+        if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+            throw new RuntimeException("This event has reached its attendee limit");
         }
+
+        if (eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId)) {
+            throw new RuntimeException("You have already joined this event");
+        }
+
+        AttendanceStatus status = event.isJoinApproval() ? AttendanceStatus.PENDING : AttendanceStatus.ACCEPTED;
+
+        EventAttendance eventAttendance = new EventAttendance(eventParticipant, event);
+        eventAttendance.setStatus(status);
+        eventAttendanceRepository.save(eventAttendance);
+
+        log.info("Successfully {}joined event with ID: {}", status == AttendanceStatus.ACCEPTED ? "" : "requested to ", eventId);
     }
+
 
     @Transactional
     public void unjoinEvent(Integer eventId, String userEmail) {
@@ -170,6 +161,5 @@ public class EventParticipantService {
 
         log.info("Successfully removed association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
     }
-
 
 }
