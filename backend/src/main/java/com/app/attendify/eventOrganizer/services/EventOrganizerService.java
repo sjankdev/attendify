@@ -205,7 +205,13 @@ public class EventOrganizerService {
 
             return event.getParticipantEvents().stream().map(participantEvent -> {
                 EventParticipant participant = participantEvent.getParticipant();
-                return new EventAttendanceDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
+                int participantId = participant.getId();
+                String participantName = participant.getUser().getFullName();
+                String participantEmail = participant.getUser().getEmail();
+
+                logger.info("Participant details - ID: {}, Name: {}, Email: {}", participantId, participantName, participantEmail);
+
+                return new EventAttendanceDTO(participantName, participantEmail, participantId);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
