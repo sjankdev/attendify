@@ -18,7 +18,8 @@ const CreateEventPage: React.FC = () => {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([
     { title: "", description: "", startTime: "", endTime: "" },
   ]);
-  
+
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -46,52 +47,98 @@ const CreateEventPage: React.FC = () => {
     fetchOrganizerDetails();
   }, []);
 
+  const validateDates = (): boolean => {
+    const errors: string[] = [];
+    const eventStart = new Date(eventDate);
+    const eventEnd = new Date(eventEndDate);
+    const join = joinDeadline ? new Date(joinDeadline) : null;
+
+    if (eventStart >= eventEnd) {
+      errors.push("Event start date must be before the event end date.");
+    }
+
+    if (join && join >= eventStart) {
+      errors.push("Join deadline must be before the event start date.");
+    }
+
+    agendaItems.forEach((item, index) => {
+      const start = new Date(item.startTime);
+      const end = new Date(item.endTime);
+
+      if (start < eventStart || end > eventEnd) {
+        errors.push(
+          `Agenda item ${index + 1}: Times must be within event duration.`
+        );
+      }
+
+      if (start >= end) {
+        errors.push(
+          `Agenda item ${index + 1}: Start time must be before end time.`
+        );
+      }
+    });
+
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
+
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
 
     if (!organizerId) {
-        setError("Organizer ID not found. Please try again.");
-        return;
+      setError("Organizer ID not found. Please try again.");
+      return;
+    }
+
+    if (!validateDates()) {
+      return;
     }
 
     setIsSubmitting(true);
 
     try {
-        const eventData = {
-            name,
-            description,
-            location,
-            organizerId,
-            attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
-            eventDate: new Date(eventDate).toISOString(),
-            eventEndDate: new Date(eventEndDate).toISOString(),
-            joinDeadline: joinDeadline ? new Date(joinDeadline).toISOString() : null,
-            joinApproval,
-            agendaItems, 
-        };
+      const eventData = {
+        name,
+        description,
+        location,
+        organizerId,
+        attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+        eventDate: new Date(eventDate).toISOString(),
+        eventEndDate: new Date(eventEndDate).toISOString(),
+        joinDeadline: joinDeadline
+          ? new Date(joinDeadline).toISOString()
+          : null,
+        joinApproval,
+        agendaItems: agendaItems.map((item) => ({
+          ...item,
+          startTime: new Date(item.startTime).toISOString(),
+          endTime: new Date(item.endTime).toISOString(),
+        })),
+      };
 
-        await axios.post(
-            "http://localhost:8080/api/auth/event-organizer/create-event",
-            eventData,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+      await axios.post(
+        "http://localhost:8080/api/auth/event-organizer/create-event",
+        eventData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-        setSuccessMessage("Event created successfully!");
-        setAgendaItems([{ title: "", description: "", startTime: "", endTime: "" }]);
+      setSuccessMessage("Event created successfully!");
+      setAgendaItems([
+        { title: "", description: "", startTime: "", endTime: "" },
+      ]);
     } catch (err: any) {
-        console.error("Error creating event: ", err);
-        setError(err.response?.data?.message || "Failed to create the event.");
+      console.error("Error creating event: ", err);
+      setError(err.response?.data?.message || "Failed to create the event.");
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
-};
-
+  };
 
   const handleAgendaItemChange = (
     index: number,
@@ -102,7 +149,6 @@ const CreateEventPage: React.FC = () => {
     updatedAgendaItems[index][field] = value;
     setAgendaItems(updatedAgendaItems);
   };
-  
 
   const addAgendaItem = () => {
     setAgendaItems([
@@ -130,6 +176,15 @@ const CreateEventPage: React.FC = () => {
       )}
       {error && (
         <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
+      )}
+      {validationErrors.length > 0 && (
+        <div style={{ color: "red", marginBottom: "10px" }}>
+          <ul>
+            {validationErrors.map((err, index) => (
+              <li key={index}>{err}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div style={{ marginBottom: "10px" }}>
@@ -243,68 +298,81 @@ const CreateEventPage: React.FC = () => {
 
       <div style={{ marginBottom: "20px" }}>
         <h3>Agenda Items</h3>
-        {agendaItems.map((agendaItem, index) => (
-          <div key={index} style={{ marginBottom: "10px" }}>
+        {agendaItems.map((item, index) => (
+          <div key={index} style={{ marginBottom: "20px" }}>
+            <h4>Agenda Item {index + 1}</h4>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Title:
+            </label>
             <input
               type="text"
-              value={agendaItem.title}
+              value={item.title}
               onChange={(e) =>
                 handleAgendaItemChange(index, "title", e.target.value)
               }
-              placeholder="Agenda item title"
-              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+              placeholder="Enter agenda title"
+              style={{ padding: "10px", width: "300px" }}
             />
+
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Description:
+            </label>
             <textarea
-              value={agendaItem.description}
+              value={item.description}
               onChange={(e) =>
                 handleAgendaItemChange(index, "description", e.target.value)
               }
-              placeholder="Agenda item description"
-              style={{
-                padding: "10px",
-                width: "300px",
-                height: "100px",
-                marginBottom: "5px",
-              }}
+              placeholder="Enter agenda description"
+              style={{ padding: "10px", width: "300px", height: "100px" }}
             />
+
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Start Time:
+            </label>
             <input
               type="datetime-local"
-              value={agendaItem.startTime}
+              value={item.startTime}
               onChange={(e) =>
                 handleAgendaItemChange(index, "startTime", e.target.value)
               }
-              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+              style={{ padding: "10px", width: "300px" }}
             />
+
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              End Time:
+            </label>
             <input
               type="datetime-local"
-              value={agendaItem.endTime}
+              value={item.endTime}
               onChange={(e) =>
                 handleAgendaItemChange(index, "endTime", e.target.value)
               }
-              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+              style={{ padding: "10px", width: "300px" }}
             />
+
             <button
+              type="button"
               onClick={() => removeAgendaItem(index)}
               style={{
-                padding: "5px 10px",
-                backgroundColor: "#dc3545",
+                backgroundColor: "red",
                 color: "white",
-                border: "none",
-                cursor: "pointer",
+                padding: "10px",
+                marginTop: "10px",
               }}
             >
-              Remove
+              Remove Agenda Item
             </button>
           </div>
         ))}
+
         <button
+          type="button"
           onClick={addAgendaItem}
           style={{
-            padding: "10px 20px",
-            backgroundColor: "#28a745",
+            backgroundColor: "green",
             color: "white",
-            border: "none",
-            cursor: "pointer",
+            padding: "10px",
+            marginTop: "10px",
           }}
         >
           Add Agenda Item
@@ -315,25 +383,22 @@ const CreateEventPage: React.FC = () => {
         onClick={handleCreateEvent}
         disabled={isSubmitting}
         style={{
-          padding: "10px 20px",
-          backgroundColor: isSubmitting ? "#ccc" : "#007bff",
+          backgroundColor: "blue",
           color: "white",
-          border: "none",
-          cursor: isSubmitting ? "not-allowed" : "pointer",
-          marginRight: "10px",
+          padding: "10px",
+          marginTop: "10px",
         }}
       >
-        {isSubmitting ? "Creating..." : "Create Event"}
+        {isSubmitting ? "Creating Event..." : "Create Event"}
       </button>
 
       <button
         onClick={handleGoBack}
         style={{
-          padding: "10px 20px",
-          backgroundColor: "#6c757d",
+          backgroundColor: "gray",
           color: "white",
-          border: "none",
-          cursor: "pointer",
+          padding: "10px",
+          marginLeft: "10px",
         }}
       >
         Go Back

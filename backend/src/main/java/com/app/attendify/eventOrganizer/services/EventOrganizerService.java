@@ -64,6 +64,12 @@ public class EventOrganizerService {
             ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
 
+            ZonedDateTime agendaStartBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime agendaStartLocalTime = agendaStartBelgrade.toLocalDateTime();
+
+            ZonedDateTime agendaEndBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime agendaEndLocalTime = agendaEndBelgrade.toLocalDateTime();
+
 
             Event event = new Event().setName(request.getName()).setDescription(request.getDescription())
                     .setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation())
@@ -76,8 +82,8 @@ public class EventOrganizerService {
 
                 AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
                         .setDescription(agendaRequest.getDescription())
-                        .setStartTime(agendaRequest.getStartTime())
-                        .setEndTime(agendaRequest.getEndTime())
+                        .setStartTime(agendaStartLocalTime)
+                        .setEndTime(agendaEndLocalTime)
                         .setEvent(event);
 
                 agendaItems.add(agendaItem);
@@ -86,6 +92,7 @@ public class EventOrganizerService {
             event.setAgendaItems(agendaItems);
 
             logger.info("Creating event: {}", event.getName());
+            validateEventDates(request);
             return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error creating event", e);
@@ -288,5 +295,27 @@ public class EventOrganizerService {
             throw new RuntimeException("Error calculating available slots for event", e);
         }
     }
+
+    private void validateEventDates(CreateEventRequest request) {
+        if (request.getEventDate().isAfter(request.getEventEndDate())) {
+            throw new IllegalArgumentException("Event start date must be before end date.");
+        }
+
+        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventDate())) {
+            throw new IllegalArgumentException("Join deadline must be before the event start date.");
+        }
+
+        for (AgendaItemRequest agendaItem : request.getAgendaItems()) {
+            if (agendaItem.getStartTime().isBefore(request.getEventDate()) ||
+                    agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
+                throw new IllegalArgumentException("Agenda items must be within the event duration.");
+            }
+
+            if (agendaItem.getStartTime().isAfter(agendaItem.getEndTime())) {
+                throw new IllegalArgumentException("Agenda item start time must be before end time.");
+            }
+        }
+    }
+
 
 }

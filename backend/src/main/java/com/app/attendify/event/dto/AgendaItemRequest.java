@@ -1,11 +1,20 @@
 package com.app.attendify.event.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 public class AgendaItemRequest {
     private String title;
     private String description;
+
+    @NotNull
+    @FutureOrPresent(message = "Agenda item start time must be in the future.")
     private LocalDateTime startTime;
+
+    @NotNull
+    @FutureOrPresent(message = "Agenda item end time must be in the future.")
     private LocalDateTime endTime;
 
     public String getTitle() {
