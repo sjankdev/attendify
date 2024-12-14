@@ -1,6 +1,9 @@
 package com.app.attendify.eventOrganizer.services;
 
+import com.app.attendify.event.dto.AgendaItemDTO;
+import com.app.attendify.event.dto.AgendaItemRequest;
 import com.app.attendify.event.dto.CreateEventRequest;
+import com.app.attendify.event.model.AgendaItem;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,19 +59,46 @@ public class EventOrganizerService {
             EventOrganizer organizer = optionalOrganizer.get();
 
             ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
+            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
+
+            ZonedDateTime agendaStartBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime agendaStartLocalTime = agendaStartBelgrade.toLocalDateTime();
+
+            ZonedDateTime agendaEndBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime agendaEndLocalTime = agendaEndBelgrade.toLocalDateTime();
+
+
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription())
+                    .setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation())
+                    .setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime)
+                    .setEventEndDate(eventEndLocalDateTime).setJoinDeadline(request.getJoinDeadline())
+                    .setJoinApproval(request.isJoinApproval());
+
+            List<AgendaItem> agendaItems = new ArrayList<>();
+            for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
+
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
+                        .setDescription(agendaRequest.getDescription())
+                        .setStartTime(agendaStartLocalTime)
+                        .setEndTime(agendaEndLocalTime)
+                        .setEvent(event);
+
+                agendaItems.add(agendaItem);
+            }
+
+            event.setAgendaItems(agendaItems);
 
             logger.info("Creating event: {}", event.getName());
+            validateEventDates(request);
             return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error creating event", e);
             throw new RuntimeException("Error creating event", e);
         }
     }
-
 
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
@@ -138,7 +169,14 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream()
+                        .map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime()))
+                        .collect(Collectors.toList());
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(),
+                        event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
@@ -257,5 +295,27 @@ public class EventOrganizerService {
             throw new RuntimeException("Error calculating available slots for event", e);
         }
     }
+
+    private void validateEventDates(CreateEventRequest request) {
+        if (request.getEventDate().isAfter(request.getEventEndDate())) {
+            throw new IllegalArgumentException("Event start date must be before end date.");
+        }
+
+        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventDate())) {
+            throw new IllegalArgumentException("Join deadline must be before the event start date.");
+        }
+
+        for (AgendaItemRequest agendaItem : request.getAgendaItems()) {
+            if (agendaItem.getStartTime().isBefore(request.getEventDate()) ||
+                    agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
+                throw new IllegalArgumentException("Agenda items must be within the event duration.");
+            }
+
+            if (agendaItem.getStartTime().isAfter(agendaItem.getEndTime())) {
+                throw new IllegalArgumentException("Agenda item start time must be before end time.");
+            }
+        }
+    }
+
 
 }

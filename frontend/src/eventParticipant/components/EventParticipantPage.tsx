@@ -96,6 +96,29 @@ const EventParticipantPage: React.FC = () => {
             minute: "2-digit",
             hour12: false,
           });
+
+          const eventEndDate = new Date(event.eventEndDate);
+          event.eventEndDate = eventEndDate.toLocaleString("en-GB", {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+
+          const joinDeadline = new Date(event.joinDeadline);
+          event.joinDeadline = joinDeadline.toLocaleString("en-GB", {
+            weekday: "short",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+
           return event;
         });
 
@@ -126,6 +149,8 @@ const EventParticipantPage: React.FC = () => {
             <p>Location: {event.location}</p>
             <p>Company: {event.companyName}</p>
             <p>Date & Time: {event.eventDate}</p>
+            <p>End Date & Time: {event.eventEndDate}</p>
+            <p>Join Deadline: {event.joinDeadline}</p>
             <p>Status: {event.status}</p>
             <p>
               Available Seats:{" "}
@@ -133,6 +158,22 @@ const EventParticipantPage: React.FC = () => {
                 ? `${event.joinedParticipants}/${event.attendeeLimit}`
                 : "No limit"}
             </p>
+
+            <h4>Agenda</h4>
+            <ul>
+              {event.agendaItems.map((item: any) => (
+                <li key={item.title}>
+                  <strong>{item.title}</strong> - {item.description}
+                  <br />
+                  <span>
+                    Start: {new Date(item.startTime).toLocaleString()}
+                  </span>
+                  <br />
+                  <span>End: {new Date(item.endTime).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
             </button>

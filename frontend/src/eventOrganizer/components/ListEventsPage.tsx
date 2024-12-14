@@ -82,6 +82,8 @@ const ListEventsPage: React.FC = () => {
               <br />
               <span>Date: {event.eventDate}</span>
               <br />
+              <span>End Date: {event.eventEndDate}</span>
+              <br />
               <span>Join Deadline: {event.joinDeadline}</span>
               <br />
               <span>
@@ -94,6 +96,26 @@ const ListEventsPage: React.FC = () => {
               <span>
                 Join Approval: {event.joinApproval ? "Enabled" : "Disabled"}
               </span>
+              <br />
+              <div>
+                <h4>Agenda:</h4>
+                {event.agendaItems.length > 0 ? (
+                  <ul>
+                    {event.agendaItems.map((agendaItem, index) => (
+                      <li key={index}>
+                        <strong>{agendaItem.title}</strong>
+                        <p>{agendaItem.description}</p>
+                        <span>
+                          {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                          {new Date(agendaItem.endTime).toLocaleString()}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No agenda items available.</p>
+                )}
+              </div>
               <br />
               <div>
                 <h4>Participants:</h4>

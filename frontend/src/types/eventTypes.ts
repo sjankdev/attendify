@@ -5,6 +5,12 @@ export interface Participant {
   status: "PENDING" | "ACCEPTED" | "REJECTED";
 }
 
+export interface AgendaItem {
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+}
 
 export interface Event {
   id: number;
@@ -12,8 +18,10 @@ export interface Event {
   description: string;
   location: string;
   eventDate: string;
+  eventEndDate: string;
   joinDeadline?: string;
   attendeeLimit?: number;
   joinApproval: boolean;
+  agendaItems: AgendaItem[]; 
   participants?: Participant[];
 }

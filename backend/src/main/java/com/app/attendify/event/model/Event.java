@@ -30,8 +30,14 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @Column(nullable = false)
+    private LocalDateTime eventEndDate;
+
     @Column(nullable = true)
     private LocalDateTime joinDeadline;
+
+    @Column(nullable = false)
+    private boolean joinApproval;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -43,11 +49,11 @@ public class Event {
     @JsonIgnore
     private EventOrganizer organizer;
 
-    @Column(nullable = false)
-    private boolean joinApproval;
-
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<EventAttendance> eventAttendances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<AgendaItem> agendaItems = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -103,6 +109,16 @@ public class Event {
         return this;
     }
 
+    public LocalDateTime getEventEndDate() {
+        return eventEndDate;
+    }
+
+    public Event setEventEndDate(LocalDateTime eventEndDate) {
+        this.eventEndDate = eventEndDate;
+        return this;
+    }
+
+
     public LocalDateTime getJoinDeadline() {
         return joinDeadline;
     }
@@ -144,6 +160,15 @@ public class Event {
 
     public Event setJoinApproval(boolean joinApproval) {
         this.joinApproval = joinApproval;
+        return this;
+    }
+
+    public List<AgendaItem> getAgendaItems() {
+        return agendaItems;
+    }
+
+    public Event setAgendaItems(List<AgendaItem> agendaItems) {
+        this.agendaItems = agendaItems;
         return this;
     }
 
