@@ -60,6 +60,15 @@ export const fetchEventsWithParticipants = async (): Promise<Event[]> => {
         minute: "2-digit",
         hour12: false,
       }),
+      eventEndDate: new Date(event.eventEndDate).toLocaleString("en-GB", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
       joinDeadline: event.joinDeadline
         ? new Date(event.joinDeadline).toLocaleString("en-GB", {
             weekday: "short",
@@ -115,6 +124,9 @@ export const updateEvent = async (
     const formattedJoinDeadline = updatedEvent.joinDeadline
       ? new Date(updatedEvent.joinDeadline).toISOString()
       : null;
+    const formattedEventEndDate = updatedEvent.eventEndDate
+      ? new Date(updatedEvent.eventEndDate).toISOString()
+      : null;
 
     const response = await fetch(
       `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
@@ -127,6 +139,7 @@ export const updateEvent = async (
         body: JSON.stringify({
           ...updatedEvent,
           eventDate: formattedEventDate,
+          eventEndDate: formattedEventEndDate,
           joinDeadline: formattedJoinDeadline,
         }),
       }

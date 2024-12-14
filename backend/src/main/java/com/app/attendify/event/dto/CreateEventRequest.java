@@ -24,6 +24,9 @@ public class CreateEventRequest {
     @NotNull
     private LocalDateTime eventDate;
 
+    @NotNull
+    private LocalDateTime eventEndDate;
+
     private LocalDateTime joinDeadline;
 
     private boolean joinApproval;
@@ -79,6 +82,15 @@ public class CreateEventRequest {
 
     public CreateEventRequest setEventDate(LocalDateTime eventDate) {
         this.eventDate = eventDate;
+        return this;
+    }
+
+    public LocalDateTime getEventEndDate() {
+        return eventEndDate;
+    }
+
+    public CreateEventRequest setEventEndDate(LocalDateTime eventEndDate) {
+        this.eventEndDate = eventEndDate;
         return this;
     }
 

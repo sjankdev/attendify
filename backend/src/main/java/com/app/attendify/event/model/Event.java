@@ -30,6 +30,9 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @Column(nullable = false)
+    private LocalDateTime eventEndDate;
+
     @Column(nullable = true)
     private LocalDateTime joinDeadline;
 
@@ -102,6 +105,16 @@ public class Event {
         this.eventDate = eventDate;
         return this;
     }
+
+    public LocalDateTime getEventEndDate() {
+        return eventEndDate;
+    }
+
+    public Event setEventEndDate(LocalDateTime eventEndDate) {
+        this.eventEndDate = eventEndDate;
+        return this;
+    }
+
 
     public LocalDateTime getJoinDeadline() {
         return joinDeadline;

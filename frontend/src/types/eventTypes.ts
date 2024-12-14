@@ -12,6 +12,7 @@ export interface Event {
   description: string;
   location: string;
   eventDate: string;
+  eventEndDate: string;
   joinDeadline?: string;
   attendeeLimit?: number;
   joinApproval: boolean;

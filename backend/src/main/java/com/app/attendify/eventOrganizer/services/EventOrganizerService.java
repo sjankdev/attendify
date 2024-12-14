@@ -54,11 +54,31 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-
+            ZonedDateTime eventDateInBelgrade = request.getEventDate()
+                    .atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
+            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate()
+                    .atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
+
+            if (!eventEndLocalDateTime.isAfter(eventLocalDateTime)) {
+                throw new IllegalArgumentException("Event end date must be after the event start date");
+            }
+
+            Event event = new Event()
+                    .setName(request.getName())
+                    .setDescription(request.getDescription())
+                    .setCompany(organizer.getCompany())
+                    .setOrganizer(organizer)
+                    .setLocation(request.getLocation())
+                    .setAttendeeLimit(request.getAttendeeLimit())
+                    .setEventDate(eventLocalDateTime)
+                    .setEventEndDate(eventEndLocalDateTime)
+                    .setJoinDeadline(request.getJoinDeadline())
+                    .setJoinApproval(request.isJoinApproval());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -67,7 +87,6 @@ public class EventOrganizerService {
             throw new RuntimeException("Error creating event", e);
         }
     }
-
 
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
