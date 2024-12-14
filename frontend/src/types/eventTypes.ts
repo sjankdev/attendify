@@ -5,7 +5,6 @@ export interface Participant {
   status: "PENDING" | "ACCEPTED" | "REJECTED";
 }
 
-
 export interface Event {
   id: number;
   name: string;
