@@ -1,6 +1,8 @@
 package com.app.attendify.eventOrganizer.services;
 
+import com.app.attendify.event.dto.AgendaItemRequest;
 import com.app.attendify.event.dto.CreateEventRequest;
+import com.app.attendify.event.model.AgendaItem;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,7 +67,36 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event end date must be after the event start date");
             }
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription())
+                    .setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation())
+                    .setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime)
+                    .setEventEndDate(eventEndLocalDateTime).setJoinDeadline(request.getJoinDeadline())
+                    .setJoinApproval(request.isJoinApproval());
+
+            List<AgendaItem> agendaItems = new ArrayList<>();
+            for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
+                if (agendaRequest.getStartTime() == null || agendaRequest.getEndTime() == null) {
+                    throw new IllegalArgumentException(String.format("Agenda item '%s' has a null start or end time", agendaRequest.getTitle()));
+                }
+
+                if (agendaRequest.getStartTime().isBefore(eventLocalDateTime) || agendaRequest.getEndTime().isAfter(eventEndLocalDateTime)) {
+                    throw new IllegalArgumentException(String.format("Agenda item '%s' is outside of the event's time frame", agendaRequest.getTitle()));
+                }
+
+                if (!agendaRequest.getEndTime().isAfter(agendaRequest.getStartTime())) {
+                    throw new IllegalArgumentException(String.format("Agenda item '%s' has an end time before the start time", agendaRequest.getTitle()));
+                }
+
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
+                        .setDescription(agendaRequest.getDescription())
+                        .setStartTime(agendaRequest.getStartTime())
+                        .setEndTime(agendaRequest.getEndTime())
+                        .setEvent(event);
+
+                agendaItems.add(agendaItem);
+            }
+
+            event.setAgendaItems(agendaItems);
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);

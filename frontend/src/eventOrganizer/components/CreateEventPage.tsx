@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AgendaItem } from "../../types/eventTypes";
 
 const CreateEventPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -14,6 +15,10 @@ const CreateEventPage: React.FC = () => {
   const [eventEndDate, setEventEndDate] = useState<string>("");
   const [joinDeadline, setJoinDeadline] = useState<string>("");
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([
+    { title: "", description: "", startTime: "", endTime: "" },
+  ]);
+  
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -57,59 +62,85 @@ const CreateEventPage: React.FC = () => {
 
     const errorMessage = validateDates();
     if (errorMessage) {
-      setError(errorMessage);
-      return;
+        setError(errorMessage);
+        return;
+    }
+
+    for (const agendaItem of agendaItems) {
+        if (!agendaItem.startTime || !agendaItem.endTime) {
+            setError("All agenda items must have both a start and an end time.");
+            return;
+        }
+        if (new Date(agendaItem.endTime) <= new Date(agendaItem.startTime)) {
+            setError("End time must be after start time for all agenda items.");
+            return;
+        }
     }
 
     if (!organizerId) {
-      setError("Organizer ID not found. Please try again.");
-      return;
+        setError("Organizer ID not found. Please try again.");
+        return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const eventData = {
-        name,
-        description,
-        location,
-        organizerId,
-        attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
-        eventDate: new Date(eventDate).toISOString(),
-        eventEndDate: new Date(eventEndDate).toISOString(),
-        joinDeadline: joinDeadline
-          ? new Date(joinDeadline).toISOString()
-          : null,
-        joinApproval,
-      };
+        const eventData = {
+            name,
+            description,
+            location,
+            organizerId,
+            attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+            eventDate: new Date(eventDate).toISOString(),
+            eventEndDate: new Date(eventEndDate).toISOString(),
+            joinDeadline: joinDeadline ? new Date(joinDeadline).toISOString() : null,
+            joinApproval,
+            agendaItems, 
+        };
 
-      await axios.post(
-        "http://localhost:8080/api/auth/event-organizer/create-event",
-        eventData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        await axios.post(
+            "http://localhost:8080/api/auth/event-organizer/create-event",
+            eventData,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
-      setSuccessMessage("Event created successfully!");
-      setName("");
-      setDescription("");
-      setLocation("");
-      setAttendeeLimit(null);
-      setIsAttendeeLimitChecked(false);
-      setEventDate("");
-      setEventEndDate("");
-      setJoinDeadline("");
-      setJoinApproval(false);
+        setSuccessMessage("Event created successfully!");
+        setAgendaItems([{ title: "", description: "", startTime: "", endTime: "" }]);
     } catch (err: any) {
-      console.error("Error creating event: ", err);
-      setError(err.response?.data?.message || "Failed to create the event.");
+        console.error("Error creating event: ", err);
+        setError(err.response?.data?.message || "Failed to create the event.");
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
+};
+
+
+  const handleAgendaItemChange = (
+    index: number,
+    field: keyof AgendaItem,
+    value: string
+  ) => {
+    const updatedAgendaItems = [...agendaItems];
+    updatedAgendaItems[index][field] = value;
+    setAgendaItems(updatedAgendaItems);
+  };
+  
+
+  const addAgendaItem = () => {
+    setAgendaItems([
+      ...agendaItems,
+      { title: "", description: "", startTime: "", endTime: "" },
+    ]);
+  };
+
+  const removeAgendaItem = (index: number) => {
+    const updatedAgendaItems = agendaItems.filter((_, i) => i !== index);
+    setAgendaItems(updatedAgendaItems);
   };
 
   const handleGoBack = () => {
@@ -237,6 +268,76 @@ const CreateEventPage: React.FC = () => {
           />
           Require Join Approval
         </label>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Agenda Items</h3>
+        {agendaItems.map((agendaItem, index) => (
+          <div key={index} style={{ marginBottom: "10px" }}>
+            <input
+              type="text"
+              value={agendaItem.title}
+              onChange={(e) =>
+                handleAgendaItemChange(index, "title", e.target.value)
+              }
+              placeholder="Agenda item title"
+              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+            />
+            <textarea
+              value={agendaItem.description}
+              onChange={(e) =>
+                handleAgendaItemChange(index, "description", e.target.value)
+              }
+              placeholder="Agenda item description"
+              style={{
+                padding: "10px",
+                width: "300px",
+                height: "100px",
+                marginBottom: "5px",
+              }}
+            />
+            <input
+              type="datetime-local"
+              value={agendaItem.startTime}
+              onChange={(e) =>
+                handleAgendaItemChange(index, "startTime", e.target.value)
+              }
+              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+            />
+            <input
+              type="datetime-local"
+              value={agendaItem.endTime}
+              onChange={(e) =>
+                handleAgendaItemChange(index, "endTime", e.target.value)
+              }
+              style={{ padding: "10px", width: "300px", marginBottom: "5px" }}
+            />
+            <button
+              onClick={() => removeAgendaItem(index)}
+              style={{
+                padding: "5px 10px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={addAgendaItem}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Add Agenda Item
+        </button>
       </div>
 
       <button
