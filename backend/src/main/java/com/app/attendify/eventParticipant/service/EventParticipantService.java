@@ -89,8 +89,7 @@ public class EventParticipantService {
     }
 
     public List<EventForParticipantsDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
-                .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
         Company participantCompany = eventParticipant.getCompany();
         if (participantCompany == null) {
@@ -107,21 +106,7 @@ public class EventParticipantService {
             Integer attendeeLimit = event.getAttendeeLimit();
             Integer joinedParticipants = event.getParticipantEvents().size();
 
-            return new EventForParticipantsDTO(
-                    event.getId(),
-                    event.getName(),
-                    event.getDescription(),
-                    event.getLocation(),
-                    event.getCompany() != null ? event.getCompany().getName() : "No company",
-                    event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                    availableSeats,
-                    event.getEventDate(),
-                    attendeeLimit,
-                    event.getJoinDeadline(),
-                    joinedParticipants,
-                    event.isJoinApproval(),
-                    status
-            );
+            return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate());
         }).collect(Collectors.toList());
     }
 
