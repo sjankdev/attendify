@@ -197,6 +197,7 @@ const CreateEventPage: React.FC = () => {
           type="datetime-local"
           value={joinDeadline}
           onChange={(e) => setJoinDeadline(e.target.value)}
+          max={eventDate}
           style={{ padding: "10px", width: "300px" }}
         />
       </div>
