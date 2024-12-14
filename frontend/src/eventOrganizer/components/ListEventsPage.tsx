@@ -82,6 +82,8 @@ const ListEventsPage: React.FC = () => {
               <br />
               <span>Date: {event.eventDate}</span>
               <br />
+              <span>End Date: {event.eventEndDate}</span>
+              <br />
               <span>Join Deadline: {event.joinDeadline}</span>
               <br />
               <span>

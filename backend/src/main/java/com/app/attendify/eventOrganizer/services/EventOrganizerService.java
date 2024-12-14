@@ -54,31 +54,17 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate()
-                    .atZone(ZoneId.of("UTC"))
-                    .withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
 
-            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate()
-                    .atZone(ZoneId.of("UTC"))
-                    .withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
 
             if (!eventEndLocalDateTime.isAfter(eventLocalDateTime)) {
                 throw new IllegalArgumentException("Event end date must be after the event start date");
             }
 
-            Event event = new Event()
-                    .setName(request.getName())
-                    .setDescription(request.getDescription())
-                    .setCompany(organizer.getCompany())
-                    .setOrganizer(organizer)
-                    .setLocation(request.getLocation())
-                    .setAttendeeLimit(request.getAttendeeLimit())
-                    .setEventDate(eventLocalDateTime)
-                    .setEventEndDate(eventEndLocalDateTime)
-                    .setJoinDeadline(request.getJoinDeadline())
-                    .setJoinApproval(request.isJoinApproval());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
 
             logger.info("Creating event: {}", event.getName());
             return eventRepository.save(event);
@@ -157,7 +143,7 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval());
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate());
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
