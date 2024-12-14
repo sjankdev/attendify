@@ -2,6 +2,7 @@ package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
+import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
@@ -88,6 +89,7 @@ public class EventParticipantService {
         return eventParticipantRepository.save(eventParticipant);
     }
 
+    @Transactional
     public List<EventForParticipantsDTO> getEventsForCurrentParticipant(String currentUserEmail) {
         EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
@@ -106,7 +108,9 @@ public class EventParticipantService {
             Integer attendeeLimit = event.getAttendeeLimit();
             Integer joinedParticipants = event.getParticipantEvents().size();
 
-            return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate());
+            List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+
+            return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems);
         }).collect(Collectors.toList());
     }
 

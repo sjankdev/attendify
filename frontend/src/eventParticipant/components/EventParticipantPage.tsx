@@ -158,6 +158,22 @@ const EventParticipantPage: React.FC = () => {
                 ? `${event.joinedParticipants}/${event.attendeeLimit}`
                 : "No limit"}
             </p>
+
+            <h4>Agenda</h4>
+            <ul>
+              {event.agendaItems.map((item: any) => (
+                <li key={item.title}>
+                  <strong>{item.title}</strong> - {item.description}
+                  <br />
+                  <span>
+                    Start: {new Date(item.startTime).toLocaleString()}
+                  </span>
+                  <br />
+                  <span>End: {new Date(item.endTime).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+
             <button onClick={() => handleJoinEvent(event.id)}>
               Join Event
             </button>
