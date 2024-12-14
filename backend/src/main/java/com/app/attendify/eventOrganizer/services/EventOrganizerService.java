@@ -64,9 +64,6 @@ public class EventOrganizerService {
             ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
 
-            if (!eventEndLocalDateTime.isAfter(eventLocalDateTime)) {
-                throw new IllegalArgumentException("Event end date must be after the event start date");
-            }
 
             Event event = new Event().setName(request.getName()).setDescription(request.getDescription())
                     .setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation())
@@ -76,17 +73,6 @@ public class EventOrganizerService {
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
-                if (agendaRequest.getStartTime() == null || agendaRequest.getEndTime() == null) {
-                    throw new IllegalArgumentException(String.format("Agenda item '%s' has a null start or end time", agendaRequest.getTitle()));
-                }
-
-                if (agendaRequest.getStartTime().isBefore(eventLocalDateTime) || agendaRequest.getEndTime().isAfter(eventEndLocalDateTime)) {
-                    throw new IllegalArgumentException(String.format("Agenda item '%s' is outside of the event's time frame", agendaRequest.getTitle()));
-                }
-
-                if (!agendaRequest.getEndTime().isAfter(agendaRequest.getStartTime())) {
-                    throw new IllegalArgumentException(String.format("Agenda item '%s' has an end time before the start time", agendaRequest.getTitle()));
-                }
 
                 AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
                         .setDescription(agendaRequest.getDescription())

@@ -46,36 +46,9 @@ const CreateEventPage: React.FC = () => {
     fetchOrganizerDetails();
   }, []);
 
-  const validateDates = (): string | null => {
-    if (!eventDate) return "Event date is required.";
-    if (!eventEndDate) return "Event end date is required.";
-    if (new Date(eventEndDate) <= new Date(eventDate))
-      return "Event end date must be after the event start date.";
-    if (joinDeadline && new Date(joinDeadline) >= new Date(eventDate))
-      return "Join deadline must be before the event date.";
-    return null;
-  };
-
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
-
-    const errorMessage = validateDates();
-    if (errorMessage) {
-        setError(errorMessage);
-        return;
-    }
-
-    for (const agendaItem of agendaItems) {
-        if (!agendaItem.startTime || !agendaItem.endTime) {
-            setError("All agenda items must have both a start and an end time.");
-            return;
-        }
-        if (new Date(agendaItem.endTime) <= new Date(agendaItem.startTime)) {
-            setError("End time must be after start time for all agenda items.");
-            return;
-        }
-    }
 
     if (!organizerId) {
         setError("Organizer ID not found. Please try again.");
@@ -214,7 +187,6 @@ const CreateEventPage: React.FC = () => {
         <input
           type="datetime-local"
           value={eventEndDate}
-          min={eventDate}
           onChange={(e) => setEventEndDate(e.target.value)}
           style={{ padding: "10px", width: "300px" }}
         />
@@ -228,7 +200,6 @@ const CreateEventPage: React.FC = () => {
           type="datetime-local"
           value={joinDeadline}
           onChange={(e) => setJoinDeadline(e.target.value)}
-          max={eventDate}
           style={{ padding: "10px", width: "300px" }}
         />
       </div>
