@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.services;
 
+import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.AgendaItemRequest;
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.event.model.AgendaItem;
@@ -175,7 +176,14 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream()
+                        .map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime()))
+                        .collect(Collectors.toList());
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(),
+                        event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);

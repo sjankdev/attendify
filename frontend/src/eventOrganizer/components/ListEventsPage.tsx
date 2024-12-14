@@ -98,6 +98,26 @@ const ListEventsPage: React.FC = () => {
               </span>
               <br />
               <div>
+                <h4>Agenda:</h4>
+                {event.agendaItems.length > 0 ? (
+                  <ul>
+                    {event.agendaItems.map((agendaItem, index) => (
+                      <li key={index}>
+                        <strong>{agendaItem.title}</strong>
+                        <p>{agendaItem.description}</p>
+                        <span>
+                          {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                          {new Date(agendaItem.endTime).toLocaleString()}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No agenda items available.</p>
+                )}
+              </div>
+              <br />
+              <div>
                 <h4>Participants:</h4>
                 {event.participants && event.participants.length > 0 ? (
                   <ul>

@@ -22,6 +22,6 @@ export interface Event {
   joinDeadline?: string;
   attendeeLimit?: number;
   joinApproval: boolean;
-  agendaItems: AgendaItem[];
+  agendaItems: AgendaItem[]; 
   participants?: Participant[];
 }
