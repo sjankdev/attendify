@@ -60,39 +60,31 @@ public class EventOrganizerService {
 
             ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
-
             ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
+            ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
 
-            ZonedDateTime agendaStartBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime agendaStartLocalTime = agendaStartBelgrade.toLocalDateTime();
-
-            ZonedDateTime agendaEndBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime agendaEndLocalTime = agendaEndBelgrade.toLocalDateTime();
-
-
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription())
-                    .setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation())
-                    .setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime)
-                    .setEventEndDate(eventEndLocalDateTime).setJoinDeadline(request.getJoinDeadline())
-                    .setJoinApproval(request.isJoinApproval());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
+                ZonedDateTime agendaStartBelgrade = agendaRequest.getStartTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+                LocalDateTime agendaStartLocalTime = agendaStartBelgrade.toLocalDateTime();
 
-                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
-                        .setDescription(agendaRequest.getDescription())
-                        .setStartTime(agendaStartLocalTime)
-                        .setEndTime(agendaEndLocalTime)
-                        .setEvent(event);
+                ZonedDateTime agendaEndBelgrade = agendaRequest.getEndTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+                LocalDateTime agendaEndLocalTime = agendaEndBelgrade.toLocalDateTime();
+
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartLocalTime).setEndTime(agendaEndLocalTime).setEvent(event);
 
                 agendaItems.add(agendaItem);
+
             }
 
             event.setAgendaItems(agendaItems);
 
-            logger.info("Creating event: {}", event.getName());
             validateEventDates(request);
+
             return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error creating event", e);
@@ -169,14 +161,9 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream()
-                        .map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime()))
-                        .collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(),
-                        event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                        event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(),
-                        event.isJoinApproval(), event.getEventEndDate(), agendaItems);
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
@@ -306,8 +293,7 @@ public class EventOrganizerService {
         }
 
         for (AgendaItemRequest agendaItem : request.getAgendaItems()) {
-            if (agendaItem.getStartTime().isBefore(request.getEventDate()) ||
-                    agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
+            if (agendaItem.getStartTime().isBefore(request.getEventDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
                 throw new IllegalArgumentException("Agenda items must be within the event duration.");
             }
 
