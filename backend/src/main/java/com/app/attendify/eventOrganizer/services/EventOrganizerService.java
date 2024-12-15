@@ -51,6 +51,10 @@ public class EventOrganizerService {
     }
 
     public Event createEvent(CreateEventRequest request) {
+        if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < 1) {
+            throw new IllegalArgumentException("Attendee limit must be at least 1.");
+        }
+
         try {
             Optional<EventOrganizer> optionalOrganizer = eventOrganizerRepository.findById(request.getOrganizerId());
             if (optionalOrganizer.isEmpty()) {
@@ -61,33 +65,16 @@ public class EventOrganizerService {
 
             LocalDateTime eventDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
             LocalDateTime eventEndDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
-            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null
-                    ? TimeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline())
-                    : null;
+            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? TimeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
 
-            Event event = new Event()
-                    .setName(request.getName())
-                    .setDescription(request.getDescription())
-                    .setCompany(organizer.getCompany())
-                    .setOrganizer(organizer)
-                    .setLocation(request.getLocation())
-                    .setAttendeeLimit(request.getAttendeeLimit())
-                    .setEventDate(eventDateInBelgrade)
-                    .setEventEndDate(eventEndDateInBelgrade)
-                    .setJoinDeadline(joinDeadlineInBelgrade)
-                    .setJoinApproval(request.isJoinApproval());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventDateInBelgrade).setEventEndDate(eventEndDateInBelgrade).setJoinDeadline(joinDeadlineInBelgrade).setJoinApproval(request.isJoinApproval());
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
                 LocalDateTime agendaStartTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
                 LocalDateTime agendaEndTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-                AgendaItem agendaItem = new AgendaItem()
-                        .setTitle(agendaRequest.getTitle())
-                        .setDescription(agendaRequest.getDescription())
-                        .setStartTime(agendaStartTime)
-                        .setEndTime(agendaEndTime)
-                        .setEvent(event);
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartTime).setEndTime(agendaEndTime).setEvent(event);
 
                 agendaItems.add(agendaItem);
             }
