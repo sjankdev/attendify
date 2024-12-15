@@ -11,6 +11,7 @@ const UpdateEventPage: React.FC = () => {
   const [event, setEvent] = useState<Partial<Event> | null>(null);
   const [updatedEvent, setUpdatedEvent] = useState<Partial<Event>>({});
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -34,12 +35,65 @@ const UpdateEventPage: React.FC = () => {
     loadEvent();
   }, [eventId]);
 
+  const validateDates = (): boolean => {
+    const errors: string[] = [];
+    const eventStart = new Date(updatedEvent.eventDate as string);
+    const eventEnd = new Date(updatedEvent.eventEndDate as string);
+    const join = updatedEvent.joinDeadline
+      ? new Date(updatedEvent.joinDeadline as string)
+      : null;
+
+    if (
+      updatedEvent.attendeeLimit !== undefined &&
+      updatedEvent.attendeeLimit !== null &&
+      updatedEvent.attendeeLimit < 1
+    ) {
+      errors.push("Attendee limit must be at least 1.");
+    }
+
+    if (eventStart >= eventEnd) {
+      errors.push("Event start date must be before the event end date.");
+    }
+
+    if (join && join >= eventStart) {
+      errors.push("Join deadline must be before the event start date.");
+    }
+
+    agendaItems.forEach((item, index) => {
+      const start = new Date(item.startTime);
+      const end = new Date(item.endTime);
+
+      if (start < eventStart || end > eventEnd) {
+        errors.push(
+          `Agenda item ${index + 1}: Times must be within event duration.`
+        );
+      }
+
+      if (start >= end) {
+        errors.push(
+          `Agenda item ${index + 1}: Start time must be before end time.`
+        );
+      }
+    });
+
+    setValidationErrors(errors);
+    return errors.length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUpdatedEvent((prevEvent) => ({
-      ...prevEvent,
-      [name]: name === "attendeeLimit" ? parseInt(value, 10) : value,
-    }));
+    const { name, value, type, checked } = e.target;
+
+    if (type === "checkbox" && name === "setAttendeeLimit") {
+      setUpdatedEvent((prevEvent) => ({
+        ...prevEvent,
+        attendeeLimit: checked ? prevEvent.attendeeLimit || 1 : null,
+      }));
+    } else {
+      setUpdatedEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: name === "attendeeLimit" ? parseInt(value, 10) : value,
+      }));
+    }
   };
 
   const handleAgendaItemChange = (
@@ -67,13 +121,22 @@ const UpdateEventPage: React.FC = () => {
   const handleUpdateEvent = async () => {
     if (!event || !event.id) return;
 
-    const updatedEventData = await updateEvent(event.id, {
-      ...updatedEvent,
-      agendaItems,
-    });
-    if (updatedEventData) {
-      navigate("/event-organizer/events");
-    } else {
+    if (!validateDates()) {
+      return;
+    }
+
+    try {
+      const updatedEventData = await updateEvent(event.id, {
+        ...updatedEvent,
+        agendaItems,
+      });
+      if (updatedEventData) {
+        navigate("/event-organizer/events");
+      } else {
+        setError("Failed to update event.");
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
       setError("Failed to update event.");
     }
   };
@@ -82,6 +145,15 @@ const UpdateEventPage: React.FC = () => {
     <div>
       <h3>Update Event</h3>
       {error && <div style={{ color: "red" }}>{error}</div>}
+      {validationErrors.length > 0 && (
+        <div style={{ color: "red", marginBottom: "10px" }}>
+          <ul>
+            {validationErrors.map((err, index) => (
+              <li key={index}>{err}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {event && (
         <form
           onSubmit={(e) => {
@@ -143,15 +215,47 @@ const UpdateEventPage: React.FC = () => {
               onChange={handleInputChange}
             />
           </div>
+
           <div>
-            <label>Attendee Limit:</label>
-            <input
-              type="number"
-              name="attendeeLimit"
-              value={updatedEvent.attendeeLimit}
-              onChange={handleInputChange}
-            />
+            <label>
+              <input
+                type="checkbox"
+                name="setAttendeeLimit"
+                checked={
+                  updatedEvent.attendeeLimit !== null &&
+                  updatedEvent.attendeeLimit !== undefined
+                }
+                onChange={(e) => {
+                  if (!e.target.checked) {
+                    setUpdatedEvent((prevEvent) => ({
+                      ...prevEvent,
+                      attendeeLimit: null,
+                    }));
+                  } else {
+                    setUpdatedEvent((prevEvent) => ({
+                      ...prevEvent,
+                      attendeeLimit: prevEvent.attendeeLimit || 1,
+                    }));
+                  }
+                }}
+              />
+              Set Attendee Limit
+            </label>
+
+            {updatedEvent.attendeeLimit !== null &&
+              updatedEvent.attendeeLimit !== undefined && (
+                <div>
+                  <label>Attendee Limit:</label>
+                  <input
+                    type="number"
+                    name="attendeeLimit"
+                    value={updatedEvent.attendeeLimit || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              )}
           </div>
+
           <div>
             <label>
               <input

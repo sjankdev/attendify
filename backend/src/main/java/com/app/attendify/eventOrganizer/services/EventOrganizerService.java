@@ -112,8 +112,12 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
+            if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < 1) {
+                throw new IllegalArgumentException("Attendee limit must be at least 1.");
+            }
+
             int currentJoinedParticipants = event.getParticipantEvents().size();
-            if (request.getAttendeeLimit() < currentJoinedParticipants) {
+            if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < currentJoinedParticipants) {
                 throw new IllegalArgumentException("Attendee limit cannot be lower than the current number of joined participants");
             }
 
@@ -123,10 +127,16 @@ public class EventOrganizerService {
             ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime eventEndDateLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
 
+            if (eventLocalDateTime.isAfter(eventEndDateLocalDateTime)) {
+                throw new IllegalArgumentException("Event start date must be before event end date.");
+            }
+
             ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
             LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
+            if (joinDeadlineLocalDateTime != null && joinDeadlineLocalDateTime.isAfter(eventLocalDateTime)) {
+                throw new IllegalArgumentException("Join deadline must be before the event start date.");
+            }
 
             List<AgendaItemUpdateRequest> agendaItemRequests = request.getAgendaItems();
             if (agendaItemRequests != null) {
@@ -142,6 +152,15 @@ public class EventOrganizerService {
                         agendaItem = new AgendaItem();
                         agendaItem.setEvent(event);
                     }
+
+                    if (agendaItemRequest.getStartTime().isBefore(eventLocalDateTime) || agendaItemRequest.getEndTime().isAfter(eventEndDateLocalDateTime)) {
+                        throw new IllegalArgumentException("Agenda items must be within the event duration.");
+                    }
+
+                    if (agendaItemRequest.getStartTime().isAfter(agendaItemRequest.getEndTime())) {
+                        throw new IllegalArgumentException("Agenda item start time must be before end time.");
+                    }
+
                     agendaItem.setTitle(agendaItemRequest.getTitle()).setDescription(agendaItemRequest.getDescription()).setStartTime(agendaItemRequest.getStartTime()).setEndTime(agendaItemRequest.getEndTime());
                     updatedAgendaItems.add(agendaItem);
                 }
@@ -150,6 +169,13 @@ public class EventOrganizerService {
                 event.getAgendaItems().clear();
                 event.getAgendaItems().addAll(updatedAgendaItems);
             }
+
+            Integer attendeeLimit = request.getAttendeeLimit();
+            if (attendeeLimit == null) {
+                attendeeLimit = null;
+            }
+
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(attendeeLimit).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
 
             return eventRepository.save(event);
         } catch (Exception e) {
