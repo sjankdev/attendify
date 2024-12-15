@@ -53,6 +53,13 @@ const CreateEventPage: React.FC = () => {
     const eventEnd = new Date(eventEndDate);
     const join = joinDeadline ? new Date(joinDeadline) : null;
 
+    if (
+      isAttendeeLimitChecked &&
+      (attendeeLimit === null || attendeeLimit < 1)
+    ) {
+      errors.push("Attendee limit must be at least 1.");
+    }
+
     if (eventStart >= eventEnd) {
       errors.push("Event start date must be before the event end date.");
     }
@@ -85,6 +92,16 @@ const CreateEventPage: React.FC = () => {
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
+
+    if (isAttendeeLimitChecked && attendeeLimit === null) {
+      setError("Please specify an attendee limit.");
+      return;
+    }
+
+    if (isAttendeeLimitChecked && attendeeLimit === 0) {
+      setError("Attendee limit must be at least 1.");
+      return;
+    }
 
     if (!organizerId) {
       setError("Organizer ID not found. Please try again.");
@@ -134,7 +151,14 @@ const CreateEventPage: React.FC = () => {
       ]);
     } catch (err: any) {
       console.error("Error creating event: ", err);
-      setError(err.response?.data?.message || "Failed to create the event.");
+
+      if (err.response && err.response.data) {
+        const errorMessage =
+          err.response.data.message || "Failed to create the event.";
+        setError(errorMessage);
+      } else {
+        setError("An unknown error occurred. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

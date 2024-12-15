@@ -2,6 +2,7 @@ package com.app.attendify.event.dto;
 
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class CreateEventRequest {
     @NotNull
     private Integer organizerId;
 
+    @Min(value = 1, message = "Attendee limit must be at least 1.")
     private Integer attendeeLimit;
 
     @NotNull

@@ -142,49 +142,67 @@ const EventParticipantPage: React.FC = () => {
       <h1>Your Events</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <ul>
-        {events.map((event) => (
-          <li key={event.id}>
-            <h3>{event.name}</h3>
-            <p>{event.description}</p>
-            <p>Location: {event.location}</p>
-            <p>Company: {event.companyName}</p>
-            <p>Date & Time: {event.eventDate}</p>
-            <p>End Date & Time: {event.eventEndDate}</p>
-            <p>Join Deadline: {event.joinDeadline}</p>
-            <p>Status: {event.status}</p>
-            <p>
-              Available Seats:{" "}
-              {event.joinedParticipants !== null && event.attendeeLimit !== null
-                ? `${event.joinedParticipants}/${event.attendeeLimit}`
-                : "No limit"}
-            </p>
+        {events.map((event) => {
+          const currentTime = new Date();
+          const joinDeadline = new Date(event.joinDeadline);
+          const isJoinDeadlinePassed = currentTime > joinDeadline;
+          const isPending = event.status === "PENDING";
+          const isAccepted = event.status === "ACCEPTED";
+          const isNotJoined = event.status === "NOT_JOINED";
 
-            <h4>Agenda</h4>
-            <ul>
-              {event.agendaItems.map((item: any) => (
-                <li key={item.title}>
-                  <strong>{item.title}</strong> - {item.description}
-                  <br />
-                  <span>
-                    Start: {new Date(item.startTime).toLocaleString()}
-                  </span>
-                  <br />
-                  <span>End: {new Date(item.endTime).toLocaleString()}</span>
-                </li>
-              ))}
-            </ul>
+          return (
+            <li key={event.id}>
+              <h3>{event.name}</h3>
+              <p>{event.description}</p>
+              <p>Location: {event.location}</p>
+              <p>Company: {event.companyName}</p>
+              <p>Date & Time: {event.eventDate}</p>
+              <p>End Date & Time: {event.eventEndDate}</p>
+              <p>Join Deadline: {event.joinDeadline}</p>
+              <p>Status: {event.status}</p>
+              <p>
+                Available Seats:{" "}
+                {event.joinedParticipants !== null &&
+                event.attendeeLimit !== null
+                  ? `${event.joinedParticipants}/${event.attendeeLimit}`
+                  : "No limit"}
+              </p>
 
-            <button onClick={() => handleJoinEvent(event.id)}>
-              Join Event
-            </button>
-            <button
-              onClick={() => handleUnjoinEvent(event.id)}
-              style={{ marginLeft: "10px" }}
-            >
-              Unjoin Event
-            </button>
-          </li>
-        ))}
+              <h4>Agenda</h4>
+              <ul>
+                {event.agendaItems.map((item: any) => (
+                  <li key={item.title}>
+                    <strong>{item.title}</strong> - {item.description}
+                    <br />
+                    <span>
+                      Start: {new Date(item.startTime).toLocaleString()}
+                    </span>
+                    <br />
+                    <span>End: {new Date(item.endTime).toLocaleString()}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {isJoinDeadlinePassed && isNotJoined && (
+                <p style={{ color: "gray" }}>
+                  The join deadline for this event has passed. You cannot join
+                  this event.
+                </p>
+              )}
+
+              {!isJoinDeadlinePassed && !isAccepted && !isPending && (
+                <button onClick={() => handleJoinEvent(event.id)}>
+                  Join Event
+                </button>
+              )}
+              {(isPending || isAccepted) && (
+                <button onClick={() => handleUnjoinEvent(event.id)}>
+                  Unjoin Event
+                </button>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

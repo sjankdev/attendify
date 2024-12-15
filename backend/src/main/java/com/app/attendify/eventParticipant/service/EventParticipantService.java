@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -128,6 +129,10 @@ public class EventParticipantService {
 
         if (eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId)) {
             throw new RuntimeException("You have already joined this event");
+        }
+
+        if (event.getJoinDeadline() != null && LocalDateTime.now().isAfter(event.getJoinDeadline())) {
+            throw new RuntimeException("The join deadline for this event has passed.");
         }
 
         AttendanceStatus status = event.isJoinApproval() ? AttendanceStatus.PENDING : AttendanceStatus.ACCEPTED;
