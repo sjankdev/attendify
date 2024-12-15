@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.app.attendify.utils.TimeZoneConversionUtil;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -58,27 +59,37 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
-            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime eventEndLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
-            ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
+            LocalDateTime eventDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
+            LocalDateTime eventEndDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
+            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null
+                    ? TimeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline())
+                    : null;
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
+            Event event = new Event()
+                    .setName(request.getName())
+                    .setDescription(request.getDescription())
+                    .setCompany(organizer.getCompany())
+                    .setOrganizer(organizer)
+                    .setLocation(request.getLocation())
+                    .setAttendeeLimit(request.getAttendeeLimit())
+                    .setEventDate(eventDateInBelgrade)
+                    .setEventEndDate(eventEndDateInBelgrade)
+                    .setJoinDeadline(joinDeadlineInBelgrade)
+                    .setJoinApproval(request.isJoinApproval());
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
-                ZonedDateTime agendaStartBelgrade = agendaRequest.getStartTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-                LocalDateTime agendaStartLocalTime = agendaStartBelgrade.toLocalDateTime();
+                LocalDateTime agendaStartTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
+                LocalDateTime agendaEndTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-                ZonedDateTime agendaEndBelgrade = agendaRequest.getEndTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-                LocalDateTime agendaEndLocalTime = agendaEndBelgrade.toLocalDateTime();
-
-                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartLocalTime).setEndTime(agendaEndLocalTime).setEvent(event);
+                AgendaItem agendaItem = new AgendaItem()
+                        .setTitle(agendaRequest.getTitle())
+                        .setDescription(agendaRequest.getDescription())
+                        .setStartTime(agendaStartTime)
+                        .setEndTime(agendaEndTime)
+                        .setEvent(event);
 
                 agendaItems.add(agendaItem);
-
             }
 
             event.setAgendaItems(agendaItems);
