@@ -20,7 +20,7 @@ export interface Event {
   eventDate: string;
   eventEndDate: string;
   joinDeadline?: string;
-  attendeeLimit?: number;
+  attendeeLimit?: number | null;
   joinApproval: boolean;
   agendaItems: AgendaItem[]; 
   participants?: Participant[];
