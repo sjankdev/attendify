@@ -3,6 +3,7 @@ package com.app.attendify.event.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EventUpdateDTO {
     private Integer id;
@@ -22,7 +23,9 @@ public class EventUpdateDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventEndDate;
 
-    public EventUpdateDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, LocalDateTime eventEndDate, Integer attendeeLimit, LocalDateTime joinDeadline, boolean joinApproval) {
+    private List<AgendaItemDTO> agendaItems;
+
+    public EventUpdateDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, LocalDateTime eventEndDate, Integer attendeeLimit, LocalDateTime joinDeadline, boolean joinApproval, List<AgendaItemDTO> agendaItems) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -35,7 +38,9 @@ public class EventUpdateDTO {
         this.attendeeLimit = attendeeLimit;
         this.joinDeadline = joinDeadline;
         this.joinApproval = joinApproval;
+        this.agendaItems = agendaItems;
     }
+
 
     public Integer getId() {
         return id;
@@ -139,6 +144,14 @@ public class EventUpdateDTO {
 
     public void setJoinApproval(boolean joinApproval) {
         this.joinApproval = joinApproval;
+    }
+
+    public List<AgendaItemDTO> getAgendaItems() {
+        return agendaItems;
+    }
+
+    public void setAgendaItems(List<AgendaItemDTO> agendaItems) {
+        this.agendaItems = agendaItems;
     }
 
 }

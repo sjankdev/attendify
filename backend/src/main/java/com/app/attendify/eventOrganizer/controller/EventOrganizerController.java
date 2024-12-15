@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.controller;
 
+import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.CreateEventRequest;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.dto.EventUpdateDTO;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/auth/event-organizer")
 @RestController
@@ -48,7 +50,9 @@ public class EventOrganizerController {
     public ResponseEntity<EventUpdateDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
         Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
 
-        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getEventEndDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval());
+        List<AgendaItemDTO> agendaItems = updatedEvent.getAgendaItems().stream().map(item -> new AgendaItemDTO(item.getId(), item.getTitle(), item.getDescription(), item.getStartTime(), item.getEndTime())).collect(Collectors.toList());
+
+        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getEventEndDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval(), agendaItems);
 
         return ResponseEntity.ok(eventUpdateDTO);
     }

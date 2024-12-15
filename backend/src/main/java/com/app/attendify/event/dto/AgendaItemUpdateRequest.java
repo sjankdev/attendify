@@ -2,14 +2,14 @@ package com.app.attendify.event.dto;
 
 import java.time.LocalDateTime;
 
-public class AgendaItemDTO {
+public class AgendaItemUpdateRequest {
     private Integer id;
     private String title;
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    public AgendaItemDTO(Integer id, String title, String description, LocalDateTime startTime, LocalDateTime endTime) {
+    public AgendaItemUpdateRequest(Integer id, String title, String description, LocalDateTime startTime, LocalDateTime endTime) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -56,4 +56,5 @@ public class AgendaItemDTO {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
+
 }

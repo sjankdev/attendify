@@ -1,6 +1,7 @@
 package com.app.attendify.event.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UpdateEventRequest {
     private String name;
@@ -11,8 +12,9 @@ public class UpdateEventRequest {
     private LocalDateTime eventEndDate;
     private LocalDateTime joinDeadline;
     private boolean joinApproval;
+    private List<AgendaItemUpdateRequest> agendaItems;
 
-    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, boolean joinApproval) {
+    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, boolean joinApproval, List<AgendaItemUpdateRequest> agendaItems) {
         this.name = name;
         this.description = description;
         this.location = location;
@@ -21,6 +23,7 @@ public class UpdateEventRequest {
         this.eventEndDate = eventEndDate;
         this.joinDeadline = joinDeadline;
         this.joinApproval = joinApproval;
+        this.agendaItems = agendaItems;
     }
 
     public String getName() {
@@ -89,5 +92,13 @@ public class UpdateEventRequest {
 
     public void setJoinApproval(boolean joinApproval) {
         this.joinApproval = joinApproval;
+    }
+
+    public List<AgendaItemUpdateRequest> getAgendaItems() {
+        return agendaItems;
+    }
+
+    public void setAgendaItems(List<AgendaItemUpdateRequest> agendaItems) {
+        this.agendaItems = agendaItems;
     }
 }

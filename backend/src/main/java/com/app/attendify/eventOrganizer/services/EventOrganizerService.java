@@ -1,11 +1,8 @@
 package com.app.attendify.eventOrganizer.services;
 
-import com.app.attendify.event.dto.AgendaItemDTO;
-import com.app.attendify.event.dto.AgendaItemRequest;
-import com.app.attendify.event.dto.CreateEventRequest;
+import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
-import com.app.attendify.event.dto.UpdateEventRequest;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
@@ -30,6 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -115,7 +113,6 @@ public class EventOrganizerService {
             }
 
             int currentJoinedParticipants = event.getParticipantEvents().size();
-
             if (request.getAttendeeLimit() < currentJoinedParticipants) {
                 throw new IllegalArgumentException("Attendee limit cannot be lower than the current number of joined participants");
             }
@@ -131,9 +128,30 @@ public class EventOrganizerService {
 
             event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
 
-            event = eventRepository.save(event);
+            List<AgendaItemUpdateRequest> agendaItemRequests = request.getAgendaItems();
+            if (agendaItemRequests != null) {
+                Map<Integer, AgendaItem> existingAgendaItems = event.getAgendaItems().stream().collect(Collectors.toMap(AgendaItem::getId, item -> item));
 
-            return event;
+                List<AgendaItem> updatedAgendaItems = new ArrayList<>();
+
+                for (AgendaItemUpdateRequest agendaItemRequest : agendaItemRequests) {
+                    AgendaItem agendaItem;
+                    if (agendaItemRequest.getId() != null && existingAgendaItems.containsKey(agendaItemRequest.getId())) {
+                        agendaItem = existingAgendaItems.get(agendaItemRequest.getId());
+                    } else {
+                        agendaItem = new AgendaItem();
+                        agendaItem.setEvent(event);
+                    }
+                    agendaItem.setTitle(agendaItemRequest.getTitle()).setDescription(agendaItemRequest.getDescription()).setStartTime(agendaItemRequest.getStartTime()).setEndTime(agendaItemRequest.getEndTime());
+                    updatedAgendaItems.add(agendaItem);
+                }
+
+                event.getAgendaItems().removeIf(item -> !updatedAgendaItems.contains(item));
+                event.getAgendaItems().clear();
+                event.getAgendaItems().addAll(updatedAgendaItems);
+            }
+
+            return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error updating event", e);
             throw new RuntimeException("Error updating event", e);
@@ -162,7 +180,7 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
                 return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
