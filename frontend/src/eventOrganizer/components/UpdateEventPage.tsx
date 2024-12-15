@@ -94,6 +94,15 @@ const UpdateEventPage: React.FC = () => {
               />
             </div>
             <div>
+              <label>Event End Date:</label>
+              <input
+                type="datetime-local"
+                name="eventEndDate"
+                value={updatedEvent.eventEndDate}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
               <label>Join Deadline:</label>
               <input
                 type="datetime-local"
