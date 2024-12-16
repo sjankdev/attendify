@@ -2,6 +2,7 @@ package com.app.attendify.eventOrganizer.services;
 
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
+import com.app.attendify.event.validation.EventValidation;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
@@ -14,17 +15,15 @@ import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
+import com.app.attendify.utils.TimeZoneConversionUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.app.attendify.utils.TimeZoneConversionUtil;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,19 +39,19 @@ public class EventOrganizerService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventAttendanceRepository eventAttendanceRepository;
+    private final EventValidation eventValidation;
+    private final TimeZoneConversionUtil timeZoneConversionUtil;
 
-    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository) {
-        this.eventOrganizerRepository = eventOrganizerRepository;
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
+    public EventOrganizerService(TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
+        this.timeZoneConversionUtil = timeZoneConversionUtil;
+        this.eventValidation = eventValidation;
         this.eventAttendanceRepository = eventAttendanceRepository;
+        this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+        this.eventOrganizerRepository = eventOrganizerRepository;
     }
 
     public Event createEvent(CreateEventRequest request) {
-        if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < 1) {
-            throw new IllegalArgumentException("Attendee limit must be at least 1.");
-        }
-
         try {
             Optional<EventOrganizer> optionalOrganizer = eventOrganizerRepository.findById(request.getOrganizerId());
             if (optionalOrganizer.isEmpty()) {
@@ -61,16 +60,16 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            LocalDateTime eventDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
-            LocalDateTime eventEndDateInBelgrade = TimeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
-            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? TimeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
+            LocalDateTime eventDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
+            LocalDateTime eventEndDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
+            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? timeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
 
             Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventDateInBelgrade).setEventEndDate(eventEndDateInBelgrade).setJoinDeadline(joinDeadlineInBelgrade).setJoinApproval(request.isJoinApproval());
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
-                LocalDateTime agendaStartTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
-                LocalDateTime agendaEndTime = TimeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
+                LocalDateTime agendaStartTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
+                LocalDateTime agendaEndTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
                 AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartTime).setEndTime(agendaEndTime).setEvent(event);
 
@@ -79,7 +78,7 @@ public class EventOrganizerService {
 
             event.setAgendaItems(agendaItems);
 
-            validateEventDates(request);
+            eventValidation.validateEventBeforeCreate(request);
 
             return eventRepository.save(event);
         } catch (Exception e) {
@@ -91,6 +90,8 @@ public class EventOrganizerService {
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
         try {
+            eventValidation.validateEventDatesBeforeUpdate(request);
+
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
                 return new IllegalArgumentException("Event not found");
@@ -112,31 +113,13 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < 1) {
-                throw new IllegalArgumentException("Attendee limit must be at least 1.");
-            }
-
             int currentJoinedParticipants = event.getParticipantEvents().size();
             if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < currentJoinedParticipants) {
                 throw new IllegalArgumentException("Attendee limit cannot be lower than the current number of joined participants");
             }
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
-
-            ZonedDateTime eventEndDateInBelgrade = request.getEventEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime eventEndDateLocalDateTime = eventEndDateInBelgrade.toLocalDateTime();
-
-            if (eventLocalDateTime.isAfter(eventEndDateLocalDateTime)) {
-                throw new IllegalArgumentException("Event start date must be before event end date.");
-            }
-
-            ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
-
-            if (joinDeadlineLocalDateTime != null && joinDeadlineLocalDateTime.isAfter(eventLocalDateTime)) {
-                throw new IllegalArgumentException("Join deadline must be before the event start date.");
-            }
+            LocalDateTime eventLocalDateTime = timeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
+            LocalDateTime eventEndDateLocalDateTime = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
 
             List<AgendaItemUpdateRequest> agendaItemRequests = request.getAgendaItems();
             if (agendaItemRequests != null) {
@@ -153,14 +136,6 @@ public class EventOrganizerService {
                         agendaItem.setEvent(event);
                     }
 
-                    if (agendaItemRequest.getStartTime().isBefore(eventLocalDateTime) || agendaItemRequest.getEndTime().isAfter(eventEndDateLocalDateTime)) {
-                        throw new IllegalArgumentException("Agenda items must be within the event duration.");
-                    }
-
-                    if (agendaItemRequest.getStartTime().isAfter(agendaItemRequest.getEndTime())) {
-                        throw new IllegalArgumentException("Agenda item start time must be before end time.");
-                    }
-
                     agendaItem.setTitle(agendaItemRequest.getTitle()).setDescription(agendaItemRequest.getDescription()).setStartTime(agendaItemRequest.getStartTime()).setEndTime(agendaItemRequest.getEndTime());
                     updatedAgendaItems.add(agendaItem);
                 }
@@ -175,7 +150,7 @@ public class EventOrganizerService {
                 attendeeLimit = null;
             }
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(attendeeLimit).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime).setJoinApproval(request.isJoinApproval());
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(attendeeLimit).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
 
             return eventRepository.save(event);
         } catch (Exception e) {
@@ -325,26 +300,6 @@ public class EventOrganizerService {
         } catch (Exception e) {
             logger.error("Error calculating available slots for event", e);
             throw new RuntimeException("Error calculating available slots for event", e);
-        }
-    }
-
-    private void validateEventDates(CreateEventRequest request) {
-        if (request.getEventDate().isAfter(request.getEventEndDate())) {
-            throw new IllegalArgumentException("Event start date must be before end date.");
-        }
-
-        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventDate())) {
-            throw new IllegalArgumentException("Join deadline must be before the event start date.");
-        }
-
-        for (AgendaItemRequest agendaItem : request.getAgendaItems()) {
-            if (agendaItem.getStartTime().isBefore(request.getEventDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
-                throw new IllegalArgumentException("Agenda items must be within the event duration.");
-            }
-
-            if (agendaItem.getStartTime().isAfter(agendaItem.getEndTime())) {
-                throw new IllegalArgumentException("Agenda item start time must be before end time.");
-            }
         }
     }
 
