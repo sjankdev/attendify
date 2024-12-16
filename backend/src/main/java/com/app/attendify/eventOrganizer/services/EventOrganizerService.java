@@ -186,12 +186,21 @@ public class EventOrganizerService {
 
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline, event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
+                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline, (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
             int allEventsCount = eventForOrganizersDTOS.size();
+
+            int thisWeekParticipants = eventForOrganizersDTOS.stream().filter(event -> eventFilterUtil.filterEventsByCurrentWeekForOrganizer(List.of(event)).contains(event)).mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
+
+            int thisMonthParticipants = eventForOrganizersDTOS.stream().filter(event -> eventFilterUtil.filterEventsByCurrentMonthForOrganizer(List.of(event)).contains(event)).mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
+
+            int allEventsParticipants = eventForOrganizersDTOS.stream().mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
 
             if ("week".equalsIgnoreCase(filterType)) {
                 eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS);
@@ -201,7 +210,7 @@ public class EventOrganizerService {
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
 
-            return new EventFilterSummaryForOrganizerDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+            return new EventFilterSummaryForOrganizerDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount, thisWeekParticipants, thisMonthParticipants, allEventsParticipants);
 
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);

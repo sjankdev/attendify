@@ -137,6 +137,11 @@ public class Event {
         return this;
     }
 
+    public List<EventAttendance> getEventAttendances() {
+        return eventAttendances;
+    }
+
+
     public EventOrganizer getOrganizer() {
         return organizer;
     }
