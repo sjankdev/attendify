@@ -4,6 +4,9 @@ import axios from "axios";
 const EventParticipantPage: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [thisWeekCount, setThisWeekCount] = useState<number>(0);
+  const [thisMonthCount, setThisMonthCount] = useState<number>(0);
+  const [allEventsCount, setAllEventsCount] = useState<number>(0);
 
   const handleJoinEvent = async (eventId: number) => {
     const token = localStorage.getItem("token");
@@ -67,7 +70,7 @@ const EventParticipantPage: React.FC = () => {
     }
   };
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (filter?: string) => {
     const token = localStorage.getItem("token");
     if (!token) {
       setError("No token found. Please log in.");
@@ -81,48 +84,17 @@ const EventParticipantPage: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: {
+            filter: filter,
+          },
         }
       );
 
-      if (response.data && response.data.length > 0) {
-        const formattedEvents = response.data.map((event: any) => {
-          const eventDate = new Date(event.eventDate);
-          event.eventDate = eventDate.toLocaleString("en-GB", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-
-          const eventEndDate = new Date(event.eventEndDate);
-          event.eventEndDate = eventEndDate.toLocaleString("en-GB", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-
-          const joinDeadline = new Date(event.joinDeadline);
-          event.joinDeadline = joinDeadline.toLocaleString("en-GB", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-
-          return event;
-        });
-
-        setEvents(formattedEvents);
+      if (response.data) {
+        setEvents(response.data.events);
+        setThisWeekCount(response.data.thisWeekCount);
+        setThisMonthCount(response.data.thisMonthCount);
+        setAllEventsCount(response.data.allEventsCount);
         setError(null);
       } else {
         setError("No events found.");
@@ -141,6 +113,20 @@ const EventParticipantPage: React.FC = () => {
     <div>
       <h1>Your Events</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <div>
+        <button onClick={() => fetchEvents("week")}>
+          This Week ({thisWeekCount})
+        </button>
+        <button onClick={() => fetchEvents("month")}>
+          This Month ({thisMonthCount})
+        </button>
+        <button onClick={() => fetchEvents("all")}>
+          All Events ({allEventsCount})
+        </button>
+      </div>
+
+      {/* Event list */}
       <ul>
         {events.map((event) => {
           const currentTime = new Date();

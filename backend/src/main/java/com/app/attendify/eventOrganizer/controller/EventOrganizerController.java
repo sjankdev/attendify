@@ -1,10 +1,6 @@
 package com.app.attendify.eventOrganizer.controller;
 
-import com.app.attendify.event.dto.AgendaItemDTO;
-import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
-import com.app.attendify.event.dto.EventUpdateDTO;
-import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
@@ -59,10 +55,10 @@ public class EventOrganizerController {
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventForOrganizersDTO>> getOrganizerEvents() {
+    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(@RequestParam(required = false) String filter) {
         try {
-            List<EventForOrganizersDTO> eventForOrganizersDTOS = eventOrganizerService.getEventsByOrganizer();
-            return ResponseEntity.ok(eventForOrganizersDTOS);
+            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter);
+            return ResponseEntity.ok(summary);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
             return ResponseEntity.status(500).body(null);
