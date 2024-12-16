@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
+import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EventFilterUtil {
 
-    public List<EventForOrganizersDTO> filterEventsByCurrentWeek(List<EventForOrganizersDTO> events) {
+    public List<EventForOrganizersDTO> filterEventsByCurrentWeekForOrganizer(List<EventForOrganizersDTO> events) {
         LocalDateTime startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
         return events.stream()
@@ -20,7 +21,23 @@ public class EventFilterUtil {
                 .collect(Collectors.toList());
     }
 
-    public List<EventForOrganizersDTO> filterEventsByCurrentMonth(List<EventForOrganizersDTO> events) {
+    public List<EventForOrganizersDTO> filterEventsByCurrentMonthForOrganizer(List<EventForOrganizersDTO> events) {
+        LocalDateTime startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+        LocalDateTime endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
+        return events.stream()
+                .filter(event -> isBetween(event.getEventDate(), startOfMonth, endOfMonth))
+                .collect(Collectors.toList());
+    }
+
+    public List<EventForParticipantsDTO> filterEventsByCurrentWeekForParticipant(List<EventForParticipantsDTO> events) {
+        LocalDateTime startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
+        return events.stream()
+                .filter(event -> isBetween(event.getEventDate(), startOfWeek, endOfWeek))
+                .collect(Collectors.toList());
+    }
+
+    public List<EventForParticipantsDTO> filterEventsByCurrentMonthForParticipant(List<EventForParticipantsDTO> events) {
         LocalDateTime startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
         LocalDateTime endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
         return events.stream()

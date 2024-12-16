@@ -3,6 +3,7 @@ package com.app.attendify.eventParticipant.service;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.event.dto.AgendaItemDTO;
+import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
@@ -18,6 +19,7 @@ import com.app.attendify.security.model.User;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import com.app.attendify.utils.EventFilterUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,16 +44,18 @@ public class EventParticipantService {
     private final PasswordEncoder passwordEncoder;
     private final EventRepository eventRepository;
     private final EventAttendanceRepository eventAttendanceRepository;
+    private final EventFilterUtil eventFilterUtil;
 
     @Autowired
-    public EventParticipantService(UserRepository userRepository, RoleRepository roleRepository, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, PasswordEncoder passwordEncoder, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.eventParticipantRepository = eventParticipantRepository;
-        this.invitationService = invitationService;
-        this.passwordEncoder = passwordEncoder;
-        this.eventRepository = eventRepository;
+    public EventParticipantService(EventFilterUtil eventFilterUtil, EventAttendanceRepository eventAttendanceRepository, EventRepository eventRepository, PasswordEncoder passwordEncoder, InvitationService invitationService, EventParticipantRepository eventParticipantRepository, RoleRepository roleRepository, UserRepository userRepository) {
+        this.eventFilterUtil = eventFilterUtil;
         this.eventAttendanceRepository = eventAttendanceRepository;
+        this.eventRepository = eventRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.invitationService = invitationService;
+        this.eventParticipantRepository = eventParticipantRepository;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
     public void registerEventParticipant(EventParticipantRegisterDto input) {
@@ -91,28 +95,52 @@ public class EventParticipantService {
     }
 
     @Transactional
-    public List<EventForParticipantsDTO> getEventsForCurrentParticipant(String currentUserEmail) {
-        EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+    public EventFilterSummaryForParticipantDTO getEventsForParticipant(String currentUserEmail, String filterType) {
+        try {
+            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
+                    .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
-        Company participantCompany = eventParticipant.getCompany();
-        if (participantCompany == null) {
-            throw new RuntimeException("The participant does not belong to any company.");
+            Company participantCompany = eventParticipant.getCompany();
+            if (participantCompany == null) {
+                throw new RuntimeException("The participant does not belong to any company.");
+            }
+
+            List<Event> events = eventRepository.findByCompany(participantCompany);
+
+            List<EventForParticipantsDTO> eventForParticipantsDTOS = events.stream().map(event -> {
+                EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
+                String status = attendance != null ? attendance.getStatus().name() : "NOT_JOINED";
+
+                Integer availableSeats = event.getAvailableSlots();
+                Integer attendeeLimit = event.getAttendeeLimit();
+                Integer joinedParticipants = event.getParticipantEvents().size();
+
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
+                        new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())
+                ).collect(Collectors.toList());
+
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company",
+                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(),
+                        joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems);
+            }).collect(Collectors.toList());
+
+            int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
+            int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS).size();
+            int allEventsCount = eventForParticipantsDTOS.size();
+
+            if ("week".equalsIgnoreCase(filterType)) {
+                eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS);
+            } else if ("month".equalsIgnoreCase(filterType)) {
+                eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS);
+            }
+
+            return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+        } catch (Exception e) {
+            log.error("Error fetching events for participant", e);
+            throw new RuntimeException("Error fetching events for participant", e);
         }
-
-        List<Event> events = eventRepository.findByCompany(participantCompany);
-
-        return events.stream().map(event -> {
-            EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
-            String status = attendance != null ? attendance.getStatus().name() : "NOT_JOINED";
-
-            Integer availableSeats = event.getAvailableSlots();
-            Integer attendeeLimit = event.getAttendeeLimit();
-            Integer joinedParticipants = event.getParticipantEvents().size();
-
-            List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
-
-            return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems);
-        }).collect(Collectors.toList());
     }
 
 

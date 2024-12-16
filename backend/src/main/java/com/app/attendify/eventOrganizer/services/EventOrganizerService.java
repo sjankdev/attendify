@@ -163,7 +163,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public EventFilterSummaryDTO getEventsByOrganizer(String filterType) {
+    public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -189,19 +189,19 @@ public class EventOrganizerService {
                 return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline, event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
 
-            int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeek(eventForOrganizersDTOS).size();
-            int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonth(eventForOrganizersDTOS).size();
+            int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
+            int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
             int allEventsCount = eventForOrganizersDTOS.size();
 
             if ("week".equalsIgnoreCase(filterType)) {
-                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeek(eventForOrganizersDTOS);
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS);
             } else if ("month".equalsIgnoreCase(filterType)) {
-                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentMonth(eventForOrganizersDTOS);
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS);
             }
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
 
-            return new EventFilterSummaryDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+            return new EventFilterSummaryForOrganizerDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount);
 
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);

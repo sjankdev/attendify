@@ -4,14 +4,14 @@ import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 
 import java.util.List;
 
-public class EventFilterSummaryDTO {
+public class EventFilterSummaryForOrganizerDTO {
 
     private List<EventForOrganizersDTO> events;
     private int thisWeekCount;
     private int thisMonthCount;
     private int allEventsCount;
 
-    public EventFilterSummaryDTO(List<EventForOrganizersDTO> events, int thisWeekCount, int thisMonthCount, int allEventsCount) {
+    public EventFilterSummaryForOrganizerDTO(List<EventForOrganizersDTO> events, int thisWeekCount, int thisMonthCount, int allEventsCount) {
         this.events = events;
         this.thisWeekCount = thisWeekCount;
         this.thisMonthCount = thisMonthCount;
