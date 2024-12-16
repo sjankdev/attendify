@@ -1,17 +1,18 @@
 import { Event, Participant } from "../../types/eventTypes";
 
-export const fetchEventsWithParticipants = async (): Promise<Event[]> => {
+export const fetchEventsWithParticipants = async (filter: string): Promise<Event[]> => {
   try {
-    const response = await fetch(
-      "http://localhost:8080/api/auth/event-organizer/my-events",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const url = filter
+      ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
+      : "http://localhost:8080/api/auth/event-organizer/my-events";
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch events");
@@ -34,8 +35,7 @@ export const fetchEventsWithParticipants = async (): Promise<Event[]> => {
           );
 
           if (participantsResponse.ok) {
-            const participants: Participant[] =
-              await participantsResponse.json();
+            const participants: Participant[] = await participantsResponse.json();
             return { ...event, participants };
           }
           return event;
@@ -86,6 +86,7 @@ export const fetchEventsWithParticipants = async (): Promise<Event[]> => {
     throw error;
   }
 };
+
 
 export const deleteEvent = async (eventId: number): Promise<boolean> => {
   try {

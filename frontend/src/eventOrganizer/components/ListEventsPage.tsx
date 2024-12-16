@@ -11,12 +11,13 @@ const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const events = await fetchEventsWithParticipants();
+        const events = await fetchEventsWithParticipants(filter);
         setEvents(events);
       } catch (error) {
         console.error("Failed to load events:", error);
@@ -24,7 +25,7 @@ const ListEventsPage: React.FC = () => {
       }
     };
     loadEvents();
-  }, []);
+  }, [filter]);
 
   const handleDeleteEvent = async (eventId: number) => {
     const success = await deleteEvent(eventId);
@@ -70,6 +71,13 @@ const ListEventsPage: React.FC = () => {
     <div>
       <h2>My Events</h2>
       {error && <div style={{ color: "red" }}>{error}</div>}
+
+      <div>
+        <button onClick={() => setFilter("week")}>This Week</button>
+        <button onClick={() => setFilter("month")}>This Month</button>
+        <button onClick={() => setFilter("")}>All Events</button>
+      </div>
+
       {events.length === 0 ? (
         <p>No events found.</p>
       ) : (

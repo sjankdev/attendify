@@ -15,6 +15,7 @@ import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
+import com.app.attendify.utils.EventFilterUtil;
 import com.app.attendify.utils.TimeZoneConversionUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,8 +42,10 @@ public class EventOrganizerService {
     private final EventAttendanceRepository eventAttendanceRepository;
     private final EventValidation eventValidation;
     private final TimeZoneConversionUtil timeZoneConversionUtil;
+    private final EventFilterUtil eventFilterUtil;
 
-    public EventOrganizerService(TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
+    public EventOrganizerService(EventFilterUtil eventFilterUtil, TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
+        this.eventFilterUtil = eventFilterUtil;
         this.timeZoneConversionUtil = timeZoneConversionUtil;
         this.eventValidation = eventValidation;
         this.eventAttendanceRepository = eventAttendanceRepository;
@@ -160,7 +163,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventForOrganizersDTO> getEventsByOrganizer() {
+    public List<EventForOrganizersDTO> getEventsByOrganizer(String filterType) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -181,10 +184,39 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
+                        new AgendaItemDTO(
+                                agendaItem.getId(),
+                                agendaItem.getTitle(),
+                                agendaItem.getDescription(),
+                                agendaItem.getStartTime(),
+                                agendaItem.getEndTime()
+                        )
+                ).collect(Collectors.toList());
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
+                return new EventForOrganizersDTO(
+                        event.getId(),
+                        event.getName(),
+                        event.getDescription(),
+                        event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company",
+                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        availableSeats,
+                        event.getEventDate(),
+                        attendeeLimit,
+                        joinDeadline,
+                        event.getParticipantEvents().size(),
+                        event.isJoinApproval(),
+                        event.getEventEndDate(),
+                        agendaItems
+                );
             }).collect(Collectors.toList());
+
+            if ("week".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeek(eventForOrganizersDTOS);
+            } else if ("month".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentMonth(eventForOrganizersDTOS);
+            }
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
             return eventForOrganizersDTOS;
