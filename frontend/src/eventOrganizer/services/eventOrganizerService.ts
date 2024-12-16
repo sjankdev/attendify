@@ -1,6 +1,6 @@
 import { Event, Participant } from "../../types/eventTypes";
 
-export const fetchEventsWithParticipants = async (filter: string): Promise<Event[]> => {
+export const fetchEventsWithParticipants = async (filter: string): Promise<{ events: Event[]; counts: { thisWeek: number; thisMonth: number; allEvents: number } }> => {
   try {
     const url = filter
       ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
@@ -18,10 +18,10 @@ export const fetchEventsWithParticipants = async (filter: string): Promise<Event
       throw new Error("Failed to fetch events");
     }
 
-    const data: Event[] = await response.json();
+    const data = await response.json();
 
     const eventsWithParticipants: Event[] = await Promise.all(
-      data.map(async (event): Promise<Event> => {
+      (data.events as Event[]).map(async (event): Promise<Event> => {
         try {
           const participantsResponse = await fetch(
             `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
@@ -49,44 +49,50 @@ export const fetchEventsWithParticipants = async (filter: string): Promise<Event
       })
     );
 
-    return eventsWithParticipants.map((event) => ({
-      ...event,
-      eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      eventEndDate: new Date(event.eventEndDate).toLocaleString("en-GB", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      joinDeadline: event.joinDeadline
-        ? new Date(event.joinDeadline).toLocaleString("en-GB", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })
-        : "No Deadline",
-    }));
+    return {
+      events: eventsWithParticipants.map((event) => ({
+        ...event,
+        eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+        eventEndDate: new Date(event.eventEndDate).toLocaleString("en-GB", {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+        joinDeadline: event.joinDeadline
+          ? new Date(event.joinDeadline).toLocaleString("en-GB", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })
+          : "No Deadline",
+      })),
+      counts: {
+        thisWeek: data.thisWeekCount,
+        thisMonth: data.thisMonthCount,
+        allEvents: data.allEventsCount,
+      }
+    };
   } catch (error) {
     console.error("Error fetching events:", error);
     throw error;
   }
 };
-
 
 export const deleteEvent = async (eventId: number): Promise<boolean> => {
   try {

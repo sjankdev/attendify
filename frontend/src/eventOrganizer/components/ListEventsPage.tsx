@@ -12,13 +12,24 @@ const ListEventsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<string>("");
+  const [counts, setCounts] = useState<{
+    thisWeek: number;
+    thisMonth: number;
+    allEvents: number;
+  }>({
+    thisWeek: 0,
+    thisMonth: 0,
+    allEvents: 0,
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const events = await fetchEventsWithParticipants(filter);
+        const { events, counts } = await fetchEventsWithParticipants(filter);
         setEvents(events);
+        setCounts(counts);
       } catch (error) {
         console.error("Failed to load events:", error);
         setError("Failed to load events.");
@@ -73,9 +84,15 @@ const ListEventsPage: React.FC = () => {
       {error && <div style={{ color: "red" }}>{error}</div>}
 
       <div>
-        <button onClick={() => setFilter("week")}>This Week</button>
-        <button onClick={() => setFilter("month")}>This Month</button>
-        <button onClick={() => setFilter("")}>All Events</button>
+        <button onClick={() => setFilter("week")}>
+          This Week ({counts.thisWeek})
+        </button>
+        <button onClick={() => setFilter("month")}>
+          This Month ({counts.thisMonth})
+        </button>
+        <button onClick={() => setFilter("")}>
+          All Events ({counts.allEvents})
+        </button>
       </div>
 
       {events.length === 0 ? (

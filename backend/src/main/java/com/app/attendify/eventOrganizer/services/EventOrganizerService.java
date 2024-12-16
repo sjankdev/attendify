@@ -163,7 +163,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventForOrganizersDTO> getEventsByOrganizer(String filterType) {
+    public EventFilterSummaryDTO getEventsByOrganizer(String filterType) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -184,33 +184,14 @@ public class EventOrganizerService {
                 Integer attendeeLimit = event.getAttendeeLimit();
                 LocalDateTime joinDeadline = event.getJoinDeadline();
 
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
-                        new AgendaItemDTO(
-                                agendaItem.getId(),
-                                agendaItem.getTitle(),
-                                agendaItem.getDescription(),
-                                agendaItem.getStartTime(),
-                                agendaItem.getEndTime()
-                        )
-                ).collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForOrganizersDTO(
-                        event.getId(),
-                        event.getName(),
-                        event.getDescription(),
-                        event.getLocation(),
-                        event.getCompany() != null ? event.getCompany().getName() : "No company",
-                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                        availableSeats,
-                        event.getEventDate(),
-                        attendeeLimit,
-                        joinDeadline,
-                        event.getParticipantEvents().size(),
-                        event.isJoinApproval(),
-                        event.getEventEndDate(),
-                        agendaItems
-                );
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline, event.getParticipantEvents().size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems);
             }).collect(Collectors.toList());
+
+            int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeek(eventForOrganizersDTOS).size();
+            int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonth(eventForOrganizersDTOS).size();
+            int allEventsCount = eventForOrganizersDTOS.size();
 
             if ("week".equalsIgnoreCase(filterType)) {
                 eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeek(eventForOrganizersDTOS);
@@ -219,7 +200,9 @@ public class EventOrganizerService {
             }
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
-            return eventForOrganizersDTOS;
+
+            return new EventFilterSummaryDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+
         } catch (Exception e) {
             logger.error("Error fetching events for organizer", e);
             throw new RuntimeException("Error fetching events for organizer", e);

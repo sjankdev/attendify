@@ -18,11 +18,9 @@ const UpdateEventPage: React.FC = () => {
   useEffect(() => {
     const loadEvent = async () => {
       try {
-        const events = await fetchEventsWithParticipants("");
+        const { events } = await fetchEventsWithParticipants("");
 
-        const currentEvent = events.find(
-          (event) => event.id === Number(eventId)
-        );
+        const currentEvent = events.find((event: Event) => event.id === Number(eventId));
         setEvent(currentEvent || null);
 
         if (currentEvent) {
