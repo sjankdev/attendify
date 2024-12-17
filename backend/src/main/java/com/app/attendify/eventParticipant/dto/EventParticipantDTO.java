@@ -5,12 +5,14 @@ public class EventParticipantDTO {
     private String fullName;
     private String email;
     private String companyName;
+    private Integer joinedEventCount;
 
-    public EventParticipantDTO(Integer id, String fullName, String email, String companyName) {
+    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.companyName = companyName;
+        this.joinedEventCount = joinedEventCount;
     }
 
     public Integer getId() {
@@ -43,5 +45,13 @@ public class EventParticipantDTO {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public Integer getJoinedEventCount() {
+        return joinedEventCount;
+    }
+
+    public void setJoinedEventCount(Integer joinedEventCount) {
+        this.joinedEventCount = joinedEventCount;
     }
 }

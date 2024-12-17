@@ -19,6 +19,7 @@ const CompanyParticipantsPage: React.FC = () => {
           participantName: participant.fullName,
           participantEmail: participant.email,
           status: "PENDING" as "PENDING",
+          joinedEventCount: participant.joinedEventCount,
         }));
 
         setParticipants(mappedParticipants);
@@ -50,7 +51,8 @@ const CompanyParticipantsPage: React.FC = () => {
         <ul>
           {participants.map((participant) => (
             <li key={participant.participantId}>
-              {participant.participantName} - {participant.participantEmail}
+              {participant.participantName} - {participant.participantEmail}-
+              Events Joined: {participant.joinedEventCount}
             </li>
           ))}
         </ul>

@@ -3,6 +3,7 @@ export interface Participant {
   participantName: string;
   participantEmail: string;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
+  joinedEventCount: number;  
 }
 
 export interface AgendaItem {

@@ -350,14 +350,20 @@ public class EventOrganizerService {
 
             List<EventParticipant> participants = company.getParticipants();
 
-            return participants.stream().map(participant ->
-                    new EventParticipantDTO(
-                            participant.getId(),
-                            participant.getUser().getFullName(),
-                            participant.getUser().getEmail(),
-                            company.getName()
-                    )
-            ).collect(Collectors.toList());
+            return participants.stream().map(participant -> {
+                Integer joinedEventCount = (int) participant.getParticipantEvents().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                        .count();
+
+
+                return new EventParticipantDTO(
+                        participant.getId(),
+                        participant.getUser().getFullName(),
+                        participant.getUser().getEmail(),
+                        company.getName(),
+                        joinedEventCount
+                );
+            }).collect(Collectors.toList());
 
         } catch (Exception e) {
             logger.error("Error retrieving participants for organizer's company", e);
