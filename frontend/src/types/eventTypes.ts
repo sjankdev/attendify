@@ -1,13 +1,4 @@
-export interface Participant {
-  participantId: number;
-  participantName: string;
-  participantEmail: string;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
-  joinedEventCount: number;
-  eventLinks: string[];
-}
-
-export interface AgendaItem {
+export interface AgendaItemDTO {
   title: string;
   description: string;
   startTime: string;
@@ -22,8 +13,21 @@ export interface Event {
   eventDate: string;
   eventEndDate: string;
   joinDeadline?: string;
-  attendeeLimit?: number | null;
+  attendeeLimit: number | null;
+  availableSeats: number;
   joinApproval: boolean;
-  agendaItems: AgendaItem[];
-  participants?: Participant[];
+  companyName: string;
+  organizerName: string;
+  participants: Participant[]; 
+  agendaItems: AgendaItemDTO[]; 
+  pendingRequests: number; 
+}
+
+export interface Participant {
+  participantId: number;
+  participantName: string;
+  participantEmail: string;
+  status: string;
+  joinedEventCount: number; 
+  eventLinks: string[];    
 }

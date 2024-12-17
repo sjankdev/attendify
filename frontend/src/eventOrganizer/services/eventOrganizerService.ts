@@ -47,7 +47,11 @@ export const fetchEventsWithParticipants = async (
           if (participantsResponse.ok) {
             const participants: Participant[] =
               await participantsResponse.json();
-            return { ...event, participants };
+            return {
+              ...event,
+              participants,
+              pendingRequests: event.pendingRequests,
+            };
           }
           return event;
         } catch (error) {
@@ -268,4 +272,3 @@ export const fetchEventDetails = async (eventId: string): Promise<any> => {
     throw error;
   }
 };
-

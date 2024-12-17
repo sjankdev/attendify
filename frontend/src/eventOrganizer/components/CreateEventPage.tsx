@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { AgendaItem } from "../../types/eventTypes";
+import { AgendaItemDTO } from "../../types/eventTypes";
 
 const CreateEventPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -15,7 +15,7 @@ const CreateEventPage: React.FC = () => {
   const [eventEndDate, setEventEndDate] = useState<string>("");
   const [joinDeadline, setJoinDeadline] = useState<string>("");
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
-  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([
+  const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
     { title: "", description: "", startTime: "", endTime: "" },
   ]);
 
@@ -166,7 +166,7 @@ const CreateEventPage: React.FC = () => {
 
   const handleAgendaItemChange = (
     index: number,
-    field: keyof AgendaItem,
+    field: keyof AgendaItemDTO,
     value: string
   ) => {
     const updatedAgendaItems = [...agendaItems];

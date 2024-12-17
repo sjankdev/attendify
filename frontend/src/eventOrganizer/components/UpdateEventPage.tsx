@@ -4,13 +4,13 @@ import {
   updateEvent,
   fetchEventsWithParticipants,
 } from "../services/eventOrganizerService";
-import { Event, AgendaItem } from "../../types/eventTypes";
+import { Event, AgendaItemDTO } from "../../types/eventTypes";
 
 const UpdateEventPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Partial<Event> | null>(null);
   const [updatedEvent, setUpdatedEvent] = useState<Partial<Event>>({});
-  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -20,7 +20,9 @@ const UpdateEventPage: React.FC = () => {
       try {
         const { events } = await fetchEventsWithParticipants("");
 
-        const currentEvent = events.find((event: Event) => event.id === Number(eventId));
+        const currentEvent = events.find(
+          (event: Event) => event.id === Number(eventId)
+        );
         setEvent(currentEvent || null);
 
         if (currentEvent) {
@@ -98,7 +100,7 @@ const UpdateEventPage: React.FC = () => {
 
   const handleAgendaItemChange = (
     index: number,
-    field: keyof AgendaItem,
+    field: keyof AgendaItemDTO,
     value: string
   ) => {
     const updatedAgenda = [...agendaItems];

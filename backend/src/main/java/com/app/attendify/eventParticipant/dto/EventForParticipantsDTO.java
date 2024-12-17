@@ -27,7 +27,9 @@ public class EventForParticipantsDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventEndDate;
 
-    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems) {
+    private Integer pendingRequests;
+
+    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -43,6 +45,8 @@ public class EventForParticipantsDTO {
         this.status = status;
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
+        this.pendingRequests = pendingRequests;
+
     }
 
     public Integer getId() {
@@ -171,5 +175,13 @@ public class EventForParticipantsDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getPendingRequests() {
+        return pendingRequests;
+    }
+
+    public void setPendingRequests(Integer pendingRequests) {
+        this.pendingRequests = pendingRequests;
     }
 }

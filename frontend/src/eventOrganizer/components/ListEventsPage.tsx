@@ -11,7 +11,7 @@ const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<string>("");  
+  const [filter, setFilter] = useState<string>("");
   const [counts, setCounts] = useState<{
     thisWeek: number;
     thisMonth: number;
@@ -36,7 +36,8 @@ const ListEventsPage: React.FC = () => {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const { events, counts, acceptedParticipants } = await fetchEventsWithParticipants(filter);
+        const { events, counts, acceptedParticipants } =
+          await fetchEventsWithParticipants(filter);
         setEvents(events);
         setCounts(counts);
         setAcceptedParticipants(acceptedParticipants);
@@ -95,13 +96,16 @@ const ListEventsPage: React.FC = () => {
 
       <div>
         <button onClick={() => setFilter("week")}>
-          This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek} Accepted)
+          This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek}{" "}
+          Accepted)
         </button>
         <button onClick={() => setFilter("month")}>
-          This Month ({counts.thisMonth} Events, {acceptedParticipants.thisMonth} Accepted)
+          This Month ({counts.thisMonth} Events,{" "}
+          {acceptedParticipants.thisMonth} Accepted)
         </button>
         <button onClick={() => setFilter("")}>
-          All Events ({counts.allEvents} Events, {acceptedParticipants.allEvents} Accepted)
+          All Events ({counts.allEvents} Events,{" "}
+          {acceptedParticipants.allEvents} Accepted)
         </button>
       </div>
 
@@ -121,12 +125,9 @@ const ListEventsPage: React.FC = () => {
               <br />
               <span>Join Deadline: {event.joinDeadline}</span>
               <br />
-              <span>
-                Joined/Limit:{" "}
-                {event.participants != null && event.attendeeLimit != null
-                  ? `${event.participants.length}/${event.attendeeLimit}`
-                  : "No limit"}
-              </span>
+              <span>Available Seats: {event.availableSeats}</span>
+              <br />
+              <span>Pending Requests: {event.pendingRequests}</span>
               <br />
               <span>
                 Join Approval: {event.joinApproval ? "Enabled" : "Disabled"}

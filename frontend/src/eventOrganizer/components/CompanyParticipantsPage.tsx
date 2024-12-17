@@ -20,7 +20,7 @@ const CompanyParticipantsPage: React.FC = () => {
           participantEmail: participant.email,
           status: "PENDING" as "PENDING",
           joinedEventCount: participant.joinedEventCount,
-          eventLinks: participant.eventLinks, // Map event links
+          eventLinks: participant.eventLinks,
         }));
 
         setParticipants(mappedParticipants);

@@ -97,8 +97,7 @@ public class EventParticipantService {
     @Transactional
     public EventFilterSummaryForParticipantDTO getEventsForParticipant(String currentUserEmail, String filterType) {
         try {
-            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail)
-                    .orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
+            EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(currentUserEmail).orElseThrow(() -> new RuntimeException("Event Participant not found for the current user"));
 
             Company participantCompany = eventParticipant.getCompany();
             if (participantCompany == null) {
@@ -113,17 +112,14 @@ public class EventParticipantService {
 
                 Integer availableSeats = event.getAvailableSlots();
                 Integer attendeeLimit = event.getAttendeeLimit();
-                Integer joinedParticipants = event.getParticipantEvents().size();
 
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
-                        new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())
-                ).collect(Collectors.toList());
+                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance1 -> attendance1.getStatus() == AttendanceStatus.ACCEPTED).count();
 
-                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(),
-                        event.getCompany() != null ? event.getCompany().getName() : "No company",
-                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                        availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(),
-                        joinedParticipants, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems);
+                Integer pendingRequests = event.getPendingRequests();
+
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests);
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
@@ -137,6 +133,7 @@ public class EventParticipantService {
             }
 
             return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+
         } catch (Exception e) {
             log.error("Error fetching events for participant", e);
             throw new RuntimeException("Error fetching events for participant", e);
@@ -152,7 +149,7 @@ public class EventParticipantService {
         EventParticipant eventParticipant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
         if (event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
-            throw new RuntimeException("This event has reached its attendee limit");
+            throw new RuntimeException("This event has reached its attendee limit.");
         }
 
         if (eventAttendanceRepository.existsByParticipantIdAndEventId(eventParticipant.getId(), eventId)) {
