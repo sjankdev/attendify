@@ -27,7 +27,9 @@ public class EventForOrganizersDTO {
 
     private List<AgendaItemDTO> agendaItems;
 
-    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems) {
+    private Integer pendingRequests;
+
+    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -42,6 +44,8 @@ public class EventForOrganizersDTO {
         this.joinApproval = joinApproval;
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
+        this.pendingRequests = pendingRequests;
+
     }
 
     public List<AgendaItemDTO> getAgendaItems() {
@@ -162,6 +166,14 @@ public class EventForOrganizersDTO {
 
     public void setJoinApproval(boolean joinApproval) {
         this.joinApproval = joinApproval;
+    }
+
+    public Integer getPendingRequests() {
+        return pendingRequests;
+    }
+
+    public void setPendingRequests(Integer pendingRequests) {
+        this.pendingRequests = pendingRequests;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -181,7 +182,14 @@ public class Event {
         if (attendeeLimit == null) {
             return null;
         }
-        return attendeeLimit - eventAttendances.size();
+
+        long acceptedCount = eventAttendances.stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+
+        return attendeeLimit - (int) acceptedCount;
+    }
+
+    public Integer getPendingRequests() {
+        return (int) eventAttendances.stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.PENDING).count();
     }
 
 }
