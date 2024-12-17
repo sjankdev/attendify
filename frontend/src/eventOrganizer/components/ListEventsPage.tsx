@@ -11,8 +11,17 @@ const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string>("");  
   const [counts, setCounts] = useState<{
+    thisWeek: number;
+    thisMonth: number;
+    allEvents: number;
+  }>({
+    thisWeek: 0,
+    thisMonth: 0,
+    allEvents: 0,
+  });
+  const [acceptedParticipants, setAcceptedParticipants] = useState<{
     thisWeek: number;
     thisMonth: number;
     allEvents: number;
@@ -27,9 +36,10 @@ const ListEventsPage: React.FC = () => {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const { events, counts } = await fetchEventsWithParticipants(filter);
+        const { events, counts, acceptedParticipants } = await fetchEventsWithParticipants(filter);
         setEvents(events);
         setCounts(counts);
+        setAcceptedParticipants(acceptedParticipants);
       } catch (error) {
         console.error("Failed to load events:", error);
         setError("Failed to load events.");
@@ -85,13 +95,13 @@ const ListEventsPage: React.FC = () => {
 
       <div>
         <button onClick={() => setFilter("week")}>
-          This Week ({counts.thisWeek})
+          This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek} Accepted)
         </button>
         <button onClick={() => setFilter("month")}>
-          This Month ({counts.thisMonth})
+          This Month ({counts.thisMonth} Events, {acceptedParticipants.thisMonth} Accepted)
         </button>
         <button onClick={() => setFilter("")}>
-          All Events ({counts.allEvents})
+          All Events ({counts.allEvents} Events, {acceptedParticipants.allEvents} Accepted)
         </button>
       </div>
 

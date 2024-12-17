@@ -1,6 +1,6 @@
 import { Event, Participant } from "../../types/eventTypes";
 
-export const fetchEventsWithParticipants = async (filter: string): Promise<{ events: Event[]; counts: { thisWeek: number; thisMonth: number; allEvents: number } }> => {
+export const fetchEventsWithParticipants = async (filter: string): Promise<{ events: Event[]; counts: { thisWeek: number; thisMonth: number; allEvents: number }; acceptedParticipants: { thisWeek: number; thisMonth: number; allEvents: number } }> => {
   try {
     const url = filter
       ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
@@ -86,7 +86,12 @@ export const fetchEventsWithParticipants = async (filter: string): Promise<{ eve
         thisWeek: data.thisWeekCount,
         thisMonth: data.thisMonthCount,
         allEvents: data.allEventsCount,
-      }
+      },
+      acceptedParticipants: {
+        thisWeek: data.thisWeekParticipants,
+        thisMonth: data.thisMonthParticipants,
+        allEvents: data.allEventsParticipants,
+      },
     };
   } catch (error) {
     console.error("Error fetching events:", error);

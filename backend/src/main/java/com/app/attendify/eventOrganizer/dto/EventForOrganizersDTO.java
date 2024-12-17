@@ -16,7 +16,7 @@ public class EventForOrganizersDTO {
     private Integer availableSeats;
     private Integer attendeeLimit;
     private LocalDateTime joinDeadline;
-    private Integer joinedParticipants;
+    private Integer acceptedParticipants;
     private boolean joinApproval;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -27,7 +27,7 @@ public class EventForOrganizersDTO {
 
     private List<AgendaItemDTO> agendaItems;
 
-    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems) {
+    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -38,7 +38,7 @@ public class EventForOrganizersDTO {
         this.eventDate = eventDate;
         this.attendeeLimit = attendeeLimit;
         this.joinDeadline = joinDeadline;
-        this.joinedParticipants = joinedParticipants;
+        this.acceptedParticipants = acceptedParticipants;
         this.joinApproval = joinApproval;
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
@@ -148,12 +148,12 @@ public class EventForOrganizersDTO {
         this.joinDeadline = joinDeadline;
     }
 
-    public Integer getJoinedParticipants() {
-        return joinedParticipants;
+    public Integer getAcceptedParticipants() {
+        return acceptedParticipants;
     }
 
-    public void setJoinedParticipants(Integer joinedParticipants) {
-        this.joinedParticipants = joinedParticipants;
+    public void setAcceptedParticipants(Integer acceptedParticipants) {
+        this.acceptedParticipants = acceptedParticipants;
     }
 
     public boolean isJoinApproval() {
