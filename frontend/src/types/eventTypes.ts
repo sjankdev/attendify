@@ -21,7 +21,9 @@ export interface Event {
   participants: Participant[]; 
   agendaItems: AgendaItemDTO[]; 
   pendingRequests: number; 
+  acceptedParticipants: number; 
 }
+
 
 export interface Participant {
   participantId: number;

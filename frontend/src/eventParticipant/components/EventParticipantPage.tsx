@@ -126,7 +126,6 @@ const EventParticipantPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Event list */}
       <ul>
         {events.map((event) => {
           const currentTime = new Date();

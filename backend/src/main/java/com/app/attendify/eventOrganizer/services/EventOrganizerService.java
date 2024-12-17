@@ -258,10 +258,6 @@ public class EventOrganizerService {
             });
 
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
-                Integer availableSeats = event.getAvailableSlots();
-                Integer attendeeLimit = event.getAttendeeLimit();
-                LocalDateTime joinDeadline = event.getJoinDeadline();
-
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
                 long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
