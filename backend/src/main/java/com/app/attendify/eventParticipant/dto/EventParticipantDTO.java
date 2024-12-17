@@ -1,18 +1,22 @@
 package com.app.attendify.eventParticipant.dto;
 
+import java.util.List;
+
 public class EventParticipantDTO {
     private Integer id;
     private String fullName;
     private String email;
     private String companyName;
     private Integer joinedEventCount;
+    private List<String> eventLinks;
 
-    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount) {
+    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount, List<String> eventLinks) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.companyName = companyName;
         this.joinedEventCount = joinedEventCount;
+        this.eventLinks = eventLinks;
     }
 
     public Integer getId() {
@@ -53,5 +57,13 @@ public class EventParticipantDTO {
 
     public void setJoinedEventCount(Integer joinedEventCount) {
         this.joinedEventCount = joinedEventCount;
+    }
+
+    public List<String> getEventLinks() {
+        return eventLinks;
+    }
+
+    public void setEventLinks(List<String> eventLinks) {
+        this.eventLinks = eventLinks;
     }
 }

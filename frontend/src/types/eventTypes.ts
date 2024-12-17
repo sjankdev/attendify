@@ -3,7 +3,8 @@ export interface Participant {
   participantName: string;
   participantEmail: string;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
-  joinedEventCount: number;  
+  joinedEventCount: number;
+  eventLinks: string[];
 }
 
 export interface AgendaItem {
@@ -23,6 +24,6 @@ export interface Event {
   joinDeadline?: string;
   attendeeLimit?: number | null;
   joinApproval: boolean;
-  agendaItems: AgendaItem[]; 
+  agendaItems: AgendaItem[];
   participants?: Participant[];
 }

@@ -20,6 +20,7 @@ const CompanyParticipantsPage: React.FC = () => {
           participantEmail: participant.email,
           status: "PENDING" as "PENDING",
           joinedEventCount: participant.joinedEventCount,
+          eventLinks: participant.eventLinks, // Map event links
         }));
 
         setParticipants(mappedParticipants);
@@ -51,8 +52,17 @@ const CompanyParticipantsPage: React.FC = () => {
         <ul>
           {participants.map((participant) => (
             <li key={participant.participantId}>
-              {participant.participantName} - {participant.participantEmail}-
+              {participant.participantName} - {participant.participantEmail} -
               Events Joined: {participant.joinedEventCount}
+              <ul>
+                {participant.eventLinks.map((link, index) => (
+                  <li key={index}>
+                    <a href={`/event-details/${link.split("/").pop()}`}>
+                      Event {index + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
