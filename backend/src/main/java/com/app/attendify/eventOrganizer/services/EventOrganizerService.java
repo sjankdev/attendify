@@ -14,6 +14,7 @@ import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.dto.ParticipantDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -335,13 +336,9 @@ public class EventOrganizerService {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
 
-            User user = userRepository.findByEmail(email).orElseThrow(() ->
-                    new IllegalArgumentException("User not found for email: " + email)
-            );
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
 
-            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() ->
-                    new IllegalArgumentException("Organizer not found for user: " + email)
-            );
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new IllegalArgumentException("Organizer not found for user: " + email));
 
             Company company = organizer.getCompany();
             if (company == null) {
@@ -351,18 +348,11 @@ public class EventOrganizerService {
             List<EventParticipant> participants = company.getParticipants();
 
             return participants.stream().map(participant -> {
-                Integer joinedEventCount = (int) participant.getParticipantEvents().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                        .count();
+                List<String> eventLinks = participant.getParticipantEvents().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).map(attendance -> "/event-details/" + attendance.getEvent().getId()).collect(Collectors.toList());
 
+                Integer joinedEventCount = eventLinks.size();
 
-                return new EventParticipantDTO(
-                        participant.getId(),
-                        participant.getUser().getFullName(),
-                        participant.getUser().getEmail(),
-                        company.getName(),
-                        joinedEventCount
-                );
+                return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks);
             }).collect(Collectors.toList());
 
         } catch (Exception e) {
@@ -371,4 +361,21 @@ public class EventOrganizerService {
         }
     }
 
+    public EventDetailDTO getEventDetails(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+            List<ParticipantDTO> participants = event.getEventAttendances().stream().map(eventAttendance -> {
+                EventParticipant participant = eventAttendance.getParticipant();
+                return new ParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail());
+            }).collect(Collectors.toList());
+
+            String attendeeLimit = (event.getAttendeeLimit() == null) ? "No Limit" : String.valueOf(event.getAttendeeLimit());
+
+            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), attendeeLimit, participants);
+        } catch (Exception e) {
+            logger.error("Error retrieving event details", e);
+            throw new RuntimeException("Error retrieving event details", e);
+        }
+    }
 }

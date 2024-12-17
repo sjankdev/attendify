@@ -103,6 +103,18 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/event-details/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<EventDetailDTO> getEventDetails(@PathVariable int eventId) {
+        try {
+            EventDetailDTO eventDetails = eventOrganizerService.getEventDetails(eventId);
+            return ResponseEntity.ok(eventDetails);
+        } catch (Exception e) {
+            logger.error("Error retrieving event details", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     @GetMapping("/company/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {

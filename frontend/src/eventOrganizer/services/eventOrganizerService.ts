@@ -243,3 +243,29 @@ export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
     throw error;
   }
 };
+
+export const fetchEventDetails = async (eventId: string): Promise<any> => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/auth/event-organizer/event-details/${eventId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch event details");
+    }
+
+    const eventDetails = await response.json();
+    return eventDetails;
+  } catch (error) {
+    console.error("Error fetching event details:", error);
+    throw error;
+  }
+};
+
