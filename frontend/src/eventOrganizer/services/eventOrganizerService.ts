@@ -1,11 +1,21 @@
 import { Event, Participant } from "../../types/eventTypes";
 
-export const fetchEventsWithParticipants = async (filter: string): Promise<{ events: Event[]; counts: { thisWeek: number; thisMonth: number; allEvents: number }; acceptedParticipants: { thisWeek: number; thisMonth: number; allEvents: number } }> => {
+export const fetchEventsWithParticipants = async (
+  filter: string
+): Promise<{
+  events: Event[];
+  counts: { thisWeek: number; thisMonth: number; allEvents: number };
+  acceptedParticipants: {
+    thisWeek: number;
+    thisMonth: number;
+    allEvents: number;
+  };
+}> => {
   try {
     const url = filter
       ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
       : "http://localhost:8080/api/auth/event-organizer/my-events";
-    
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -35,7 +45,8 @@ export const fetchEventsWithParticipants = async (filter: string): Promise<{ eve
           );
 
           if (participantsResponse.ok) {
-            const participants: Participant[] = await participantsResponse.json();
+            const participants: Participant[] =
+              await participantsResponse.json();
             return { ...event, participants };
           }
           return event;
@@ -205,5 +216,30 @@ export const reviewJoinRequest = async (
       error
     );
     return false;
+  }
+};
+
+export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/auth/event-organizer/company/participants",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch participants from company");
+    }
+
+    const participants: Participant[] = await response.json();
+    return participants;
+  } catch (error) {
+    console.error("Error fetching participants from company:", error);
+    throw error;
   }
 };

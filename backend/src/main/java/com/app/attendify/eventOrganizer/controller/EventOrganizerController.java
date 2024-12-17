@@ -5,6 +5,7 @@ import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
+import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,6 +99,18 @@ public class EventOrganizerController {
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/company/participants")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {
+        try {
+            List<EventParticipantDTO> participants = eventOrganizerService.getParticipantsByCompany();
+            return ResponseEntity.ok(participants);
+        } catch (Exception e) {
+            logger.error("Error retrieving participants for organizer's company", e);
             return ResponseEntity.status(500).body(null);
         }
     }

@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.services;
 
+import com.app.attendify.company.model.Company;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
 import com.app.attendify.event.validation.EventValidation;
@@ -12,6 +13,7 @@ import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
+import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -327,5 +329,46 @@ public class EventOrganizerService {
         }
     }
 
+    @Transactional
+    public List<EventParticipantDTO> getParticipantsByCompany() {
+        try {
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+
+            User user = userRepository.findByEmail(email).orElseThrow(() ->
+                    new IllegalArgumentException("User not found for email: " + email)
+            );
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() ->
+                    new IllegalArgumentException("Organizer not found for user: " + email)
+            );
+
+            Company company = organizer.getCompany();
+            if (company == null) {
+                throw new IllegalArgumentException("Organizer does not have an associated company.");
+            }
+
+            List<EventParticipant> participants = company.getParticipants();
+
+            return participants.stream().map(participant -> {
+                Integer joinedEventCount = (int) participant.getParticipantEvents().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                        .count();
+
+
+                return new EventParticipantDTO(
+                        participant.getId(),
+                        participant.getUser().getFullName(),
+                        participant.getUser().getEmail(),
+                        company.getName(),
+                        joinedEventCount
+                );
+            }).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error retrieving participants for organizer's company", e);
+            throw new RuntimeException("Error retrieving participants for organizer's company", e);
+        }
+    }
 
 }

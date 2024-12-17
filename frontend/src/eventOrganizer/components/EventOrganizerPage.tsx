@@ -48,6 +48,20 @@ const EventOrganizerPage: React.FC = () => {
       >
         See Events
       </button>
+      <button
+        onClick={() => navigate("/event-organizer/company-participants")}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#6f42c1",
+          color: "white",
+          border: "none",
+          cursor: "pointer",
+          marginTop: "10px",
+          marginLeft: "10px",
+        }}
+      >
+        See Participants from Your Company
+      </button>
     </div>
   );
 };
