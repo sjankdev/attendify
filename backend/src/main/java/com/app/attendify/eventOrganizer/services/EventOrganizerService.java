@@ -1,16 +1,25 @@
 package com.app.attendify.eventOrganizer.services;
 
-import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
-import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.company.model.Company;
+import com.app.attendify.event.dto.*;
+import com.app.attendify.event.model.AgendaItem;
+import com.app.attendify.event.validation.EventValidation;
+import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.dto.ParticipantDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
+import com.app.attendify.utils.EventFilterUtil;
+import com.app.attendify.utils.TimeZoneConversionUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.slf4j.Logger;
@@ -19,9 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,11 +42,19 @@ public class EventOrganizerService {
     private final EventOrganizerRepository eventOrganizerRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventAttendanceRepository eventAttendanceRepository;
+    private final EventValidation eventValidation;
+    private final TimeZoneConversionUtil timeZoneConversionUtil;
+    private final EventFilterUtil eventFilterUtil;
 
-    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository) {
-        this.eventOrganizerRepository = eventOrganizerRepository;
-        this.eventRepository = eventRepository;
+    public EventOrganizerService(EventFilterUtil eventFilterUtil, TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
+        this.eventFilterUtil = eventFilterUtil;
+        this.timeZoneConversionUtil = timeZoneConversionUtil;
+        this.eventValidation = eventValidation;
+        this.eventAttendanceRepository = eventAttendanceRepository;
         this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+        this.eventOrganizerRepository = eventOrganizerRepository;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -49,13 +66,26 @@ public class EventOrganizerService {
             }
             EventOrganizer organizer = optionalOrganizer.get();
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
+            LocalDateTime eventDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
+            LocalDateTime eventEndDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
+            LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? timeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
 
-            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventDateInBelgrade).setEventEndDate(eventEndDateInBelgrade).setJoinDeadline(joinDeadlineInBelgrade).setJoinApproval(request.isJoinApproval());
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(request.getJoinDeadline());
+            List<AgendaItem> agendaItems = new ArrayList<>();
+            for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
+                LocalDateTime agendaStartTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
+                LocalDateTime agendaEndTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-            logger.info("Creating event: {}", event.getName());
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartTime).setEndTime(agendaEndTime).setEvent(event);
+
+                agendaItems.add(agendaItem);
+            }
+
+            event.setAgendaItems(agendaItems);
+
+            eventValidation.validateEventBeforeCreate(request);
+
             return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error creating event", e);
@@ -66,6 +96,8 @@ public class EventOrganizerService {
     @Transactional
     public Event updateEvent(int eventId, UpdateEventRequest request) {
         try {
+            eventValidation.validateEventDatesBeforeUpdate(request);
+
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
                 return new IllegalArgumentException("Event not found");
@@ -87,53 +119,49 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            ZonedDateTime eventDateInBelgrade = request.getEventDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime eventLocalDateTime = eventDateInBelgrade.toLocalDateTime();
+            int currentJoinedParticipants = event.getParticipantEvents().size();
+            if (request.getAttendeeLimit() != null && request.getAttendeeLimit() < currentJoinedParticipants) {
+                throw new IllegalArgumentException("Attendee limit cannot be lower than the current number of joined participants");
+            }
 
-            ZonedDateTime joinDeadlineInBelgrade = request.getJoinDeadline().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Europe/Belgrade"));
-            LocalDateTime joinDeadlineLocalDateTime = joinDeadlineInBelgrade.toLocalDateTime();
+            LocalDateTime eventLocalDateTime = timeZoneConversionUtil.convertToBelgradeTime(request.getEventDate());
+            LocalDateTime eventEndDateLocalDateTime = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
 
-            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventDate(eventLocalDateTime).setJoinDeadline(joinDeadlineLocalDateTime);
+            List<AgendaItemUpdateRequest> agendaItemRequests = request.getAgendaItems();
+            if (agendaItemRequests != null) {
+                Map<Integer, AgendaItem> existingAgendaItems = event.getAgendaItems().stream().collect(Collectors.toMap(AgendaItem::getId, item -> item));
 
-            event = eventRepository.save(event);
+                List<AgendaItem> updatedAgendaItems = new ArrayList<>();
 
-            return event;
+                for (AgendaItemUpdateRequest agendaItemRequest : agendaItemRequests) {
+                    AgendaItem agendaItem;
+                    if (agendaItemRequest.getId() != null && existingAgendaItems.containsKey(agendaItemRequest.getId())) {
+                        agendaItem = existingAgendaItems.get(agendaItemRequest.getId());
+                    } else {
+                        agendaItem = new AgendaItem();
+                        agendaItem.setEvent(event);
+                    }
+
+                    agendaItem.setTitle(agendaItemRequest.getTitle()).setDescription(agendaItemRequest.getDescription()).setStartTime(agendaItemRequest.getStartTime()).setEndTime(agendaItemRequest.getEndTime());
+                    updatedAgendaItems.add(agendaItem);
+                }
+
+                event.getAgendaItems().removeIf(item -> !updatedAgendaItems.contains(item));
+                event.getAgendaItems().clear();
+                event.getAgendaItems().addAll(updatedAgendaItems);
+            }
+
+            Integer attendeeLimit = request.getAttendeeLimit();
+            if (attendeeLimit == null) {
+                attendeeLimit = null;
+            }
+
+            event.setName(request.getName()).setDescription(request.getDescription()).setLocation(request.getLocation()).setAttendeeLimit(attendeeLimit).setEventDate(eventLocalDateTime).setEventEndDate(eventEndDateLocalDateTime).setJoinDeadline(request.getJoinDeadline()).setJoinApproval(request.isJoinApproval());
+
+            return eventRepository.save(event);
         } catch (Exception e) {
             logger.error("Error updating event", e);
             throw new RuntimeException("Error updating event", e);
-        }
-    }
-
-    @Transactional
-    public List<EventDTO> getEventsByOrganizer() {
-        try {
-            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            String email = currentUser.getUsername();
-            logger.info("Fetching events for organizer: {}", email);
-
-            User user = userRepository.findByEmail(email).orElseThrow(() -> {
-                logger.error("User not found for email: {}", email);
-                return new IllegalArgumentException("User not found");
-            });
-
-            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
-                logger.error("Event organizer not found for user: {}", email);
-                return new IllegalArgumentException("Organizer not found");
-            });
-
-            List<EventDTO> eventDTOs = organizer.getEvents().stream().map(event -> {
-                Integer availableSeats = event.getAvailableSlots();
-                Integer attendeeLimit = event.getAttendeeLimit();
-                LocalDateTime joinDeadline = event.getJoinDeadline();
-
-                return new EventDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventDate(), attendeeLimit, joinDeadline);
-            }).collect(Collectors.toList());
-
-            logger.info("Found {} events for organizer: {}", eventDTOs.size(), email);
-            return eventDTOs;
-        } catch (Exception e) {
-            logger.error("Error fetching events for organizer", e);
-            throw new RuntimeException("Error fetching events for organizer", e);
         }
     }
 
@@ -172,7 +200,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<EventParticipantDTO> getParticipantsByEvent(int eventId) {
+    public List<EventAttendanceDTO> getParticipantsByEvent(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
@@ -197,12 +225,93 @@ public class EventOrganizerService {
 
             return event.getParticipantEvents().stream().map(participantEvent -> {
                 EventParticipant participant = participantEvent.getParticipant();
-                return new EventParticipantDTO(participant.getUser().getFullName(), participant.getUser().getEmail());
+                int participantId = participant.getId();
+                String participantName = participant.getUser().getFullName();
+                String participantEmail = participant.getUser().getEmail();
+                AttendanceStatus status = participantEvent.getStatus();
+
+                logger.info("Participant details - ID: {}, Name: {}, Email: {}, Status: {}", participantId, participantName, participantEmail, status);
+
+                return new EventAttendanceDTO(participantName, participantEmail, participantId, status);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
             throw new RuntimeException("Error retrieving participants for event", e);
         }
+    }
+
+    @Transactional
+    public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType) {
+        try {
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+            logger.info("Fetching events for organizer: {}", email);
+
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                logger.error("User not found for email: {}", email);
+                return new IllegalArgumentException("User not found");
+            });
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+                logger.error("Event organizer not found for user: {}", email);
+                return new IllegalArgumentException("Organizer not found");
+            });
+
+            List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+
+                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+
+                int pendingRequests = event.getPendingRequests();
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems, pendingRequests);
+
+            }).collect(Collectors.toList());
+
+            int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
+            int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
+            int allEventsCount = eventForOrganizersDTOS.size();
+
+            int thisWeekParticipants = eventForOrganizersDTOS.stream().filter(event -> eventFilterUtil.filterEventsByCurrentWeekForOrganizer(List.of(event)).contains(event)).mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
+
+            int thisMonthParticipants = eventForOrganizersDTOS.stream().filter(event -> eventFilterUtil.filterEventsByCurrentMonthForOrganizer(List.of(event)).contains(event)).mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
+
+            int allEventsParticipants = eventForOrganizersDTOS.stream().mapToInt(EventForOrganizersDTO::getAcceptedParticipants).sum();
+
+            if ("week".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS);
+            } else if ("month".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS);
+            }
+
+            logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
+
+            return new EventFilterSummaryForOrganizerDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount, thisWeekParticipants, thisMonthParticipants, allEventsParticipants);
+
+        } catch (Exception e) {
+            logger.error("Error fetching events for organizer", e);
+            throw new RuntimeException("Error fetching events for organizer", e);
+        }
+    }
+
+    @Transactional
+    public void reviewJoinRequest(int eventId, int participantId, AttendanceStatus newStatus) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.isJoinApproval()) {
+            throw new RuntimeException("Join requests do not require approval for this event");
+        }
+
+        EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(participantId, eventId).orElseThrow(() -> new RuntimeException("No join request found for this participant and event"));
+
+        if (newStatus == AttendanceStatus.ACCEPTED && event.getAttendeeLimit() != null && event.getAvailableSlots() <= 0) {
+            throw new RuntimeException("Event has no available slots");
+        }
+
+        attendance.setStatus(newStatus);
+        eventAttendanceRepository.save(attendance);
+
+        logger.info("Updated join request to status: {}", newStatus);
     }
 
     public Integer getAvailableSlotsForEvent(int eventId) {
@@ -219,4 +328,52 @@ public class EventOrganizerService {
         }
     }
 
+    @Transactional
+    public List<EventParticipantDTO> getParticipantsByCompany() {
+        try {
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new IllegalArgumentException("Organizer not found for user: " + email));
+
+            Company company = organizer.getCompany();
+            if (company == null) {
+                throw new IllegalArgumentException("Organizer does not have an associated company.");
+            }
+
+            List<EventParticipant> participants = company.getParticipants();
+
+            return participants.stream().map(participant -> {
+                List<String> eventLinks = participant.getParticipantEvents().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).map(attendance -> "/event-details/" + attendance.getEvent().getId()).collect(Collectors.toList());
+
+                Integer joinedEventCount = eventLinks.size();
+
+                return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks);
+            }).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error retrieving participants for organizer's company", e);
+            throw new RuntimeException("Error retrieving participants for organizer's company", e);
+        }
+    }
+
+    public EventDetailDTO getEventDetails(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+            List<ParticipantDTO> participants = event.getEventAttendances().stream().map(eventAttendance -> {
+                EventParticipant participant = eventAttendance.getParticipant();
+                return new ParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail());
+            }).collect(Collectors.toList());
+
+            String attendeeLimit = (event.getAttendeeLimit() == null) ? "No Limit" : String.valueOf(event.getAttendeeLimit());
+
+            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), attendeeLimit, participants);
+        } catch (Exception e) {
+            logger.error("Error retrieving event details", e);
+            throw new RuntimeException("Error retrieving event details", e);
+        }
+    }
 }

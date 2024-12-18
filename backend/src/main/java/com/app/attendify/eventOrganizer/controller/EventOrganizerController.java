@@ -1,12 +1,11 @@
 package com.app.attendify.eventOrganizer.controller;
 
-import com.app.attendify.event.dto.CreateEventRequest;
-import com.app.attendify.event.dto.EventDTO;
-import com.app.attendify.event.dto.UpdateEventRequest;
+import com.app.attendify.event.dto.*;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
+import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
-import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/auth/event-organizer")
 @RestController
@@ -44,20 +44,22 @@ public class EventOrganizerController {
 
     @PutMapping("/update-event/{eventId}")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<EventDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
+    public ResponseEntity<EventUpdateDTO> updateEvent(@PathVariable int eventId, @Valid @RequestBody UpdateEventRequest request) {
         Event updatedEvent = eventOrganizerService.updateEvent(eventId, request);
 
-        EventDTO eventDTO = new EventDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline());
+        List<AgendaItemDTO> agendaItems = updatedEvent.getAgendaItems().stream().map(item -> new AgendaItemDTO(item.getId(), item.getTitle(), item.getDescription(), item.getStartTime(), item.getEndTime())).collect(Collectors.toList());
 
-        return ResponseEntity.ok(eventDTO);
+        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getEventEndDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval(), agendaItems);
+
+        return ResponseEntity.ok(eventUpdateDTO);
     }
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventDTO>> getOrganizerEvents() {
+    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(@RequestParam(required = false) String filter) {
         try {
-            List<EventDTO> events = eventOrganizerService.getEventsByOrganizer();
-            return ResponseEntity.ok(events);
+            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter);
+            return ResponseEntity.ok(summary);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
             return ResponseEntity.status(500).body(null);
@@ -76,14 +78,51 @@ public class EventOrganizerController {
         }
     }
 
+    @PutMapping("/events/{eventId}/participants/{participantId}/status")
+    public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
+        try {
+            eventOrganizerService.reviewJoinRequest(eventId, participantId, status);
+            logger.info("Join request updated: Event ID={}, Participant ID={}, New Status={}", eventId, participantId, status);
+            return ResponseEntity.ok("Join request updated successfully");
+        } catch (RuntimeException e) {
+            logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
     @GetMapping("/my-events/{eventId}/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<List<EventParticipantDTO>> getEventParticipants(@PathVariable int eventId) {
+    public ResponseEntity<List<EventAttendanceDTO>> getEventParticipants(@PathVariable int eventId) {
         try {
-            List<EventParticipantDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
+            List<EventAttendanceDTO> participants = eventOrganizerService.getParticipantsByEvent(eventId);
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/event-details/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<EventDetailDTO> getEventDetails(@PathVariable int eventId) {
+        try {
+            EventDetailDTO eventDetails = eventOrganizerService.getEventDetails(eventId);
+            return ResponseEntity.ok(eventDetails);
+        } catch (Exception e) {
+            logger.error("Error retrieving event details", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/company/participants")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {
+        try {
+            List<EventParticipantDTO> participants = eventOrganizerService.getParticipantsByCompany();
+            return ResponseEntity.ok(participants);
+        } catch (Exception e) {
+            logger.error("Error retrieving participants for organizer's company", e);
             return ResponseEntity.status(500).body(null);
         }
     }

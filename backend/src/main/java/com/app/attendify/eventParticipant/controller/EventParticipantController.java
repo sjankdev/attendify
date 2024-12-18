@@ -1,6 +1,6 @@
 package com.app.attendify.eventParticipant.controller;
 
-import com.app.attendify.event.dto.EventDTO;
+import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @RequestMapping("/api/auth/event-participant")
 @RestController
@@ -30,11 +28,11 @@ public class EventParticipantController {
     }
 
     @GetMapping("/my-events")
-    public ResponseEntity<List<EventDTO>> getMyEvents() {
+    public ResponseEntity<EventFilterSummaryForParticipantDTO> getMyEvents(@RequestParam(required = false) String filter) {
         try {
             String currentUserEmail = getCurrentUserEmail();
-            List<EventDTO> events = eventParticipantService.getEventsForCurrentParticipant(currentUserEmail);
-            return ResponseEntity.ok(events);
+            EventFilterSummaryForParticipantDTO summary = eventParticipantService.getEventsForParticipant(currentUserEmail, filter);
+            return ResponseEntity.ok(summary);
         } catch (Exception e) {
             logger.error("Failed to fetch events for the participant", e);
             return ResponseEntity.status(500).body(null);
@@ -52,6 +50,23 @@ public class EventParticipantController {
             return ResponseEntity.status(500).body("Error while joining event: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/unjoin-event/{eventId}")
+    public ResponseEntity<String> unjoinEvent(@PathVariable Integer eventId) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+            logger.info("Received unjoin request. User email: {}, Event ID: {}", currentUserEmail, eventId);
+
+            eventParticipantService.unjoinEvent(eventId, currentUserEmail);
+
+            logger.info("User {} successfully unjoined event ID {}", currentUserEmail, eventId);
+            return ResponseEntity.ok("Successfully unjoined the event.");
+        } catch (Exception e) {
+            logger.error("Error while unjoining event. Event ID: {}, Error: {}", eventId, e.getMessage(), e);
+            return ResponseEntity.status(500).body("Error while unjoining event: " + e.getMessage());
+        }
+    }
+
 
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

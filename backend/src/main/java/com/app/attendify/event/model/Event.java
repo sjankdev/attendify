@@ -1,6 +1,7 @@
 package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -30,8 +31,14 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @Column(nullable = false)
+    private LocalDateTime eventEndDate;
+
     @Column(nullable = true)
     private LocalDateTime joinDeadline;
+
+    @Column(nullable = false)
+    private boolean joinApproval;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -44,7 +51,10 @@ public class Event {
     private EventOrganizer organizer;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ParticipantEvent> participantEvents = new ArrayList<>();
+    private List<EventAttendance> eventAttendances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<AgendaItem> agendaItems = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -100,6 +110,16 @@ public class Event {
         return this;
     }
 
+    public LocalDateTime getEventEndDate() {
+        return eventEndDate;
+    }
+
+    public Event setEventEndDate(LocalDateTime eventEndDate) {
+        this.eventEndDate = eventEndDate;
+        return this;
+    }
+
+
     public LocalDateTime getJoinDeadline() {
         return joinDeadline;
     }
@@ -118,6 +138,11 @@ public class Event {
         return this;
     }
 
+    public List<EventAttendance> getEventAttendances() {
+        return eventAttendances;
+    }
+
+
     public EventOrganizer getOrganizer() {
         return organizer;
     }
@@ -127,19 +152,44 @@ public class Event {
         return this;
     }
 
-    public List<ParticipantEvent> getParticipantEvents() {
-        return participantEvents;
+    public List<EventAttendance> getParticipantEvents() {
+        return eventAttendances;
     }
 
-    public void setParticipantEvents(List<ParticipantEvent> participantEvents) {
-        this.participantEvents = participantEvents;
+    public void setParticipantEvents(List<EventAttendance> eventAttendances) {
+        this.eventAttendances = eventAttendances;
+    }
+
+    public boolean isJoinApproval() {
+        return joinApproval;
+    }
+
+    public Event setJoinApproval(boolean joinApproval) {
+        this.joinApproval = joinApproval;
+        return this;
+    }
+
+    public List<AgendaItem> getAgendaItems() {
+        return agendaItems;
+    }
+
+    public Event setAgendaItems(List<AgendaItem> agendaItems) {
+        this.agendaItems = agendaItems;
+        return this;
     }
 
     public Integer getAvailableSlots() {
         if (attendeeLimit == null) {
             return null;
         }
-        return attendeeLimit - participantEvents.size();
+
+        long acceptedCount = eventAttendances.stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+
+        return attendeeLimit - (int) acceptedCount;
+    }
+
+    public Integer getPendingRequests() {
+        return (int) eventAttendances.stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.PENDING).count();
     }
 
 }
