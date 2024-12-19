@@ -140,15 +140,23 @@ const ListEventsPage: React.FC = () => {
                 </p>
                 <p>
                   <strong>Date:</strong>{" "}
-                  {new Date(event.eventDate).toLocaleDateString()}
+                  {new Date(event.eventDate).toLocaleString()}
                 </p>
                 <p>
                   <strong>End Date:</strong>{" "}
-                  {new Date(event.eventEndDate).toLocaleDateString()}
+                  {new Date(event.eventEndDate).toLocaleString()}
                 </p>
                 <p>
-                  <strong>Available Seats:</strong> {event.acceptedParticipants}
-                  /{event.attendeeLimit}
+                  <strong>Join Deadline:</strong>{" "}
+                  {event.joinDeadline
+                    ? new Date(event.joinDeadline).toLocaleString()
+                    : "N/A"}
+                </p>
+                <p>
+                  <strong>Available Seats: </strong>
+                  {event.attendeeLimit === null
+                    ? `${event.acceptedParticipants}/no limit`
+                    : `${event.acceptedParticipants}/${event.attendeeLimit}`}
                 </p>
                 <p>
                   <strong>Pending Requests:</strong> {event.pendingRequests}
