@@ -36,28 +36,41 @@ const CompanyParticipantsPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading participants...</p>;
+    return <div className="text-center text-lg">Loading participants...</div>;
   }
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return <div className="text-center text-lg text-red-600">{error}</div>;
   }
 
   return (
-    <div>
-      <h2>Participants from Your Company</h2>
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Participants from Your Company</h2>
+
       {participants.length === 0 ? (
-        <p>No participants found for your company.</p>
+        <p className="text-center text-lg text-gray-500">No participants found for your company.</p>
       ) : (
-        <ul>
+        <ul className="space-y-4">
           {participants.map((participant) => (
-            <li key={participant.participantId}>
-              {participant.participantName} - {participant.participantEmail} -
-              Events Joined: {participant.joinedEventCount}
-              <ul>
+            <li
+              key={participant.participantId}
+              className="bg-gray-100 p-4 rounded-lg shadow-sm hover:bg-gray-200 transition-colors"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-medium text-gray-700">{participant.participantName}</h3>
+                  <p className="text-gray-500">{participant.participantEmail}</p>
+                  <p className="text-sm text-gray-600">Events Joined: {participant.joinedEventCount}</p>
+                </div>
+              </div>
+
+              <ul className="mt-4 space-y-2">
                 {participant.eventLinks.map((link, index) => (
                   <li key={index}>
-                    <a href={`/event-details/${link.split("/").pop()}`}>
+                    <a
+                      href={`/event-details/${link.split("/").pop()}`}
+                      className="text-blue-500 hover:underline"
+                    >
                       Event {index + 1}
                     </a>
                   </li>
