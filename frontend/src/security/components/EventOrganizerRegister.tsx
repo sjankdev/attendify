@@ -78,65 +78,90 @@ const EventOrganizerRegister: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+    <div className="min-h-screen bg-gradient-to-r from-teal-500 via-green-500 to-blue-500 flex items-center justify-center p-8">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Event Organizer Registration</h2>
+        
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {success && <p className="text-green-500 text-center mb-4">{success}</p>}
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-lg font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          
+          <div className="flex flex-col">
+            <label htmlFor="password" className="text-lg font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          
+          <div className="flex flex-col">
+            <label htmlFor="fullName" className="text-lg font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          
+          <div className="flex flex-col">
+            <label htmlFor="companyName" className="text-lg font-medium text-gray-700">Company Name</label>
+            <input
+              type="text"
+              name="companyName"
+              value={formData.companyName}
+              onChange={handleChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          
+          <div className="flex flex-col">
+            <label htmlFor="companyDescription" className="text-lg font-medium text-gray-700">Company Description</label>
+            <textarea
+              name="companyDescription"
+              value={formData.companyDescription}
+              onChange={handleChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+          >
+            Register
+          </button>
+        </form>
+
+        <div className="text-center mt-6">
+          <p className="text-gray-700">Already have an account?</p>
+          <button
+            onClick={handleLoginRedirect}
+            className="text-teal-600 font-semibold hover:underline"
+          >
+            Login
+          </button>
         </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Full Name:</label>
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Company Name:</label>
-          <input
-            type="text"
-            name="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Company Description:</label>
-          <textarea
-            name="companyDescription"
-            value={formData.companyDescription}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      <div style={{ marginTop: "10px" }}>
-        <p>Already have an account?</p>
-        <button onClick={handleLoginRedirect}>Login</button>
       </div>
     </div>
   );

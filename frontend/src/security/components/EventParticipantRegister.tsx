@@ -46,36 +46,62 @@ const EventParticipantRegister = () => {
   };
 
   return (
-    <div>
-      <h2>Complete Your Registration</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 flex items-center justify-center p-8">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          Complete Your Registration
+        </h2>
+
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col">
+            <label htmlFor="name" className="text-lg font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="password" className="text-lg font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-lg font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              readOnly
+              className="px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+          >
+            Register
+          </button>
+        </form>
+        
+        <div className="text-center mt-6">
+          <p className="text-gray-700">Already registered? <span className="text-teal-600 font-semibold hover:underline cursor-pointer" onClick={() => navigate("/login")}>Login</span></p>
         </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input type="email" id="email" value={email} readOnly />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      {error && <p>{error}</p>}
+      </div>
     </div>
   );
 };
