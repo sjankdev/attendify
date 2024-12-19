@@ -162,21 +162,21 @@ const CreateEventPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px", backgroundColor: "#f9f9f9", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-      <h2 style={{ color: "#333", fontSize: "24px", marginBottom: "20px" }}>Create Event</h2>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Create Event</h2>
 
       {successMessage && (
-        <div style={{ color: "green", marginBottom: "20px", padding: "10px", backgroundColor: "#d4edda", borderRadius: "5px" }}>
+        <div className="bg-green-100 text-green-800 p-4 mb-6 rounded-md">
           {successMessage}
         </div>
       )}
       {error && (
-        <div style={{ color: "red", marginBottom: "20px", padding: "10px", backgroundColor: "#f8d7da", borderRadius: "5px" }}>
+        <div className="bg-red-100 text-red-800 p-4 mb-6 rounded-md">
           {error}
         </div>
       )}
       {validationErrors.length > 0 && (
-        <div style={{ color: "red", marginBottom: "20px" }}>
+        <div className="text-red-600 mb-6">
           <ul>
             {validationErrors.map((err, index) => (
               <li key={index}>{err}</li>
@@ -185,156 +185,145 @@ const CreateEventPage: React.FC = () => {
         </div>
       )}
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Event Name:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Event Name:</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter event name"
-          style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Event Description:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Event Description:</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter event description"
-          style={{ padding: "12px", width: "100%", height: "100px", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Event Location:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Event Location:</label>
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter event location"
-          style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Event Date:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Event Date:</label>
         <input
           type="datetime-local"
           value={eventDate}
           onChange={(e) => setEventDate(e.target.value)}
-          style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Event End Date:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Event End Date:</label>
         <input
           type="datetime-local"
           value={eventEndDate}
           onChange={(e) => setEventEndDate(e.target.value)}
-          style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Join Deadline:</label>
+      <div className="mb-4">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Join Deadline:</label>
         <input
           type="datetime-local"
           value={joinDeadline}
           onChange={(e) => setJoinDeadline(e.target.value)}
-          style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+          className="w-full p-3 border rounded-md border-gray-300 text-lg"
         />
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ fontWeight: "600" }}>
+      <div className="mb-4 flex items-center">
+        <label className="font-semibold text-gray-700 mr-2">
           <input
             type="checkbox"
             checked={isAttendeeLimitChecked}
             onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-            style={{ marginRight: "10px" }}
+            className="mr-2"
           />
           Set Attendee Limit
         </label>
         {isAttendeeLimitChecked && (
-          <div style={{ marginTop: "10px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Attendee Limit:</label>
-            <input
-              type="number"
-              value={attendeeLimit ?? ""}
-              onChange={(e) => setAttendeeLimit(Number(e.target.value))}
-              placeholder="Enter attendee limit"
-              style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
-              min="1"
-            />
-          </div>
+          <input
+            type="number"
+            value={attendeeLimit ?? ""}
+            onChange={(e) => setAttendeeLimit(Number(e.target.value))}
+            placeholder="Enter attendee limit"
+            className="p-3 border rounded-md border-gray-300 text-lg"
+            min="1"
+          />
         )}
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ fontWeight: "600" }}>
+      <div className="mb-4">
+        <label className="font-semibold text-gray-700">
           <input
             type="checkbox"
             checked={joinApproval}
             onChange={(e) => setJoinApproval(e.target.checked)}
-            style={{ marginRight: "10px" }}
+            className="mr-2"
           />
           Require Join Approval
         </label>
       </div>
 
-      <div style={{ marginBottom: "20px" }}>
-        <h3 style={{ fontSize: "20px", marginBottom: "10px" }}>Agenda Items</h3>
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-700 mb-4">Agenda Items</h3>
         {agendaItems.map((item, index) => (
-          <div key={index} style={{ marginBottom: "20px" }}>
-            <h4 style={{ fontSize: "18px", marginBottom: "10px" }}>Agenda Item {index + 1}</h4>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Title:</label>
+          <div key={index} className="mb-6">
+            <h4 className="text-lg font-semibold text-gray-700">Agenda Item {index + 1}</h4>
+
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Title:</label>
             <input
               type="text"
               value={item.title}
               onChange={(e) => handleAgendaItemChange(index, "title", e.target.value)}
               placeholder="Enter agenda title"
-              style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+              className="w-full p-3 border rounded-md border-gray-300 text-lg"
             />
 
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Description:</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Description:</label>
             <textarea
               value={item.description}
               onChange={(e) => handleAgendaItemChange(index, "description", e.target.value)}
               placeholder="Enter agenda description"
-              style={{ padding: "12px", width: "100%", height: "100px", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+              className="w-full p-3 border rounded-md border-gray-300 text-lg"
             />
 
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Start Time:</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Start Time:</label>
             <input
               type="datetime-local"
               value={item.startTime}
               onChange={(e) => handleAgendaItemChange(index, "startTime", e.target.value)}
-              style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+              className="w-full p-3 border rounded-md border-gray-300 text-lg"
             />
 
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>End Time:</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">End Time:</label>
             <input
               type="datetime-local"
               value={item.endTime}
               onChange={(e) => handleAgendaItemChange(index, "endTime", e.target.value)}
-              style={{ padding: "12px", width: "100%", borderRadius: "5px", border: "1px solid #ccc", fontSize: "16px" }}
+              className="w-full p-3 border rounded-md border-gray-300 text-lg"
             />
 
             <button
               type="button"
               onClick={() => removeAgendaItem(index)}
-              style={{
-                backgroundColor: "#e74c3c",
-                color: "#fff",
-                padding: "10px",
-                borderRadius: "5px",
-                border: "none",
-                fontSize: "16px",
-                cursor: "pointer",
-                marginTop: "10px",
-              }}
+              className="bg-red-500 text-white p-3 mt-2 rounded-md"
             >
               Remove Agenda Item
             </button>
@@ -343,15 +332,7 @@ const CreateEventPage: React.FC = () => {
         <button
           type="button"
           onClick={addAgendaItem}
-          style={{
-            backgroundColor: "#3498db",
-            color: "#fff",
-            padding: "10px",
-            borderRadius: "5px",
-            border: "none",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
+          className="bg-blue-500 text-white p-3 rounded-md"
         >
           Add Agenda Item
         </button>
@@ -360,34 +341,14 @@ const CreateEventPage: React.FC = () => {
       <button
         onClick={handleCreateEvent}
         disabled={isSubmitting}
-        style={{
-          backgroundColor: "#2ecc71",
-          color: "#fff",
-          padding: "15px",
-          width: "100%",
-          borderRadius: "5px",
-          border: "none",
-          fontSize: "18px",
-          cursor: "pointer",
-          marginTop: "20px",
-        }}
+        className="bg-green-500 text-white p-4 rounded-md w-full text-lg"
       >
         {isSubmitting ? "Creating Event..." : "Create Event"}
       </button>
 
       <button
         onClick={handleGoBack}
-        style={{
-          backgroundColor: "#f39c12",
-          color: "#fff",
-          padding: "15px",
-          width: "100%",
-          borderRadius: "5px",
-          border: "none",
-          fontSize: "18px",
-          cursor: "pointer",
-          marginTop: "15px",
-        }}
+        className="bg-yellow-500 text-white p-4 rounded-md w-full text-lg mt-4"
       >
         Go Back
       </button>
