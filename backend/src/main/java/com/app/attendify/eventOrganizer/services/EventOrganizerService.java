@@ -258,15 +258,48 @@ public class EventOrganizerService {
             });
 
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+                        List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream()
+                                .map(agendaItem -> new AgendaItemDTO(
+                                        agendaItem.getId(),
+                                        agendaItem.getTitle(),
+                                        agendaItem.getDescription(),
+                                        agendaItem.getStartTime(),
+                                        agendaItem.getEndTime()))
+                                .collect(Collectors.toList());
 
-                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+                        long acceptedParticipantsCount = event.getEventAttendances().stream()
+                                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                                .count();
 
-                int pendingRequests = event.getPendingRequests();
+                        Double averageAge = event.getEventAttendances().stream()
+                                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                                .mapToInt(attendance -> attendance.getParticipant().getAge())
+                                .average()
+                                .orElse(0.0);
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems, pendingRequests);
+                        logger.info("Calculated average age for event {}: {}", event.getId(), averageAge);
 
-            }).collect(Collectors.toList());
+
+                        return new EventForOrganizersDTO(
+                                event.getId(),
+                                event.getName(),
+                                event.getDescription(),
+                                event.getLocation(),
+                                event.getCompany() != null ? event.getCompany().getName() : "No company",
+                                event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                                event.getAvailableSlots(),
+                                event.getEventDate(),
+                                event.getAttendeeLimit(),
+                                event.getJoinDeadline(),
+                                (int) acceptedParticipantsCount,
+                                event.isJoinApproval(),
+                                event.getEventEndDate(),
+                                agendaItems,
+                                event.getPendingRequests(),
+                                averageAge
+                        );
+                    })
+                    .collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
@@ -375,5 +408,24 @@ public class EventOrganizerService {
             logger.error("Error retrieving event details", e);
             throw new RuntimeException("Error retrieving event details", e);
         }
+    }
+
+    @Transactional
+    public Double calculateAverageAge(Integer eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
+                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                .toList();
+
+        if (acceptedAttendances.isEmpty()) {
+            return 0.0;
+        }
+
+        return acceptedAttendances.stream()
+                .map(attendance -> attendance.getParticipant().getAge())
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0.0);
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 public class EventForOrganizersDTO {
     private Integer id;
     private String name;
@@ -18,6 +19,7 @@ public class EventForOrganizersDTO {
     private LocalDateTime joinDeadline;
     private Integer acceptedParticipants;
     private boolean joinApproval;
+    private Double averageAge;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
@@ -29,7 +31,7 @@ public class EventForOrganizersDTO {
 
     private Integer pendingRequests;
 
-    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
+    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, Double averageAge) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -45,7 +47,7 @@ public class EventForOrganizersDTO {
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
         this.pendingRequests = pendingRequests;
-
+        this.averageAge = averageAge;
     }
 
     public List<AgendaItemDTO> getAgendaItems() {
@@ -176,4 +178,12 @@ public class EventForOrganizersDTO {
         this.pendingRequests = pendingRequests;
     }
 
+
+    public Double getAverageAge() {
+        return averageAge;
+    }
+
+    public void setAverageAge(Double averageAge) {
+        this.averageAge = averageAge;
+    }
 }

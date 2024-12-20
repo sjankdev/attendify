@@ -18,10 +18,11 @@ export interface Event {
   joinApproval: boolean;
   companyName: string;
   organizerName: string;
-  participants: Participant[]; 
-  agendaItems: AgendaItemDTO[]; 
-  pendingRequests: number; 
-  acceptedParticipants: number; 
+  participants: Participant[];
+  agendaItems: AgendaItemDTO[];
+  pendingRequests: number;
+  acceptedParticipants: number;
+  averageAge: number;
 }
 
 
