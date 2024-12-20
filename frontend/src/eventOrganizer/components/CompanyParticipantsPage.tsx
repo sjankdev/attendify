@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
+import Layout from "../../shared/components/Layout";
 
 const CompanyParticipantsPage: React.FC = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -44,6 +45,7 @@ const CompanyParticipantsPage: React.FC = () => {
   }
 
   return (
+    <Layout>
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Participants from Your Company</h2>
 
@@ -81,6 +83,7 @@ const CompanyParticipantsPage: React.FC = () => {
         </ul>
       )}
     </div>
+    </Layout>
   );
 };
 
