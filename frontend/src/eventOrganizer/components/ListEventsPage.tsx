@@ -165,15 +165,21 @@ const ListEventsPage: React.FC = () => {
                   </p>
                   <p>
                     <strong>Average Age:</strong>{" "}
-                    {event.averageAge ? event.averageAge.toFixed(1) : "N/A"}
+                    {event.averageAge && event.acceptedParticipants > 0
+                      ? event.averageAge.toFixed(1)
+                      : "No Participants"}
                   </p>
                   <p>
                     <strong>Highest Age:</strong>{" "}
-                    {event.highestAge !== undefined ? event.highestAge : "N/A"}
+                    {event.highestAge && event.acceptedParticipants > 0
+                      ? event.highestAge
+                      : "No Participants"}
                   </p>
                   <p>
                     <strong>Lowest Age:</strong>{" "}
-                    {event.lowestAge !== undefined ? event.lowestAge : "N/A"}
+                    {event.lowestAge && event.acceptedParticipants > 0
+                      ? event.lowestAge
+                      : "No Participants"}
                   </p>
                 </div>
 

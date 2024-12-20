@@ -398,6 +398,7 @@ public class EventOrganizerService {
         Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
         Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
 
+        assert lowestAge != null;
         return Map.of("averageAge", averageAge, "highestAge", highestAge, "lowestAge", lowestAge);
     }
 }
