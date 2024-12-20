@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { AgendaItemDTO } from "../../types/eventTypes";
 
 const EventParticipantPage: React.FC = () => {
   const [events, setEvents] = useState<any[]>([]);
@@ -110,23 +111,32 @@ const EventParticipantPage: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Your Events</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Your Events</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      <div>
-        <button onClick={() => fetchEvents("week")}>
+      <div className="flex space-x-4 mb-6">
+        <button
+          onClick={() => fetchEvents("week")}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
           This Week ({thisWeekCount})
         </button>
-        <button onClick={() => fetchEvents("month")}>
+        <button
+          onClick={() => fetchEvents("month")}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
           This Month ({thisMonthCount})
         </button>
-        <button onClick={() => fetchEvents("all")}>
+        <button
+          onClick={() => fetchEvents("all")}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+        >
           All Events ({allEventsCount})
         </button>
       </div>
 
-      <ul>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event) => {
           const currentTime = new Date();
           const joinDeadline = new Date(event.joinDeadline);
@@ -136,59 +146,82 @@ const EventParticipantPage: React.FC = () => {
           const isNotJoined = event.status === "NOT_JOINED";
 
           return (
-            <li key={event.id}>
-              <h3>{event.name}</h3>
-              <p>{event.description}</p>
-              <p>Location: {event.location}</p>
-              <p>Company: {event.companyName}</p>
-              <p>Date & Time: {event.eventDate}</p>
-              <p>End Date & Time: {event.eventEndDate}</p>
-              <p>Join Deadline: {event.joinDeadline}</p>
-              <p>Status: {event.status}</p>
-              <p>
-                Available Seats:{" "}
+            <div
+              key={event.id}
+              className="p-4 border rounded shadow hover:shadow-lg"
+            >
+              <h3 className="text-xl font-bold mb-2">{event.name}</h3>
+              <p className="text-gray-700 mb-2">{event.description}</p>
+              <p className="text-gray-500">
+                <strong>Location:</strong> {event.location}
+              </p>
+              <p className="text-gray-500">
+                <strong>Company:</strong> {event.companyName}
+              </p>
+              <p className="text-gray-500">
+                <strong>Date & Time:</strong> {event.eventDate}
+              </p>
+              <p className="text-gray-500">
+                <strong>End Date & Time:</strong> {event.eventEndDate}
+              </p>
+              <p className="text-gray-500">
+                <strong>Join Deadline:</strong> {event.joinDeadline}
+              </p>
+              <p className="text-gray-500">
+                <strong>Status:</strong> {event.status}
+              </p>
+              <p className="text-gray-500">
+                <strong>Available Seats:</strong>{" "}
                 {event.joinedParticipants !== null &&
                 event.attendeeLimit !== null
                   ? `${event.joinedParticipants}/${event.attendeeLimit}`
                   : "No limit"}
               </p>
 
-              <h4>Agenda</h4>
-              <ul>
-                {event.agendaItems.map((item: any) => (
+              <h4 className="text-lg font-semibold mt-4">Agenda</h4>
+              <ul className="list-disc list-inside text-gray-700 mb-4">
+                {event.agendaItems.map((item: AgendaItemDTO) => (
                   <li key={item.title}>
                     <strong>{item.title}</strong> - {item.description}
                     <br />
-                    <span>
+                    <span className="text-sm">
                       Start: {new Date(item.startTime).toLocaleString()}
                     </span>
                     <br />
-                    <span>End: {new Date(item.endTime).toLocaleString()}</span>
+                    <span className="text-sm">
+                      End: {new Date(item.endTime).toLocaleString()}
+                    </span>
                   </li>
                 ))}
               </ul>
 
               {isJoinDeadlinePassed && isNotJoined && (
-                <p style={{ color: "gray" }}>
+                <p className="text-gray-500 italic">
                   The join deadline for this event has passed. You cannot join
                   this event.
                 </p>
               )}
 
               {!isJoinDeadlinePassed && !isAccepted && !isPending && (
-                <button onClick={() => handleJoinEvent(event.id)}>
+                <button
+                  onClick={() => handleJoinEvent(event.id)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                >
                   Join Event
                 </button>
               )}
               {(isPending || isAccepted) && (
-                <button onClick={() => handleUnjoinEvent(event.id)}>
+                <button
+                  onClick={() => handleUnjoinEvent(event.id)}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full mt-2"
+                >
                   Unjoin Event
                 </button>
               )}
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 };

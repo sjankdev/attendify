@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Layout from "../../shared/components/Layout";
 
 const InvitationPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -69,65 +70,63 @@ const InvitationPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading company information...</div>;
+    return <div className="text-center text-gray-600">Loading company information...</div>;
   }
 
   if (error) {
-    return <div style={{ color: "red" }}>{error}</div>;
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   return (
-    <div>
-      <h2>Invite Participants</h2>
-      {companyName && (
-        <p>
-          Company: <strong>{companyName}</strong>
-        </p>
-      )}
-      <div>
-        <h3>Send Invitation</h3>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter participant's email"
-          style={{ padding: "10px", width: "300px" }}
-        />
-        <button
-          onClick={handleSendInvitation}
-          style={{
-            padding: "10px 20px",
-            marginLeft: "10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Send Invitation
-        </button>
-      </div>
-      {successMessage && (
-        <div style={{ color: "green", marginTop: "10px" }}>
-          {successMessage}
-        </div>
-      )}
-      {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
+    <Layout>
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-teal-500 flex items-center justify-center p-8">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          Invite Participants
+        </h2>
 
-      <button
-        onClick={handleGoBack}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#6c757d",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Go Back
-      </button>
+        {companyName && (
+          <p className="text-lg text-center mb-4">
+            Company: <strong>{companyName}</strong>
+          </p>
+        )}
+
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Send Invitation</h3>
+          <div className="flex flex-col space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter participant's email"
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+            <button
+              onClick={handleSendInvitation}
+              className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+            >
+              Send Invitation
+            </button>
+          </div>
+
+          {successMessage && (
+            <div className="mt-4 text-green-600 text-center">
+              {successMessage}
+            </div>
+          )}
+
+          {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
+
+          <button
+            onClick={handleGoBack}
+            className="mt-6 px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-700 transition duration-300"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
     </div>
+    </Layout>
   );
 };
 

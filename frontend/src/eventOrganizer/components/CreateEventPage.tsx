@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AgendaItemDTO } from "../../types/eventTypes";
+import Layout from "../../shared/components/Layout";
 
 const CreateEventPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -164,270 +165,263 @@ const CreateEventPage: React.FC = () => {
     }
   };
 
-  const handleAgendaItemChange = (
-    index: number,
-    field: keyof AgendaItemDTO,
-    value: string
-  ) => {
+  const handleGoBack = () => {
+    navigate("/event-organizer");
+  };
+
+  const handleAgendaChange = (index: number, field: string, value: string) => {
     const updatedAgendaItems = [...agendaItems];
-    updatedAgendaItems[index][field] = value;
+    updatedAgendaItems[index] = {
+      ...updatedAgendaItems[index],
+      [field]: value,
+    };
     setAgendaItems(updatedAgendaItems);
   };
 
-  const addAgendaItem = () => {
+  const handleAddAgendaItem = () => {
     setAgendaItems([
       ...agendaItems,
       { title: "", description: "", startTime: "", endTime: "" },
     ]);
   };
 
-  const removeAgendaItem = (index: number) => {
+  const handleRemoveAgendaItem = (index: number) => {
     const updatedAgendaItems = agendaItems.filter((_, i) => i !== index);
     setAgendaItems(updatedAgendaItems);
   };
 
-  const handleGoBack = () => {
-    navigate("/event-organizer");
-  };
-
   return (
-    <div>
-      <h2>Create Event</h2>
-      {successMessage && (
-        <div style={{ color: "green", marginBottom: "10px" }}>
-          {successMessage}
-        </div>
-      )}
-      {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
-      )}
-      {validationErrors.length > 0 && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          <ul>
-            {validationErrors.map((err, index) => (
-              <li key={index}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+    <Layout>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-6">
+          Create Event
+        </h2>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter event name"
-          style={{ padding: "10px", width: "300px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Description:
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter event description"
-          style={{ padding: "10px", width: "300px", height: "100px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Location:
-        </label>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter event location"
-          style={{ padding: "10px", width: "300px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Event Date:
-        </label>
-        <input
-          type="datetime-local"
-          value={eventDate}
-          onChange={(e) => setEventDate(e.target.value)}
-          style={{ padding: "10px", width: "300px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Event End Date:
-        </label>
-        <input
-          type="datetime-local"
-          value={eventEndDate}
-          onChange={(e) => setEventEndDate(e.target.value)}
-          style={{ padding: "10px", width: "300px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>
-          Join Deadline:
-        </label>
-        <input
-          type="datetime-local"
-          value={joinDeadline}
-          onChange={(e) => setJoinDeadline(e.target.value)}
-          style={{ padding: "10px", width: "300px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={isAttendeeLimitChecked}
-            onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-          />
-          Set Attendee Limit
-        </label>
-        {isAttendeeLimitChecked && (
-          <div style={{ marginTop: "10px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              Attendee Limit:
-            </label>
-            <input
-              type="number"
-              value={attendeeLimit ?? ""}
-              onChange={(e) => setAttendeeLimit(Number(e.target.value))}
-              placeholder="Enter attendee limit"
-              style={{ padding: "10px", width: "300px" }}
-              min="1"
-            />
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+            {successMessage}
           </div>
         )}
-      </div>
+        {error && (
+          <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+        {validationErrors.length > 0 && (
+          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4">
+            <ul>
+              {validationErrors.map((err, index) => (
+                <li key={index}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={joinApproval}
-            onChange={(e) => setJoinApproval(e.target.checked)}
-          />
-          Require Join Approval
-        </label>
-      </div>
-
-      <div style={{ marginBottom: "20px" }}>
-        <h3>Agenda Items</h3>
-        {agendaItems.map((item, index) => (
-          <div key={index} style={{ marginBottom: "20px" }}>
-            <h4>Agenda Item {index + 1}</h4>
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              Title:
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 border border-gray-300 rounded-lg shadow-sm">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Event Name
             </label>
             <input
               type="text"
-              value={item.title}
-              onChange={(e) =>
-                handleAgendaItemChange(index, "title", e.target.value)
-              }
-              placeholder="Enter agenda title"
-              style={{ padding: "10px", width: "300px" }}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter event name"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
+          </div>
 
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              Description:
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Start Time
+            </label>
+            <input
+              type="datetime-local"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Event Description
             </label>
             <textarea
-              value={item.description}
-              onChange={(e) =>
-                handleAgendaItemChange(index, "description", e.target.value)
-              }
-              placeholder="Enter agenda description"
-              style={{ padding: "10px", width: "300px", height: "100px" }}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter event description"
+              rows={4}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
-
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              Start Time:
-            </label>
-            <input
-              type="datetime-local"
-              value={item.startTime}
-              onChange={(e) =>
-                handleAgendaItemChange(index, "startTime", e.target.value)
-              }
-              style={{ padding: "10px", width: "300px" }}
-            />
-
-            <label style={{ display: "block", marginBottom: "5px" }}>
-              End Time:
-            </label>
-            <input
-              type="datetime-local"
-              value={item.endTime}
-              onChange={(e) =>
-                handleAgendaItemChange(index, "endTime", e.target.value)
-              }
-              style={{ padding: "10px", width: "300px" }}
-            />
-
-            <button
-              type="button"
-              onClick={() => removeAgendaItem(index)}
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "10px",
-                marginTop: "10px",
-              }}
-            >
-              Remove Agenda Item
-            </button>
           </div>
-        ))}
 
-        <button
-          type="button"
-          onClick={addAgendaItem}
-          style={{
-            backgroundColor: "green",
-            color: "white",
-            padding: "10px",
-            marginTop: "10px",
-          }}
-        >
-          Add Agenda Item
-        </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              End Time
+            </label>
+            <input
+              type="datetime-local"
+              value={eventEndDate}
+              onChange={(e) => setEventEndDate(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Event Location
+            </label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Enter event location"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Join Deadline
+            </label>
+            <input
+              type="datetime-local"
+              value={joinDeadline}
+              onChange={(e) => setJoinDeadline(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              <input
+                type="checkbox"
+                checked={isAttendeeLimitChecked}
+                onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+                className="mr-2"
+              />
+              Set Attendee Limit
+            </label>
+            {isAttendeeLimitChecked && (
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Attendee Limit
+                </label>
+                <input
+                  type="number"
+                  value={attendeeLimit ?? ""}
+                  onChange={(e) => setAttendeeLimit(Number(e.target.value))}
+                  placeholder="Enter attendee limit"
+                  min="1"
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Require Join Approval */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              <input
+                type="checkbox"
+                checked={joinApproval}
+                onChange={(e) => setJoinApproval(e.target.checked)}
+                className="mr-2"
+              />
+              Require Join Approval
+            </label>
+          </div>
+        </div>
+
+        <div className="p-6 border border-gray-300 rounded-lg shadow-sm mb-6">
+          <label className="block text-sm font-medium text-gray-700">
+            Agenda Items
+          </label>
+          {agendaItems.map((item, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
+            >
+              <div>
+                <input
+                  type="text"
+                  value={item.title}
+                  onChange={(e) =>
+                    handleAgendaChange(index, "title", e.target.value)
+                  }
+                  placeholder="Agenda item title"
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={item.description}
+                  onChange={(e) =>
+                    handleAgendaChange(index, "description", e.target.value)
+                  }
+                  placeholder="Agenda item description"
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <input
+                  type="datetime-local"
+                  value={item.startTime}
+                  onChange={(e) =>
+                    handleAgendaChange(index, "startTime", e.target.value)
+                  }
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div>
+                <input
+                  type="datetime-local"
+                  value={item.endTime}
+                  onChange={(e) =>
+                    handleAgendaChange(index, "endTime", e.target.value)
+                  }
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              <div className="col-span-2 flex justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => handleRemoveAgendaItem(index)}
+                  className="text-red-500 font-semibold hover:text-red-700"
+                >
+                  Remove Agenda Item
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddAgendaItem}
+            className="mt-4 inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700"
+          >
+            Add Agenda Item
+          </button>
+        </div>
+
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={handleCreateEvent}
+            disabled={isSubmitting}
+            className="inline-block bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 disabled:opacity-50"
+          >
+            {isSubmitting ? "Creating Event..." : "Create Event"}
+          </button>
+          <button
+            onClick={handleGoBack}
+            className="inline-block bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700"
+          >
+            Go Back
+          </button>
+        </div>
       </div>
-
-      <button
-        onClick={handleCreateEvent}
-        disabled={isSubmitting}
-        style={{
-          backgroundColor: "blue",
-          color: "white",
-          padding: "10px",
-          marginTop: "10px",
-        }}
-      >
-        {isSubmitting ? "Creating Event..." : "Create Event"}
-      </button>
-
-      <button
-        onClick={handleGoBack}
-        style={{
-          backgroundColor: "gray",
-          color: "white",
-          padding: "10px",
-          marginLeft: "10px",
-        }}
-      >
-        Go Back
-      </button>
-    </div>
+    </Layout>
   );
 };
 
