@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/auth/event-organizer")
@@ -21,7 +22,6 @@ import java.util.stream.Collectors;
 public class EventOrganizerController {
 
     private static final Logger logger = LoggerFactory.getLogger(EventOrganizerController.class);
-
 
     private final EventOrganizerService eventOrganizerService;
 
@@ -127,16 +127,16 @@ public class EventOrganizerController {
         }
     }
 
-    @GetMapping("/average-age/{eventId}")
+    @GetMapping("/age-stats/{eventId}")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<Double> getAverageAge(@PathVariable Integer eventId) {
-        logger.info("Received request to calculate average age for event ID: {}", eventId);
+    public ResponseEntity<Map<String, Object>> getAgeStats(@PathVariable Integer eventId) {
+        logger.info("Received request to calculate age stats for event ID: {}", eventId);
         try {
-            Double averageAge = eventOrganizerService.calculateAverageAge(eventId);
-            logger.info("Average age for event ID {}: {}", eventId, averageAge);
-            return ResponseEntity.ok(averageAge);
+            Map<String, Object> ageStats = eventOrganizerService.calculateAgeStats(eventId);
+            logger.info("Age stats for event ID {}: {}", eventId, ageStats);
+            return ResponseEntity.ok(ageStats);
         } catch (Exception e) {
-            logger.error("Error calculating average age for event ID: {}", eventId, e);
+            logger.error("Error calculating age stats for event ID: {}", eventId, e);
             return ResponseEntity.status(500).body(null);
         }
     }

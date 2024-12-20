@@ -23,8 +23,9 @@ export interface Event {
   pendingRequests: number;
   acceptedParticipants: number;
   averageAge: number;
+  highestAge?: number; 
+  lowestAge?: number; 
 }
-
 
 export interface Participant {
   participantId: number;

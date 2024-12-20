@@ -67,7 +67,9 @@ export const fetchEventsWithParticipants = async (
     return {
       events: eventsWithParticipants.map((event) => ({
         ...event,
-        averageAge: event.averageAge, 
+        averageAge: event.averageAge,
+        highestAge: event.highestAge, 
+        lowestAge: event.lowestAge, 
         eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
