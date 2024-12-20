@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Layout from "../../shared/components/Layout";
 
 const InvitationPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -16,7 +17,7 @@ const InvitationPage: React.FC = () => {
     const fetchCompanyData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -47,7 +48,7 @@ const InvitationPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/invitation/send",
+        "https://attendify-backend-el2r.onrender.com/api/auth/invitation/send",
         { email, companyId },
         {
           headers: {
@@ -77,6 +78,7 @@ const InvitationPage: React.FC = () => {
   }
 
   return (
+    <Layout>
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-teal-500 flex items-center justify-center p-8">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
@@ -124,6 +126,7 @@ const InvitationPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

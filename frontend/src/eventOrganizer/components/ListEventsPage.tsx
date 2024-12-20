@@ -6,6 +6,7 @@ import {
   reviewJoinRequest,
 } from "../services/eventOrganizerService";
 import { Event, Participant } from "../../types/eventTypes";
+import Layout from "../../shared/components/Layout";
 
 const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -92,6 +93,7 @@ const ListEventsPage: React.FC = () => {
   };
 
   return (
+    <Layout>
     <div className="container mx-auto p-6">
       <h2 className="text-3xl font-semibold text-gray-800 mb-6">My Events</h2>
       {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -274,6 +276,7 @@ const ListEventsPage: React.FC = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 
