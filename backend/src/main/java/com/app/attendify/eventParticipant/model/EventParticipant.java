@@ -2,6 +2,7 @@ package com.app.attendify.eventParticipant.model;
 
 import com.app.attendify.company.model.Company;
 import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
@@ -27,6 +28,10 @@ public class EventParticipant {
 
     @Column(nullable = false)
     private Integer age;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
 
     public Integer getId() {
         return id;
@@ -69,6 +74,15 @@ public class EventParticipant {
 
     public EventParticipant setAge(Integer age) {
         this.age = age;
+        return this;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public EventParticipant setGender(Gender gender) {
+        this.gender = gender;
         return this;
     }
 }

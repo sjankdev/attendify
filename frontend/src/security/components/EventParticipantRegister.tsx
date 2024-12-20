@@ -8,6 +8,7 @@ const EventParticipantRegister = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState<number | "">("");
+  const [gender, setGender] = useState<string>("");
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const EventParticipantRegister = () => {
         email,
         password,
         age,
+        gender,
         token,
       })
       .then((response) => {
@@ -45,6 +47,10 @@ const EventParticipantRegister = () => {
       .catch((err) => {
         setError("Error registering participant.");
       });
+  };
+
+  const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setGender(e.target.value);
   };
 
   return (
@@ -101,7 +107,28 @@ const EventParticipantRegister = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-
+          <div className="flex flex-col">
+            <label
+              htmlFor="gender"
+              className="text-lg font-medium text-gray-700"
+            >
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={handleGenderChange}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
           <div className="flex flex-col">
             <label
               htmlFor="email"
