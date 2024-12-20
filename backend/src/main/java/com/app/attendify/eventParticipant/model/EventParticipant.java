@@ -25,6 +25,9 @@ public class EventParticipant {
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventAttendance> eventAttendances = new ArrayList<>();
 
+    @Column(nullable = false)
+    private Integer age;
+
     public Integer getId() {
         return id;
     }
@@ -58,5 +61,14 @@ public class EventParticipant {
 
     public void setParticipantEvents(List<EventAttendance> eventAttendances) {
         this.eventAttendances = eventAttendances;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public EventParticipant setAge(Integer age) {
+        this.age = age;
+        return this;
     }
 }
