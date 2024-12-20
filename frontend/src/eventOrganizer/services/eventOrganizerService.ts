@@ -1,6 +1,16 @@
 import { Event, Participant } from "../../types/eventTypes";
 
-export const fetchEventsWithParticipants = async (filter: string) => {
+export const fetchEventsWithParticipants = async (
+  filter: string
+): Promise<{
+  events: Event[];
+  counts: { thisWeek: number; thisMonth: number; allEvents: number };
+  acceptedParticipants: {
+    thisWeek: number;
+    thisMonth: number;
+    allEvents: number;
+  };
+}> => {
   try {
     const url = filter
       ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
@@ -21,15 +31,43 @@ export const fetchEventsWithParticipants = async (filter: string) => {
     const data = await response.json();
 
     const eventsWithParticipants: Event[] = await Promise.all(
-      data.events.map(async (event: Event) => {
-        return event;
+      (data.events as Event[]).map(async (event): Promise<Event> => {
+        try {
+          const participantsResponse = await fetch(
+            `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+
+          if (participantsResponse.ok) {
+            const participants: Participant[] =
+              await participantsResponse.json();
+            return {
+              ...event,
+              participants,
+              pendingRequests: event.pendingRequests,
+            };
+          }
+          return event;
+        } catch (error) {
+          console.error(
+            `Failed to fetch participants for event ID ${event.id}:`,
+            error
+          );
+          return event;
+        }
       })
     );
 
     return {
       events: eventsWithParticipants.map((event) => ({
         ...event,
-        averageAge: event.averageAge,
+        averageAge: event.averageAge, 
         eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
