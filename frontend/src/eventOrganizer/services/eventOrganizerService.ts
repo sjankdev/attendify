@@ -13,8 +13,8 @@ export const fetchEventsWithParticipants = async (
 }> => {
   try {
     const url = filter
-      ? `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events?filter=${filter}`
-      : "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events";
+      ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
+      : "http://localhost:8080/api/auth/event-organizer/my-events";
 
     const response = await fetch(url, {
       method: "GET",
@@ -34,7 +34,7 @@ export const fetchEventsWithParticipants = async (
       (data.events as Event[]).map(async (event): Promise<Event> => {
         try {
           const participantsResponse = await fetch(
-            `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${event.id}/participants`,
+            `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
             {
               method: "GET",
               headers: {
@@ -67,6 +67,7 @@ export const fetchEventsWithParticipants = async (
     return {
       events: eventsWithParticipants.map((event) => ({
         ...event,
+        averageAge: event.averageAge, 
         eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
@@ -117,7 +118,7 @@ export const fetchEventsWithParticipants = async (
 export const deleteEvent = async (eventId: number): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/delete-event/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/delete-event/${eventId}`,
       {
         method: "DELETE",
         headers: {
@@ -156,7 +157,7 @@ export const updateEvent = async (
       : null;
 
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/update-event/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
       {
         method: "PUT",
         headers: {
@@ -192,7 +193,7 @@ export const reviewJoinRequest = async (
 ): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/events/${eventId}/participants/${participantId}/status?status=${status}`,
+      `http://localhost:8080/api/auth/event-organizer/events/${eventId}/participants/${participantId}/status?status=${status}`,
       {
         method: "PUT",
         headers: {
@@ -226,7 +227,7 @@ export const reviewJoinRequest = async (
 export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
   try {
     const response = await fetch(
-      "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/company/participants",
+      "http://localhost:8080/api/auth/event-organizer/company/participants",
       {
         method: "GET",
         headers: {
@@ -251,7 +252,7 @@ export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
 export const fetchEventDetails = async (eventId: string): Promise<any> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/event-details/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/event-details/${eventId}`,
       {
         method: "GET",
         headers: {

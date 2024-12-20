@@ -67,7 +67,11 @@ public class EventParticipantService {
 
         User newUser = createUser(input);
 
-        createEventParticipant(newUser, invitation);
+        EventParticipant participant = new EventParticipant()
+                .setUser(newUser)
+                .setCompany(invitation.getCompany())
+                .setAge(input.getAge());
+        eventParticipantRepository.save(participant);
 
         invitationService.markAsAccepted(invitation);
     }

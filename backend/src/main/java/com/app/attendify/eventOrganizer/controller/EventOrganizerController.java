@@ -126,4 +126,18 @@ public class EventOrganizerController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/average-age/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<Double> getAverageAge(@PathVariable Integer eventId) {
+        logger.info("Received request to calculate average age for event ID: {}", eventId);
+        try {
+            Double averageAge = eventOrganizerService.calculateAverageAge(eventId);
+            logger.info("Average age for event ID {}: {}", eventId, averageAge);
+            return ResponseEntity.ok(averageAge);
+        } catch (Exception e) {
+            logger.error("Error calculating average age for event ID: {}", eventId, e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 }

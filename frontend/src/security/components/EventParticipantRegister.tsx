@@ -7,6 +7,7 @@ const EventParticipantRegister = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [age, setAge] = useState<number | "">("");
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -18,9 +19,9 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .get(`https://attendify-backend-el2r.onrender.com/api/auth/accept?token=${token}`)
+      .get(`http://localhost:8080/api/auth/accept?token=${token}`)
       .then((response) => {
-        setEmail(response.data.email); 
+        setEmail(response.data.email);
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Error fetching invitation.");
@@ -31,10 +32,11 @@ const EventParticipantRegister = () => {
     e.preventDefault();
 
     axios
-      .post("https://attendify-backend-el2r.onrender.com/api/auth/register-participant", {
+      .post("http://localhost:8080/api/auth/register-participant", {
         name,
         email,
         password,
+        age,
         token,
       })
       .then((response) => {
@@ -56,7 +58,9 @@ const EventParticipantRegister = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col">
-            <label htmlFor="name" className="text-lg font-medium text-gray-700">Full Name</label>
+            <label htmlFor="name" className="text-lg font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               id="name"
@@ -68,7 +72,12 @@ const EventParticipantRegister = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="password" className="text-lg font-medium text-gray-700">Password</label>
+            <label
+              htmlFor="password"
+              className="text-lg font-medium text-gray-700"
+            >
+              Password
+            </label>
             <input
               type="password"
               id="password"
@@ -80,7 +89,26 @@ const EventParticipantRegister = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="email" className="text-lg font-medium text-gray-700">Email</label>
+            <label htmlFor="age" className="text-lg font-medium text-gray-700">
+              Age
+            </label>
+            <input
+              type="number"
+              id="age"
+              value={age}
+              onChange={(e) => setAge(Number(e.target.value))}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label
+              htmlFor="email"
+              className="text-lg font-medium text-gray-700"
+            >
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -97,9 +125,17 @@ const EventParticipantRegister = () => {
             Register
           </button>
         </form>
-        
+
         <div className="text-center mt-6">
-          <p className="text-gray-700">Already registered? <span className="text-teal-600 font-semibold hover:underline cursor-pointer" onClick={() => navigate("/login")}>Login</span></p>
+          <p className="text-gray-700">
+            Already registered?{" "}
+            <span
+              className="text-teal-600 font-semibold hover:underline cursor-pointer"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </span>
+          </p>
         </div>
       </div>
     </div>

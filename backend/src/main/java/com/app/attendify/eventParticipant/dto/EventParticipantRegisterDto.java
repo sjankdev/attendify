@@ -5,6 +5,7 @@ public class EventParticipantRegisterDto {
     private String email;
     private String password;
     private String token;
+    private Integer age;
 
     public String getName() {
         return name;
@@ -36,5 +37,13 @@ public class EventParticipantRegisterDto {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }
