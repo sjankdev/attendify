@@ -258,48 +258,25 @@ public class EventOrganizerService {
             });
 
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
-                        List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream()
-                                .map(agendaItem -> new AgendaItemDTO(
-                                        agendaItem.getId(),
-                                        agendaItem.getTitle(),
-                                        agendaItem.getDescription(),
-                                        agendaItem.getStartTime(),
-                                        agendaItem.getEndTime()))
-                                .collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                        long acceptedParticipantsCount = event.getEventAttendances().stream()
-                                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                                .count();
+                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
 
-                        Double averageAge = event.getEventAttendances().stream()
-                                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                                .mapToInt(attendance -> attendance.getParticipant().getAge())
-                                .average()
-                                .orElse(0.0);
+                List<Integer> ages = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).map(attendance -> attendance.getParticipant().getAge()).toList();
 
-                        logger.info("Calculated average age for event {}: {}", event.getId(), averageAge);
+                Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
 
+                Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
 
-                        return new EventForOrganizersDTO(
-                                event.getId(),
-                                event.getName(),
-                                event.getDescription(),
-                                event.getLocation(),
-                                event.getCompany() != null ? event.getCompany().getName() : "No company",
-                                event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                                event.getAvailableSlots(),
-                                event.getEventDate(),
-                                event.getAttendeeLimit(),
-                                event.getJoinDeadline(),
-                                (int) acceptedParticipantsCount,
-                                event.isJoinApproval(),
-                                event.getEventEndDate(),
-                                agendaItems,
-                                event.getPendingRequests(),
-                                averageAge
-                        );
-                    })
-                    .collect(Collectors.toList());
+                Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
+
+                logger.info("Calculated average age for event {}: {}", event.getId(), averageAge);
+                logger.info("Calculated highest age for event {}: {}", event.getId(), highestAge);
+                logger.info("Calculated lowest age for event {}: {}", event.getId(), lowestAge);
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests(), averageAge, highestAge, lowestAge);
+            }).collect(Collectors.toList());
+
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
@@ -410,22 +387,17 @@ public class EventOrganizerService {
         }
     }
 
-    @Transactional
-    public Double calculateAverageAge(Integer eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+    public Map<String, Object> calculateAgeStats(Integer eventId) {
+        List<Integer> ages = eventAttendanceRepository.findAcceptedParticipantAgesByEventId(eventId);
 
-        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
-                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                .toList();
-
-        if (acceptedAttendances.isEmpty()) {
-            return 0.0;
+        if (ages.isEmpty()) {
+            return Map.of("averageAge", 0.0, "highestAge", null, "lowestAge", null);
         }
 
-        return acceptedAttendances.stream()
-                .map(attendance -> attendance.getParticipant().getAge())
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0.0);
+        Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
+        Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
+
+        return Map.of("averageAge", averageAge, "highestAge", highestAge, "lowestAge", lowestAge);
     }
 }

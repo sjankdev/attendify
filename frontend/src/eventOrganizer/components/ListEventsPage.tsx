@@ -167,6 +167,14 @@ const ListEventsPage: React.FC = () => {
                     <strong>Average Age:</strong>{" "}
                     {event.averageAge ? event.averageAge.toFixed(1) : "N/A"}
                   </p>
+                  <p>
+                    <strong>Highest Age:</strong>{" "}
+                    {event.highestAge !== undefined ? event.highestAge : "N/A"}
+                  </p>
+                  <p>
+                    <strong>Lowest Age:</strong>{" "}
+                    {event.lowestAge !== undefined ? event.lowestAge : "N/A"}
+                  </p>
                 </div>
 
                 <div className="mt-4">
