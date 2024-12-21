@@ -1,5 +1,6 @@
 package com.app.attendify.eventParticipant.dto;
 
+import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 
 public class EventParticipantRegisterDto {
@@ -10,6 +11,7 @@ public class EventParticipantRegisterDto {
     private Integer age;
     private Integer yearsOfExperience;
     private Gender gender;
+    private EducationLevel educationLevel;
 
     public String getName() {
         return name;
@@ -65,5 +67,13 @@ public class EventParticipantRegisterDto {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public EducationLevel getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(EducationLevel educationLevel) {
+        this.educationLevel = educationLevel;
     }
 }

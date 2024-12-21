@@ -134,6 +134,27 @@ const EventStatisticsPage: React.FC = () => {
     ],
   };
 
+  const educationLabels = Object.keys(stats.educationLevelStats);
+  const educationData = Object.values(stats.educationLevelStats);
+
+  const educationChartData = {
+    labels: educationLabels,
+    datasets: [
+      {
+        label: "Education Level",
+        data: educationData,
+        backgroundColor: [
+          "#6366f1",
+          "#f59e0b",
+          "#10b981",
+          "#ef4444",
+          "#8b5cf6",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <Layout>
       <div className="container mx-auto p-6">
@@ -184,6 +205,14 @@ const EventStatisticsPage: React.FC = () => {
                 data={experienceData}
                 options={{ responsive: true, maintainAspectRatio: false }}
               />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Education Level Distribution
+            </h3>
+            <div className="w-3/4 mx-auto">
+              <Pie data={educationChartData} />
             </div>
           </div>
         </div>

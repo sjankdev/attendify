@@ -1,11 +1,13 @@
 package com.app.attendify.event.services;
 
 import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsService {
@@ -56,5 +58,13 @@ public class StatisticsService {
                 "highestExperience", highestExperience,
                 "lowestExperience", lowestExperience
         );
+    }
+
+    public Map<EducationLevel, Long> calculateEducationLevelStats(List<EventAttendance> attendances) {
+        return attendances.stream()
+                .collect(Collectors.groupingBy(
+                        attendance -> attendance.getParticipant().getEducationLevel(),
+                        Collectors.counting()
+                ));
     }
 }

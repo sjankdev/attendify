@@ -16,6 +16,7 @@ import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
+import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
@@ -60,7 +61,7 @@ public class EventOrganizerService {
 
     public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
         List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
-        Map<Integer, Map<Gender, Long>> statistics = new    HashMap<>();
+        Map<Integer, Map<Gender, Long>> statistics = new HashMap<>();
 
         for (Object[] result : results) {
             Integer eventId = (Integer) result[0];
@@ -441,6 +442,14 @@ public class EventOrganizerService {
                         .toList()
         );
 
+        Map<EducationLevel, Long> educationLevelStats = statisticsService.calculateEducationLevelStats(acceptedAttendances);
+
+        Map<String, Long> educationLevelStatsStringMap = educationLevelStats.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().name(),
+                        Map.Entry::getValue
+                ));
+
         return new EventStatisticsDTO(
                 (Double) ageStats.get("averageAge"),
                 (Integer) ageStats.get("highestAge"),
@@ -450,7 +459,8 @@ public class EventOrganizerService {
                 genderCounts.get("otherCount"),
                 (Double) experienceStats.get("averageExperience"),
                 (Integer) experienceStats.get("highestExperience"),
-                (Integer) experienceStats.get("lowestExperience")
+                (Integer) experienceStats.get("lowestExperience"),
+                educationLevelStatsStringMap
         );
     }
 }

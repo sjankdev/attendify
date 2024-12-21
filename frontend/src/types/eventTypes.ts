@@ -44,4 +44,5 @@ export interface EventStatistics {
   averageExperience: number; 
   highestExperience: number;  
   lowestExperience: number;  
+  educationLevelStats: Record<string, number>; 
 }

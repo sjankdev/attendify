@@ -10,6 +10,7 @@ const EventParticipantRegister = () => {
   const [age, setAge] = useState<number | "">("");
   const [yearsOfExperience, setYearsOfExperience] = useState<number | "">("");
   const [gender, setGender] = useState<string>("");
+  const [educationLevel, setEducationLevel] = useState<string>("");  
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -41,18 +42,15 @@ const EventParticipantRegister = () => {
         age,
         yearsOfExperience,
         gender,
+        educationLevel,  
         token,
       })
-      .then((response) => {
+      .then(() => {
         navigate("/login");
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Error registering participant.");
       });
-  };
-
-  const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setGender(e.target.value);
   };
 
   return (
@@ -66,7 +64,7 @@ const EventParticipantRegister = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col">
-            <label htmlFor="name" className="text-lg font-medium text-gray-700">
+            <label htmlFor="name" className="text-lg font-medium">
               Full Name
             </label>
             <input
@@ -75,15 +73,12 @@ const EventParticipantRegister = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-4 py-3 border rounded-lg"
             />
           </div>
 
           <div className="flex flex-col">
-            <label
-              htmlFor="password"
-              className="text-lg font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="text-lg font-medium">
               Password
             </label>
             <input
@@ -92,12 +87,12 @@ const EventParticipantRegister = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-4 py-3 border rounded-lg"
             />
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="age" className="text-lg font-medium text-gray-700">
+            <label htmlFor="age" className="text-lg font-medium">
               Age
             </label>
             <input
@@ -106,11 +101,12 @@ const EventParticipantRegister = () => {
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
               required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-4 py-3 border rounded-lg"
             />
           </div>
+
           <div className="flex flex-col">
-            <label htmlFor="yearsOfExperience" className="text-lg font-medium text-gray-700">
+            <label htmlFor="yearsOfExperience" className="text-lg font-medium">
               Years of Experience
             </label>
             <input
@@ -119,36 +115,50 @@ const EventParticipantRegister = () => {
               value={yearsOfExperience}
               onChange={(e) => setYearsOfExperience(Number(e.target.value))}
               required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-4 py-3 border rounded-lg"
             />
           </div>
+
           <div className="flex flex-col">
-            <label
-              htmlFor="gender"
-              className="text-lg font-medium text-gray-700"
-            >
+            <label htmlFor="gender" className="text-lg font-medium">
               Gender
             </label>
             <select
               id="gender"
               value={gender}
-              onChange={handleGenderChange}
+              onChange={(e) => setGender(e.target.value)}
               required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-4 py-3 border rounded-lg"
             >
-              <option value="" disabled>
-                Select Gender
-              </option>
+              <option value="">Select Gender</option>
               <option value="MALE">Male</option>
               <option value="FEMALE">Female</option>
               <option value="OTHER">Other</option>
             </select>
           </div>
+
           <div className="flex flex-col">
-            <label
-              htmlFor="email"
-              className="text-lg font-medium text-gray-700"
+            <label htmlFor="educationLevel" className="text-lg font-medium">
+              Education Level
+            </label>
+            <select
+              id="educationLevel"
+              value={educationLevel}
+              onChange={(e) => setEducationLevel(e.target.value)}
+              required
+              className="px-4 py-3 border rounded-lg"
             >
+              <option value="">Select Education Level</option>
+              <option value="HIGH_SCHOOL">High School</option>
+              <option value="BACHELOR">Bachelor</option>
+              <option value="MASTER">Master</option>
+              <option value="PHD">PhD</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-lg font-medium">
               Email
             </label>
             <input
@@ -156,29 +166,17 @@ const EventParticipantRegister = () => {
               id="email"
               value={email}
               readOnly
-              className="px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+              className="px-4 py-3 border bg-gray-100 text-gray-500 rounded-lg"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+            className="w-full py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
           >
             Register
           </button>
         </form>
-
-        <div className="text-center mt-6">
-          <p className="text-gray-700">
-            Already registered?{" "}
-            <span
-              className="text-teal-600 font-semibold hover:underline cursor-pointer"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </span>
-          </p>
-        </div>
       </div>
     </div>
   );
