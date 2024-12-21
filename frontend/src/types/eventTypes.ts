@@ -33,3 +33,12 @@ export interface Participant {
   joinedEventCount: number; 
   eventLinks: string[];    
 }
+
+export interface EventStatistics {
+  averageAge: number | null;
+  highestAge: number | null;
+  lowestAge: number | null;
+  maleCount: number;
+  femaleCount: number;
+  otherCount: number;
+}
