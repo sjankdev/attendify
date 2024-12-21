@@ -290,14 +290,6 @@ public class EventOrganizerService {
                         .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
                         .toList();
 
-                Map<String, Object> ageStats = statisticsService.calculateAgeStats(
-                        acceptedAttendances.stream()
-                                .map(attendance -> attendance.getParticipant().getAge())
-                                .toList()
-                );
-
-                Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
-
                 return new EventForOrganizersDTO(
                         event.getId(),
                         event.getName(),
@@ -313,13 +305,7 @@ public class EventOrganizerService {
                         event.isJoinApproval(),
                         event.getEventEndDate(),
                         agendaItems,
-                        event.getPendingRequests(),
-                        (Double) ageStats.get("averageAge"),
-                        (Integer) ageStats.get("highestAge"),
-                        (Integer) ageStats.get("lowestAge"),
-                        genderCounts.get("maleCount"),
-                        genderCounts.get("femaleCount"),
-                        genderCounts.get("otherCount")
+                        event.getPendingRequests()
                 );
             }).collect(Collectors.toList());
 
