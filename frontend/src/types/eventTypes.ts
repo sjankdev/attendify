@@ -22,12 +22,6 @@ export interface Event {
   agendaItems: AgendaItemDTO[];
   pendingRequests: number;
   acceptedParticipants: number;
-  averageAge: number;
-  highestAge?: number; 
-  lowestAge?: number; 
-  maleCount?: number; 
-  femaleCount?: number; 
-  otherCount?: number; 
 }
 
 

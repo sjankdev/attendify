@@ -2,7 +2,7 @@ import axios from "axios";
 import { Event, Participant } from "../../types/eventTypes";
 
 export const fetchEventStatistics = async (eventId: string) => {
-  const token = localStorage.getItem("token"); // Get token from localStorage
+  const token = localStorage.getItem("token");
   const response = await axios.get(
     `http://localhost:8080/api/auth/event-organizer/event-stats/${eventId}`,
     {
@@ -65,9 +65,6 @@ export const fetchEventsWithParticipants = async (
               ...event,
               participants,
               pendingRequests: event.pendingRequests,
-              maleCount: event.maleCount,
-              femaleCount: event.femaleCount,
-              otherCount: event.otherCount,
             };
           }
           return event;
@@ -84,9 +81,6 @@ export const fetchEventsWithParticipants = async (
     return {
       events: eventsWithParticipants.map((event) => ({
         ...event,
-        averageAge: event.averageAge,
-        highestAge: event.highestAge,
-        lowestAge: event.lowestAge,
         eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
