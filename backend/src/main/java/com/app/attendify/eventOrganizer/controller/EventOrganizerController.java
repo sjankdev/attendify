@@ -133,18 +133,4 @@ public class EventOrganizerController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
-    @GetMapping("/age-stats/{eventId}")
-    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<Map<String, Object>> getAgeStats(@PathVariable Integer eventId) {
-        logger.info("Received request to calculate age stats for event ID: {}", eventId);
-        try {
-            Map<String, Object> ageStats = eventOrganizerService.calculateAgeStats(eventId);
-            logger.info("Age stats for event ID {}: {}", eventId, ageStats);
-            return ResponseEntity.ok(ageStats);
-        } catch (Exception e) {
-            logger.error("Error calculating age stats for event ID: {}", eventId, e);
-            return ResponseEntity.status(500).body(null);
-        }
-    }
 }
