@@ -22,7 +22,9 @@ public class EventForOrganizersDTO {
     private Double averageAge;
     private Integer highestAge;
     private Integer lowestAge;
-
+    private long maleCount;
+    private long femaleCount;
+    private long otherCount;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -33,7 +35,7 @@ public class EventForOrganizersDTO {
 
     private Integer pendingRequests;
 
-    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, Double averageAge, Integer highestAge, Integer lowestAge) {
+    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, Double averageAge, Integer highestAge, Integer lowestAge, Long maleCount, Long femaleCount, Long otherCount) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -52,6 +54,9 @@ public class EventForOrganizersDTO {
         this.averageAge = averageAge;
         this.highestAge = highestAge;
         this.lowestAge = lowestAge;
+        this.maleCount = maleCount;
+        this.femaleCount = femaleCount;
+        this.otherCount = otherCount;
     }
 
     public List<AgendaItemDTO> getAgendaItems() {
@@ -64,6 +69,30 @@ public class EventForOrganizersDTO {
 
     public Integer getId() {
         return id;
+    }
+
+    public long getMaleCount() {
+        return maleCount;
+    }
+
+    public void setMaleCount(long maleCount) {
+        this.maleCount = maleCount;
+    }
+
+    public long getFemaleCount() {
+        return femaleCount;
+    }
+
+    public void setFemaleCount(long femaleCount) {
+        this.femaleCount = femaleCount;
+    }
+
+    public long getOtherCount() {
+        return otherCount;
+    }
+
+    public void setOtherCount(long otherCount) {
+        this.otherCount = otherCount;
     }
 
     public void setId(Integer id) {

@@ -25,7 +25,11 @@ export interface Event {
   averageAge: number;
   highestAge?: number; 
   lowestAge?: number; 
+  maleCount?: number; 
+  femaleCount?: number; 
+  otherCount?: number; 
 }
+
 
 export interface Participant {
   participantId: number;

@@ -31,7 +31,8 @@ export const fetchEventsWithParticipants = async (
     const data = await response.json();
 
     const eventsWithParticipants: Event[] = await Promise.all(
-      (data.events as Event[]).map(async (event): Promise<Event> => {
+      (data.events as Event[]).map(async (event: Event): Promise<Event> => {
+    
         try {
           const participantsResponse = await fetch(
             `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
@@ -43,14 +44,16 @@ export const fetchEventsWithParticipants = async (
               },
             }
           );
-
+    
           if (participantsResponse.ok) {
-            const participants: Participant[] =
-              await participantsResponse.json();
+            const participants: Participant[] = await participantsResponse.json();
             return {
               ...event,
               participants,
               pendingRequests: event.pendingRequests,
+              maleCount: event.maleCount,
+              femaleCount: event.femaleCount,
+              otherCount: event.otherCount,
             };
           }
           return event;
