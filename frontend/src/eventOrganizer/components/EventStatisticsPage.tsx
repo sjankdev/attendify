@@ -27,6 +27,9 @@ const Spinner: React.FC = () => (
   <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mx-auto"></div>
 );
 
+const formatNumber = (value: number | null | undefined) =>
+  value ? value.toFixed(1) : "N/A";
+
 const EventStatisticsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [stats, setStats] = useState<EventStatistics | null>(null);
@@ -86,6 +89,7 @@ const EventStatisticsPage: React.FC = () => {
 
   const totalParticipants =
     stats.maleCount + stats.femaleCount + stats.otherCount;
+
   const genderData = {
     labels: ["Male", "Female", "Other"],
     datasets: [
@@ -104,9 +108,9 @@ const EventStatisticsPage: React.FC = () => {
       {
         label: "Age",
         data: [
-          stats.averageAge || 0,
-          stats.highestAge || 0,
-          stats.lowestAge || 0,
+          (stats.averageAge || 0).toFixed(1),
+          (stats.highestAge || 0).toFixed(1),
+          (stats.lowestAge || 0).toFixed(1),
         ],
         backgroundColor: ["#10b981", "#facc15", "#f87171"],
         borderWidth: 1,
@@ -120,9 +124,9 @@ const EventStatisticsPage: React.FC = () => {
       {
         label: "Experience (Years)",
         data: [
-          stats.averageExperience || 0,
-          stats.highestExperience || 0,
-          stats.lowestExperience || 0,
+          (stats.averageExperience || 0).toFixed(1),
+          (stats.highestExperience || 0).toFixed(1),
+          (stats.lowestExperience || 0).toFixed(1),
         ],
         backgroundColor: ["#06b6d4", "#8b5cf6", "#f87171"],
         borderWidth: 1,
@@ -141,9 +145,14 @@ const EventStatisticsPage: React.FC = () => {
             Total Participants: <strong>{totalParticipants}</strong>
           </p>
           <p className="text-md">
-            Average Age:{" "}
-            {stats.averageAge ? stats.averageAge.toFixed(1) : "N/A"} | Highest:{" "}
-            {stats.highestAge || "N/A"} | Lowest: {stats.lowestAge || "N/A"}
+            Average Age: {formatNumber(stats.averageAge)} | Highest:{" "}
+            {formatNumber(stats.highestAge)} | Lowest:{" "}
+            {formatNumber(stats.lowestAge)}
+          </p>
+          <p className="text-md">
+            Average Experience: {formatNumber(stats.averageExperience)} |{" "}
+            Highest: {formatNumber(stats.highestExperience)} | Lowest:{" "}
+            {formatNumber(stats.lowestExperience)}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
