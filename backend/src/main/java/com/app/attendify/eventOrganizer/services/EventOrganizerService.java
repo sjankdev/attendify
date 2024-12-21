@@ -68,9 +68,7 @@ public class EventOrganizerService {
             Gender gender = (Gender) result[1];
             Long count = (Long) result[2];
 
-            statistics
-                    .computeIfAbsent(eventId, k -> new HashMap<>())
-                    .put(gender, count);
+            statistics.computeIfAbsent(eventId, k -> new HashMap<>()).put(gender, count);
         }
 
         return statistics;
@@ -277,37 +275,11 @@ public class EventOrganizerService {
             });
 
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
-                        new AgendaItemDTO(
-                                agendaItem.getId(),
-                                agendaItem.getTitle(),
-                                agendaItem.getDescription(),
-                                agendaItem.getStartTime(),
-                                agendaItem.getEndTime()
-                        )
-                ).collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                        .toList();
+                List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
 
-                return new EventForOrganizersDTO(
-                        event.getId(),
-                        event.getName(),
-                        event.getDescription(),
-                        event.getLocation(),
-                        event.getCompany() != null ? event.getCompany().getName() : "No company",
-                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                        event.getAvailableSlots(),
-                        event.getEventDate(),
-                        event.getAttendeeLimit(),
-                        event.getJoinDeadline(),
-                        (int) acceptedAttendances.size(),
-                        event.isJoinApproval(),
-                        event.getEventEndDate(),
-                        agendaItems,
-                        event.getPendingRequests()
-                );
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedAttendances.size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests());
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
@@ -421,46 +393,20 @@ public class EventOrganizerService {
 
     @Transactional
     public EventStatisticsDTO getEventStatistics(Integer eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
-        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
-                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                .toList();
+        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
 
-        Map<String, Object> ageStats = statisticsService.calculateAgeStats(
-                acceptedAttendances.stream()
-                        .map(attendance -> attendance.getParticipant().getAge())
-                        .toList()
-        );
+        Map<String, Object> ageStats = statisticsService.calculateAgeStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getAge()).toList());
 
         Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
 
-        Map<String, Object> experienceStats = statisticsService.calculateExperienceStats(
-                acceptedAttendances.stream()
-                        .map(attendance -> attendance.getParticipant().getYearsOfExperience())
-                        .toList()
-        );
+        Map<String, Object> experienceStats = statisticsService.calculateExperienceStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getYearsOfExperience()).toList());
 
-        Map<EducationLevel, Long> educationLevelStats = statisticsService.calculateEducationLevelStats(acceptedAttendances);
+        Map<String, Map<String, Object>> educationLevelStats = statisticsService.calculateEducationLevelStats(acceptedAttendances);
 
-        Map<String, Long> educationLevelStatsStringMap = educationLevelStats.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getKey().name(),
-                        Map.Entry::getValue
-                ));
+            Map<String, EducationLevelStatsDTO> educationLevelDTOMap = educationLevelStats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new EducationLevelStatsDTO((Long) entry.getValue().get("count"), (Double) entry.getValue().get("percentage"))));
 
-        return new EventStatisticsDTO(
-                (Double) ageStats.get("averageAge"),
-                (Integer) ageStats.get("highestAge"),
-                (Integer) ageStats.get("lowestAge"),
-                genderCounts.get("maleCount"),
-                genderCounts.get("femaleCount"),
-                genderCounts.get("otherCount"),
-                (Double) experienceStats.get("averageExperience"),
-                (Integer) experienceStats.get("highestExperience"),
-                (Integer) experienceStats.get("lowestExperience"),
-                educationLevelStatsStringMap
-        );
+        return new EventStatisticsDTO((Double) ageStats.get("averageAge"), (Integer) ageStats.get("highestAge"), (Integer) ageStats.get("lowestAge"), genderCounts.get("maleCount"), genderCounts.get("femaleCount"), genderCounts.get("otherCount"), (Double) experienceStats.get("averageExperience"), (Integer) experienceStats.get("highestExperience"), (Integer) experienceStats.get("lowestExperience"), educationLevelDTOMap);
     }
 }

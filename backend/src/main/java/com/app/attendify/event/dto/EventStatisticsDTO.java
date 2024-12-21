@@ -12,6 +12,6 @@ public record EventStatisticsDTO(
         Double averageExperience,
         Integer highestExperience,
         Integer lowestExperience,
-        Map<String, Long> educationLevelStats
+        Map<String, EducationLevelStatsDTO> educationLevelStats
 ) {
 }

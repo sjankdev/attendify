@@ -41,8 +41,8 @@ export interface EventStatistics {
   maleCount: number;
   femaleCount: number;
   otherCount: number;
-  averageExperience: number; 
-  highestExperience: number;  
-  lowestExperience: number;  
-  educationLevelStats: Record<string, number>; 
+  averageExperience: number;
+  highestExperience: number;
+  lowestExperience: number;
+  educationLevelStats: Record<string, { count: number; percentage: number }>;
 }

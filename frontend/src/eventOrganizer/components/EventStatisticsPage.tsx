@@ -135,7 +135,9 @@ const EventStatisticsPage: React.FC = () => {
   };
 
   const educationLabels = Object.keys(stats.educationLevelStats);
-  const educationData = Object.values(stats.educationLevelStats);
+  const educationData = Object.values(stats.educationLevelStats).map(
+    (eduStat) => eduStat.count
+  );
 
   const educationChartData = {
     labels: educationLabels,
@@ -153,6 +155,22 @@ const EventStatisticsPage: React.FC = () => {
         borderWidth: 1,
       },
     ],
+  };
+
+  const educationChartOptions = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const label = tooltipItem.label || "";
+            const data = tooltipItem.raw || 0;
+            const percentage =
+              stats.educationLevelStats[label]?.percentage.toFixed(2) || "0";
+            return `${label}: ${data} (${percentage}%)`;
+          },
+        },
+      },
+    },
   };
 
   return (
@@ -185,34 +203,31 @@ const EventStatisticsPage: React.FC = () => {
               <Pie data={genderData} />
             </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-center">
               Age Statistics
             </h3>
-            <div className="w-3/4 mx-auto h-[300px]">
-              <Bar
-                data={ageData}
-                options={{ responsive: true, maintainAspectRatio: false }}
-              />
+            <div className="w-3/4 mx-auto">
+              <Bar data={ageData} />
             </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-center">
               Experience Statistics
             </h3>
-            <div className="w-3/4 mx-auto h-[300px]">
-              <Bar
-                data={experienceData}
-                options={{ responsive: true, maintainAspectRatio: false }}
-              />
+            <div className="w-3/4 mx-auto">
+              <Bar data={experienceData} />
             </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-center">
               Education Level Distribution
             </h3>
             <div className="w-3/4 mx-auto">
-              <Pie data={educationChartData} />
+              <Pie data={educationChartData} options={educationChartOptions} />
             </div>
           </div>
         </div>
