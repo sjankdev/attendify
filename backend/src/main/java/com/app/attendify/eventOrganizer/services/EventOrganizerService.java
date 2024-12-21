@@ -3,6 +3,7 @@ package com.app.attendify.eventOrganizer.services;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
+import com.app.attendify.event.services.StatisticsService;
 import com.app.attendify.event.validation.EventValidation;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -44,16 +45,19 @@ public class EventOrganizerService {
     private final EventValidation eventValidation;
     private final TimeZoneConversionUtil timeZoneConversionUtil;
     private final EventFilterUtil eventFilterUtil;
+    private final StatisticsService statisticsService;
 
-    public EventOrganizerService(EventFilterUtil eventFilterUtil, TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
-        this.eventFilterUtil = eventFilterUtil;
-        this.timeZoneConversionUtil = timeZoneConversionUtil;
-        this.eventValidation = eventValidation;
-        this.eventAttendanceRepository = eventAttendanceRepository;
-        this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository, EventValidation eventValidation, TimeZoneConversionUtil timeZoneConversionUtil, EventFilterUtil eventFilterUtil, StatisticsService statisticsService) {
         this.eventOrganizerRepository = eventOrganizerRepository;
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
+        this.eventValidation = eventValidation;
+        this.timeZoneConversionUtil = timeZoneConversionUtil;
+        this.eventFilterUtil = eventFilterUtil;
+        this.statisticsService = statisticsService;
     }
+
     public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
         List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
         Map<Integer, Map<Gender, Long>> statistics = new    HashMap<>();
@@ -282,38 +286,17 @@ public class EventOrganizerService {
                         )
                 ).collect(Collectors.toList());
 
-                long acceptedParticipantsCount = event.getEventAttendances().stream()
+                List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
                         .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                        .count();
-
-                Long maleCount = event.getEventAttendances().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
-                                attendance.getParticipant().getGender() == Gender.MALE)
-                        .count();
-
-                Long femaleCount = event.getEventAttendances().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
-                                attendance.getParticipant().getGender() == Gender.FEMALE)
-                        .count();
-
-                Long otherCount = event.getEventAttendances().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
-                                attendance.getParticipant().getGender() == Gender.OTHER)
-                        .count();
-
-                List<Integer> ages = event.getEventAttendances().stream()
-                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                        .map(attendance -> attendance.getParticipant().getAge())
                         .toList();
 
-                Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+                Map<String, Object> ageStats = statisticsService.calculateAgeStats(
+                        acceptedAttendances.stream()
+                                .map(attendance -> attendance.getParticipant().getAge())
+                                .toList()
+                );
 
-                Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
-
-                Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
-
-                logger.info("Calculated male count for event {}: {}", event.getId(), maleCount);
-                logger.info("Calculated female count for event {}: {}", event.getId(), femaleCount);
+                Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
 
                 return new EventForOrganizersDTO(
                         event.getId(),
@@ -326,21 +309,19 @@ public class EventOrganizerService {
                         event.getEventDate(),
                         event.getAttendeeLimit(),
                         event.getJoinDeadline(),
-                        (int) acceptedParticipantsCount,
+                        (int) acceptedAttendances.size(),
                         event.isJoinApproval(),
                         event.getEventEndDate(),
                         agendaItems,
                         event.getPendingRequests(),
-                        averageAge,
-                        highestAge,
-                        lowestAge,
-                        maleCount,
-                        femaleCount,
-                        otherCount
+                        (Double) ageStats.get("averageAge"),
+                        (Integer) ageStats.get("highestAge"),
+                        (Integer) ageStats.get("lowestAge"),
+                        genderCounts.get("maleCount"),
+                        genderCounts.get("femaleCount"),
+                        genderCounts.get("otherCount")
                 );
             }).collect(Collectors.toList());
-
-
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS).size();
@@ -451,18 +432,30 @@ public class EventOrganizerService {
         }
     }
 
-    public Map<String, Object> calculateAgeStats(Integer eventId) {
-        List<Integer> ages = eventAttendanceRepository.findAcceptedParticipantAgesByEventId(eventId);
+    @Transactional
+    public EventStatisticsDTO getEventStatistics(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
-        if (ages.isEmpty()) {
-            return Map.of("averageAge", 0.0, "highestAge", null, "lowestAge", null);
-        }
+        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
+                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                .toList();
 
-        Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
-        Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
-        Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
+        Map<String, Object> ageStats = statisticsService.calculateAgeStats(
+                acceptedAttendances.stream()
+                        .map(attendance -> attendance.getParticipant().getAge())
+                        .toList()
+        );
 
-        assert lowestAge != null;
-        return Map.of("averageAge", averageAge, "highestAge", highestAge, "lowestAge", lowestAge);
+        Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
+
+        return new EventStatisticsDTO(
+                (Double) ageStats.get("averageAge"),
+                (Integer) ageStats.get("highestAge"),
+                (Integer) ageStats.get("lowestAge"),
+                genderCounts.get("maleCount"),
+                genderCounts.get("femaleCount"),
+                genderCounts.get("otherCount")
+        );
     }
 }

@@ -1,4 +1,18 @@
+import axios from "axios";
 import { Event, Participant } from "../../types/eventTypes";
+
+export const fetchEventStatistics = async (eventId: string) => {
+  const token = localStorage.getItem("token"); // Get token from localStorage
+  const response = await axios.get(
+    `http://localhost:8080/api/auth/event-organizer/event-stats/${eventId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
 export const fetchEventsWithParticipants = async (
   filter: string
@@ -32,7 +46,6 @@ export const fetchEventsWithParticipants = async (
 
     const eventsWithParticipants: Event[] = await Promise.all(
       (data.events as Event[]).map(async (event: Event): Promise<Event> => {
-    
         try {
           const participantsResponse = await fetch(
             `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
@@ -44,9 +57,10 @@ export const fetchEventsWithParticipants = async (
               },
             }
           );
-    
+
           if (participantsResponse.ok) {
-            const participants: Participant[] = await participantsResponse.json();
+            const participants: Participant[] =
+              await participantsResponse.json();
             return {
               ...event,
               participants,
@@ -71,8 +85,8 @@ export const fetchEventsWithParticipants = async (
       events: eventsWithParticipants.map((event) => ({
         ...event,
         averageAge: event.averageAge,
-        highestAge: event.highestAge, 
-        lowestAge: event.lowestAge, 
+        highestAge: event.highestAge,
+        lowestAge: event.lowestAge,
         eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
