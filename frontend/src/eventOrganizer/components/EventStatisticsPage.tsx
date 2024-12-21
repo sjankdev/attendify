@@ -114,6 +114,22 @@ const EventStatisticsPage: React.FC = () => {
     ],
   };
 
+  const experienceData = {
+    labels: ["Average Experience", "Highest Experience", "Lowest Experience"],
+    datasets: [
+      {
+        label: "Experience (Years)",
+        data: [
+          stats.averageExperience || 0,
+          stats.highestExperience || 0,
+          stats.lowestExperience || 0,
+        ],
+        backgroundColor: ["#06b6d4", "#8b5cf6", "#f87171"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <Layout>
       <div className="container mx-auto p-6">
@@ -125,7 +141,9 @@ const EventStatisticsPage: React.FC = () => {
             Total Participants: <strong>{totalParticipants}</strong>
           </p>
           <p className="text-md">
-            Average Age: {stats.averageAge ? stats.averageAge.toFixed(1) : "N/A"} | Highest: {stats.highestAge || "N/A"} | Lowest: {stats.lowestAge || "N/A"}
+            Average Age:{" "}
+            {stats.averageAge ? stats.averageAge.toFixed(1) : "N/A"} | Highest:{" "}
+            {stats.highestAge || "N/A"} | Lowest: {stats.lowestAge || "N/A"}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -144,6 +162,17 @@ const EventStatisticsPage: React.FC = () => {
             <div className="w-3/4 mx-auto h-[300px]">
               <Bar
                 data={ageData}
+                options={{ responsive: true, maintainAspectRatio: false }}
+              />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Experience Statistics
+            </h3>
+            <div className="w-3/4 mx-auto h-[300px]">
+              <Bar
+                data={experienceData}
                 options={{ responsive: true, maintainAspectRatio: false }}
               />
             </div>
