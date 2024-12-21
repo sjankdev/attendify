@@ -73,7 +73,8 @@ public class EventParticipantService {
                 .setAge(input.getAge())
                 .setYearsOfExperience(input.getYearsOfExperience())
                 .setGender(input.getGender())
-                .setEducationLevel(input.getEducationLevel());
+                .setEducationLevel(input.getEducationLevel())
+                .setOccupation(input.getOccupation());
 
         eventParticipantRepository.save(participant);
         invitationService.markAsAccepted(invitation);

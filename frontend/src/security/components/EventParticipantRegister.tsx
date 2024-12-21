@@ -10,10 +10,20 @@ const EventParticipantRegister = () => {
   const [age, setAge] = useState<number | "">("");
   const [yearsOfExperience, setYearsOfExperience] = useState<number | "">("");
   const [gender, setGender] = useState<string>("");
-  const [educationLevel, setEducationLevel] = useState<string>("");  
+  const [educationLevel, setEducationLevel] = useState<string>("");
+  const [occupation, setOccupation] = useState<string>("");
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const occupationList = [
+    { value: "", label: "Select Occupation" },
+    { value: "SOFTWARE_ENGINEER", label: "Software Engineer" },
+    { value: "DESIGNER", label: "Designer" },
+    { value: "PRODUCT_MANAGER", label: "Product Manager" },
+    { value: "DATA_SCIENTIST", label: "Data Scientist" },
+    { value: "OTHER", label: "Other" },
+  ];
 
   useEffect(() => {
     if (!token) {
@@ -42,7 +52,8 @@ const EventParticipantRegister = () => {
         age,
         yearsOfExperience,
         gender,
-        educationLevel,  
+        educationLevel,
+        occupation,
         token,
       })
       .then(() => {
@@ -138,6 +149,24 @@ const EventParticipantRegister = () => {
           </div>
 
           <div className="flex flex-col">
+            <label htmlFor="occupation" className="text-lg font-medium">
+              Occupation
+            </label>
+            <select
+              id="occupation"
+              value={occupation}
+              onChange={(e) => setOccupation(e.target.value)}
+              required
+              className="px-4 py-3 border rounded-lg"
+            >
+              {occupationList.map((occ) => (
+                <option key={occ.value} value={occ.value}>
+                  {occ.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col">
             <label htmlFor="educationLevel" className="text-lg font-medium">
               Education Level
             </label>
@@ -156,7 +185,6 @@ const EventParticipantRegister = () => {
               <option value="OTHER">Other</option>
             </select>
           </div>
-
           <div className="flex flex-col">
             <label htmlFor="email" className="text-lg font-medium">
               Email

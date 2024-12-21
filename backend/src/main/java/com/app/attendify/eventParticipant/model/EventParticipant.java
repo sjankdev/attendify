@@ -4,6 +4,7 @@ import com.app.attendify.company.model.Company;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
+import com.app.attendify.eventParticipant.enums.Occupation;
 import com.app.attendify.security.model.User;
 import jakarta.persistence.*;
 
@@ -40,6 +41,10 @@ public class EventParticipant {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EducationLevel educationLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Occupation occupation;
 
     public Integer getId() {
         return id;
@@ -109,6 +114,15 @@ public class EventParticipant {
 
     public EventParticipant setEducationLevel(EducationLevel educationLevel) {
         this.educationLevel = educationLevel;
+        return this;
+    }
+
+    public Occupation getOccupation() {
+        return occupation;
+    }
+
+    public EventParticipant setOccupation(Occupation occupation) {
+        this.occupation = occupation;
         return this;
     }
 }
