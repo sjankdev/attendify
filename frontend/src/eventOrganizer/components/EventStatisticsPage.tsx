@@ -178,11 +178,60 @@ const EventStatisticsPage: React.FC = () => {
         callbacks: {
           label: function (tooltipItem: any) {
             const formattedLabel = tooltipItem.label || "";
-            const rawLabel = rawToFormattedLabels[formattedLabel]; 
+            const rawLabel = rawToFormattedLabels[formattedLabel];
 
             const data = tooltipItem.raw || 0;
             const percentage =
               stats.educationLevelStats[rawLabel]?.percentage.toFixed(2) || "0";
+
+            return `${formattedLabel}: ${data} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  const occupationData = Object.values(stats.occupationStats).map(
+    (occStat) => occStat.count
+  );
+
+  const occupationLabels = Object.keys(stats.occupationStats).map(
+    (rawLabel) => {
+      const formattedLabel = formatLabel(rawLabel);
+      rawToFormattedLabels[formattedLabel] = rawLabel;
+      return formattedLabel;
+    }
+  );
+
+  const occupationChartData = {
+    labels: occupationLabels,
+    datasets: [
+      {
+        label: "Occupation",
+        data: occupationData,
+        backgroundColor: [
+          "#3b82f6",
+          "#ec4899",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const occupationChartOptions = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const formattedLabel = tooltipItem.label || "";
+            const rawLabel = rawToFormattedLabels[formattedLabel];
+
+            const data = tooltipItem.raw || 0;
+            const percentage =
+              stats.occupationStats[rawLabel]?.percentage.toFixed(2) || "0";
 
             return `${formattedLabel}: ${data} (${percentage}%)`;
           },
@@ -246,6 +295,17 @@ const EventStatisticsPage: React.FC = () => {
             </h3>
             <div className="w-3/4 mx-auto">
               <Pie data={educationChartData} options={educationChartOptions} />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Occupation Distribution
+            </h3>
+            <div className="w-3/4 mx-auto">
+              <Pie
+                data={occupationChartData}
+                options={occupationChartOptions}
+              />
             </div>
           </div>
         </div>

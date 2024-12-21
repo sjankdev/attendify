@@ -80,4 +80,24 @@ public class StatisticsService {
                         }
                 ));
     }
+
+    public Map<String, Map<String, Object>> calculateOccupationStats(List<EventAttendance> attendances) {
+        long total = attendances.size();
+        return attendances.stream()
+                .collect(Collectors.groupingBy(
+                        attendance -> attendance.getParticipant().getOccupation().name(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            Map<String, Object> stats = new HashMap<>();
+                            stats.put("count", entry.getValue());
+                            stats.put("percentage", (entry.getValue() * 100.0) / total);
+                            return stats;
+                        }
+                ));
+    }
 }

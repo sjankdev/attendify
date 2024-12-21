@@ -34,15 +34,21 @@ export interface Participant {
   eventLinks: string[];    
 }
 
+export interface OccupationStatsDTO {
+  count: number;
+  percentage: number;
+}
+
 export interface EventStatistics {
-  averageAge: number | null;
-  highestAge: number | null;
-  lowestAge: number | null;
+  averageAge: number;
+  highestAge: number;
+  lowestAge: number;
   maleCount: number;
   femaleCount: number;
   otherCount: number;
   averageExperience: number;
   highestExperience: number;
   lowestExperience: number;
-  educationLevelStats: Record<string, { count: number; percentage: number }>;
+  educationLevelStats: Record<string, OccupationStatsDTO>;
+  occupationStats: Record<string, OccupationStatsDTO>; 
 }
