@@ -71,6 +71,7 @@ public class EventParticipantService {
                 .setUser(newUser)
                 .setCompany(invitation.getCompany())
                 .setAge(input.getAge())
+                .setYearsOfExperience(input.getYearsOfExperience())
                 .setGender(input.getGender());
 
         eventParticipantRepository.save(participant);

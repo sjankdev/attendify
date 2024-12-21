@@ -8,6 +8,7 @@ const EventParticipantRegister = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState<number | "">("");
+  const [yearsOfExperience, setYearsOfExperience] = useState<number | "">("");
   const [gender, setGender] = useState<string>("");
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState("");
@@ -38,6 +39,7 @@ const EventParticipantRegister = () => {
         email,
         password,
         age,
+        yearsOfExperience,
         gender,
         token,
       })
@@ -103,6 +105,19 @@ const EventParticipantRegister = () => {
               id="age"
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
+              required
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="yearsOfExperience" className="text-lg font-medium text-gray-700">
+              Years of Experience
+            </label>
+            <input
+              type="number"
+              id="yearsOfExperience"
+              value={yearsOfExperience}
+              onChange={(e) => setYearsOfExperience(Number(e.target.value))}
               required
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />

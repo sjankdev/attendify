@@ -29,6 +29,9 @@ public class EventParticipant {
     @Column(nullable = false)
     private Integer age;
 
+    @Column(nullable = false)
+    private Integer yearsOfExperience;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Gender gender;
@@ -74,6 +77,15 @@ public class EventParticipant {
 
     public EventParticipant setAge(Integer age) {
         this.age = age;
+        return this;
+    }
+
+    public Integer getYearsOfExperience() {
+        return yearsOfExperience;
+    }
+
+    public EventParticipant setYearsOfExperience(Integer yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
         return this;
     }
 
