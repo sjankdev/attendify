@@ -133,4 +133,16 @@ public class EventOrganizerController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/event-stats/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<EventStatisticsDTO> getEventStatistics(@PathVariable Integer eventId) {
+        try {
+            EventStatisticsDTO stats = eventOrganizerService.getEventStatistics(eventId);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            logger.error("Error retrieving event statistics for eventId: {}", eventId, e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 }

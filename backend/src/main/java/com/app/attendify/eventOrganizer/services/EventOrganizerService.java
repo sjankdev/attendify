@@ -431,4 +431,31 @@ public class EventOrganizerService {
             throw new RuntimeException("Error retrieving event details", e);
         }
     }
+
+    @Transactional
+    public EventStatisticsDTO getEventStatistics(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream()
+                .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                .toList();
+
+        Map<String, Object> ageStats = statisticsService.calculateAgeStats(
+                acceptedAttendances.stream()
+                        .map(attendance -> attendance.getParticipant().getAge())
+                        .toList()
+        );
+
+        Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
+
+        return new EventStatisticsDTO(
+                (Double) ageStats.get("averageAge"),
+                (Integer) ageStats.get("highestAge"),
+                (Integer) ageStats.get("lowestAge"),
+                genderCounts.get("maleCount"),
+                genderCounts.get("femaleCount"),
+                genderCounts.get("otherCount")
+        );
+    }
 }

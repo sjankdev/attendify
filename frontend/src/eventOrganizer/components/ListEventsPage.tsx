@@ -163,36 +163,13 @@ const ListEventsPage: React.FC = () => {
                   <p>
                     <strong>Pending Requests:</strong> {event.pendingRequests}
                   </p>
-                  <p>
-                    <strong>Average Age:</strong>{" "}
-                    {event.averageAge && event.acceptedParticipants > 0
-                      ? event.averageAge.toFixed(1)
-                      : "No Participants"}
-                  </p>
-                  <p>
-                    <strong>Highest Age:</strong>{" "}
-                    {event.highestAge && event.acceptedParticipants > 0
-                      ? event.highestAge
-                      : "No Participants"}
-                  </p>
-                  <p>
-                    <strong>Lowest Age:</strong>{" "}
-                    {event.lowestAge && event.acceptedParticipants > 0
-                      ? event.lowestAge
-                      : "No Participants"}
-                  </p>
-                  <div className="mt-4 space-y-2">
-                    <p>
-                      <strong>Male Participants:</strong> {event.maleCount}
-                    </p>
-                    <p>
-                      <strong>Female Participants:</strong> {event.femaleCount}
-                    </p>
-                    <p>
-                      <strong>Other Participants:</strong> {event.otherCount}
-                    </p>
-                  </div>
                 </div>
+                <button
+                  onClick={() => navigate(`/event-stats/${event.id}`)}
+                  className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 w-full mt-2"
+                >
+                  View Stats
+                </button>
 
                 <div className="mt-4">
                   <button
