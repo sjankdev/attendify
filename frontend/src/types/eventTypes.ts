@@ -41,4 +41,7 @@ export interface EventStatistics {
   maleCount: number;
   femaleCount: number;
   otherCount: number;
+  averageExperience: number; 
+  highestExperience: number;  
+  lowestExperience: number;  
 }

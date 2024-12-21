@@ -41,4 +41,20 @@ public class StatisticsService {
 
         return Map.of("maleCount", maleCount, "femaleCount", femaleCount, "otherCount", otherCount);
     }
+
+    public Map<String, Object> calculateExperienceStats(List<Integer> experienceList) {
+        if (experienceList.isEmpty()) {
+            return Map.of("averageExperience", 0.0, "highestExperience", 0, "lowestExperience", 0);
+        }
+
+        Double averageExperience = experienceList.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        Integer highestExperience = experienceList.stream().max(Integer::compareTo).orElse(0);
+        Integer lowestExperience = experienceList.stream().min(Integer::compareTo).orElse(0);
+
+        return Map.of(
+                "averageExperience", averageExperience,
+                "highestExperience", highestExperience,
+                "lowestExperience", lowestExperience
+        );
+    }
 }

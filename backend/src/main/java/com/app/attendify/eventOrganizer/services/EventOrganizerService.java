@@ -435,13 +435,22 @@ public class EventOrganizerService {
 
         Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
 
+        Map<String, Object> experienceStats = statisticsService.calculateExperienceStats(
+                acceptedAttendances.stream()
+                        .map(attendance -> attendance.getParticipant().getYearsOfExperience())
+                        .toList()
+        );
+
         return new EventStatisticsDTO(
                 (Double) ageStats.get("averageAge"),
                 (Integer) ageStats.get("highestAge"),
                 (Integer) ageStats.get("lowestAge"),
                 genderCounts.get("maleCount"),
                 genderCounts.get("femaleCount"),
-                genderCounts.get("otherCount")
+                genderCounts.get("otherCount"),
+                (Double) experienceStats.get("averageExperience"),
+                (Integer) experienceStats.get("highestExperience"),
+                (Integer) experienceStats.get("lowestExperience")
         );
     }
 }
