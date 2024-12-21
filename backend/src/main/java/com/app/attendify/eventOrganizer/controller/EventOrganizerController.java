@@ -6,6 +6,7 @@ import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.enums.Gender;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -76,6 +77,12 @@ public class EventOrganizerController {
             logger.error("Error deleting event", e);
             return ResponseEntity.status(500).body("Error deleting event");
         }
+    }
+
+    @GetMapping("/statistics/gender")
+    public ResponseEntity<Map<Integer, Map<Gender, Long>>> getGenderStatistics() {
+        Map<Integer, Map<Gender, Long>> statistics = eventOrganizerService.getGenderStatistics();
+        return ResponseEntity.ok(statistics);
     }
 
     @PutMapping("/events/{eventId}/participants/{participantId}/status")

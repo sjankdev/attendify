@@ -15,6 +15,7 @@ import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
+import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -28,10 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +53,22 @@ public class EventOrganizerService {
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.eventOrganizerRepository = eventOrganizerRepository;
+    }
+    public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
+        List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
+        Map<Integer, Map<Gender, Long>> statistics = new    HashMap<>();
+
+        for (Object[] result : results) {
+            Integer eventId = (Integer) result[0];
+            Gender gender = (Gender) result[1];
+            Long count = (Long) result[2];
+
+            statistics
+                    .computeIfAbsent(eventId, k -> new HashMap<>())
+                    .put(gender, count);
+        }
+
+        return statistics;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -258,11 +272,39 @@ public class EventOrganizerService {
             });
 
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
-                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+                List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem ->
+                        new AgendaItemDTO(
+                                agendaItem.getId(),
+                                agendaItem.getTitle(),
+                                agendaItem.getDescription(),
+                                agendaItem.getStartTime(),
+                                agendaItem.getEndTime()
+                        )
+                ).collect(Collectors.toList());
 
-                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+                long acceptedParticipantsCount = event.getEventAttendances().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                        .count();
 
-                List<Integer> ages = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).map(attendance -> attendance.getParticipant().getAge()).toList();
+                Long maleCount = event.getEventAttendances().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
+                                attendance.getParticipant().getGender() == Gender.MALE)
+                        .count();
+
+                Long femaleCount = event.getEventAttendances().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
+                                attendance.getParticipant().getGender() == Gender.FEMALE)
+                        .count();
+
+                Long otherCount = event.getEventAttendances().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED &&
+                                attendance.getParticipant().getGender() == Gender.OTHER)
+                        .count();
+
+                List<Integer> ages = event.getEventAttendances().stream()
+                        .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                        .map(attendance -> attendance.getParticipant().getAge())
+                        .toList();
 
                 Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
 
@@ -270,12 +312,34 @@ public class EventOrganizerService {
 
                 Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
 
-                logger.info("Calculated average age for event {}: {}", event.getId(), averageAge);
-                logger.info("Calculated highest age for event {}: {}", event.getId(), highestAge);
-                logger.info("Calculated lowest age for event {}: {}", event.getId(), lowestAge);
+                logger.info("Calculated male count for event {}: {}", event.getId(), maleCount);
+                logger.info("Calculated female count for event {}: {}", event.getId(), femaleCount);
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests(), averageAge, highestAge, lowestAge);
+                return new EventForOrganizersDTO(
+                        event.getId(),
+                        event.getName(),
+                        event.getDescription(),
+                        event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company",
+                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        event.getAvailableSlots(),
+                        event.getEventDate(),
+                        event.getAttendeeLimit(),
+                        event.getJoinDeadline(),
+                        (int) acceptedParticipantsCount,
+                        event.isJoinApproval(),
+                        event.getEventEndDate(),
+                        agendaItems,
+                        event.getPendingRequests(),
+                        averageAge,
+                        highestAge,
+                        lowestAge,
+                        maleCount,
+                        femaleCount,
+                        otherCount
+                );
             }).collect(Collectors.toList());
+
 
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();

@@ -1,11 +1,14 @@
 package com.app.attendify.eventParticipant.dto;
 
+import com.app.attendify.eventParticipant.enums.Gender;
+
 public class EventParticipantRegisterDto {
     private String name;
     private String email;
     private String password;
     private String token;
     private Integer age;
+    private Gender gender;
 
     public String getName() {
         return name;
@@ -45,5 +48,13 @@ public class EventParticipantRegisterDto {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }

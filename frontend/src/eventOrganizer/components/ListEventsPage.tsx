@@ -175,6 +175,18 @@ const ListEventsPage: React.FC = () => {
                       ? event.highestAge
                       : "No Participants"}
                   </p>
+                  <div className="mt-4 space-y-2">
+                    <p>
+                      <strong>Male Participants:</strong> {event.maleCount}
+                    </p>
+                    <p>
+                      <strong>Female Participants:</strong> {event.femaleCount}
+                    </p>
+                    <p>
+                      <strong>Other Participants:</strong> {event.otherCount}
+                    </p>
+                  </div>
+
                   <p>
                     <strong>Lowest Age:</strong>{" "}
                     {event.lowestAge && event.acceptedParticipants > 0
