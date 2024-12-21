@@ -12,14 +12,18 @@ public class StatisticsService {
 
     public Map<String, Object> calculateAgeStats(List<Integer> ages) {
         if (ages.isEmpty()) {
-            return Map.of("averageAge", 0.0, "highestAge", null, "lowestAge", null);
+            return Map.of("averageAge", 0.0, "highestAge", 0, "lowestAge", 0);
         }
 
         Double averageAge = ages.stream().mapToInt(Integer::intValue).average().orElse(0.0);
         Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
         Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
 
-        return Map.of("averageAge", averageAge, "highestAge", highestAge, "lowestAge", lowestAge);
+        return Map.of(
+                "averageAge", averageAge,
+                "highestAge", highestAge != null ? highestAge : 0,
+                "lowestAge", lowestAge != null ? lowestAge : 0
+        );
     }
 
     public Map<String, Long> calculateGenderCounts(List<EventAttendance> attendances) {
