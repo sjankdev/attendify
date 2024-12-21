@@ -133,7 +133,9 @@ const EventStatisticsPage: React.FC = () => {
             Total Participants: <strong>{totalParticipants}</strong>
           </p>
           <p className="text-md">
-            Average Age: {stats.averageAge || "N/A"} | Highest: {stats.highestAge || "N/A"} | Lowest: {stats.lowestAge || "N/A"}
+            Average Age:{" "}
+            {stats.averageAge ? stats.averageAge.toFixed(1) : "N/A"} | Highest:{" "}
+            {stats.highestAge || "N/A"} | Lowest: {stats.lowestAge || "N/A"}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
