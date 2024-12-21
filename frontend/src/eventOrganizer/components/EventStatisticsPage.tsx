@@ -134,9 +134,24 @@ const EventStatisticsPage: React.FC = () => {
     ],
   };
 
-  const educationLabels = Object.keys(stats.educationLevelStats);
+  const formatLabel = (label: string) => {
+    return label
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   const educationData = Object.values(stats.educationLevelStats).map(
     (eduStat) => eduStat.count
+  );
+
+  const rawToFormattedLabels: Record<string, string> = {};
+  const educationLabels = Object.keys(stats.educationLevelStats).map(
+    (rawLabel) => {
+      const formattedLabel = formatLabel(rawLabel);
+      rawToFormattedLabels[formattedLabel] = rawLabel;
+      return formattedLabel;
+    }
   );
 
   const educationChartData = {
@@ -162,11 +177,14 @@ const EventStatisticsPage: React.FC = () => {
       tooltip: {
         callbacks: {
           label: function (tooltipItem: any) {
-            const label = tooltipItem.label || "";
+            const formattedLabel = tooltipItem.label || "";
+            const rawLabel = rawToFormattedLabels[formattedLabel]; 
+
             const data = tooltipItem.raw || 0;
             const percentage =
-              stats.educationLevelStats[label]?.percentage.toFixed(2) || "0";
-            return `${label}: ${data} (${percentage}%)`;
+              stats.educationLevelStats[rawLabel]?.percentage.toFixed(2) || "0";
+
+            return `${formattedLabel}: ${data} (${percentage}%)`;
           },
         },
       },
