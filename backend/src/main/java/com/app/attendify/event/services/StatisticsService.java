@@ -1,11 +1,14 @@
 package com.app.attendify.event.services;
 
 import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsService {
@@ -56,5 +59,45 @@ public class StatisticsService {
                 "highestExperience", highestExperience,
                 "lowestExperience", lowestExperience
         );
+    }
+
+    public Map<String, Map<String, Object>> calculateEducationLevelStats(List<EventAttendance> attendances) {
+        long total = attendances.size();
+        return attendances.stream()
+                .collect(Collectors.groupingBy(
+                        attendance -> attendance.getParticipant().getEducationLevel().name(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            Map<String, Object> stats = new HashMap<>();
+                            stats.put("count", entry.getValue());
+                            stats.put("percentage", (entry.getValue() * 100.0) / total);
+                            return stats;
+                        }
+                ));
+    }
+
+    public Map<String, Map<String, Object>> calculateOccupationStats(List<EventAttendance> attendances) {
+        long total = attendances.size();
+        return attendances.stream()
+                .collect(Collectors.groupingBy(
+                        attendance -> attendance.getParticipant().getOccupation().name(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            Map<String, Object> stats = new HashMap<>();
+                            stats.put("count", entry.getValue());
+                            stats.put("percentage", (entry.getValue() * 100.0) / total);
+                            return stats;
+                        }
+                ));
     }
 }

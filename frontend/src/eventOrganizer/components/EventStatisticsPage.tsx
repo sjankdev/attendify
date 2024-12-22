@@ -134,6 +134,112 @@ const EventStatisticsPage: React.FC = () => {
     ],
   };
 
+  const formatLabel = (label: string) => {
+    return label
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const educationData = Object.values(stats.educationLevelStats).map(
+    (eduStat) => eduStat.count
+  );
+
+  const rawToFormattedLabels: Record<string, string> = {};
+  const educationLabels = Object.keys(stats.educationLevelStats).map(
+    (rawLabel) => {
+      const formattedLabel = formatLabel(rawLabel);
+      rawToFormattedLabels[formattedLabel] = rawLabel;
+      return formattedLabel;
+    }
+  );
+
+  const educationChartData = {
+    labels: educationLabels,
+    datasets: [
+      {
+        label: "Education Level",
+        data: educationData,
+        backgroundColor: [
+          "#6366f1",
+          "#f59e0b",
+          "#10b981",
+          "#ef4444",
+          "#8b5cf6",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const educationChartOptions = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const formattedLabel = tooltipItem.label || "";
+            const rawLabel = rawToFormattedLabels[formattedLabel];
+
+            const data = tooltipItem.raw || 0;
+            const percentage =
+              stats.educationLevelStats[rawLabel]?.percentage.toFixed(2) || "0";
+
+            return `${formattedLabel}: ${data} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  const occupationData = Object.values(stats.occupationStats).map(
+    (occStat) => occStat.count
+  );
+
+  const occupationLabels = Object.keys(stats.occupationStats).map(
+    (rawLabel) => {
+      const formattedLabel = formatLabel(rawLabel);
+      rawToFormattedLabels[formattedLabel] = rawLabel;
+      return formattedLabel;
+    }
+  );
+
+  const occupationChartData = {
+    labels: occupationLabels,
+    datasets: [
+      {
+        label: "Occupation",
+        data: occupationData,
+        backgroundColor: [
+          "#3b82f6",
+          "#ec4899",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const occupationChartOptions = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const formattedLabel = tooltipItem.label || "";
+            const rawLabel = rawToFormattedLabels[formattedLabel];
+
+            const data = tooltipItem.raw || 0;
+            const percentage =
+              stats.occupationStats[rawLabel]?.percentage.toFixed(2) || "0";
+
+            return `${formattedLabel}: ${data} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
   return (
     <Layout>
       <div className="container mx-auto p-6">
@@ -164,25 +270,41 @@ const EventStatisticsPage: React.FC = () => {
               <Pie data={genderData} />
             </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-center">
               Age Statistics
             </h3>
-            <div className="w-3/4 mx-auto h-[300px]">
-              <Bar
-                data={ageData}
-                options={{ responsive: true, maintainAspectRatio: false }}
-              />
+            <div className="w-3/4 mx-auto">
+              <Bar data={ageData} />
             </div>
           </div>
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-center">
               Experience Statistics
             </h3>
-            <div className="w-3/4 mx-auto h-[300px]">
-              <Bar
-                data={experienceData}
-                options={{ responsive: true, maintainAspectRatio: false }}
+            <div className="w-3/4 mx-auto">
+              <Bar data={experienceData} />
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Education Level Distribution
+            </h3>
+            <div className="w-3/4 mx-auto">
+              <Pie data={educationChartData} options={educationChartOptions} />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Occupation Distribution
+            </h3>
+            <div className="w-3/4 mx-auto">
+              <Pie
+                data={occupationChartData}
+                options={occupationChartOptions}
               />
             </div>
           </div>

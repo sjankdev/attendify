@@ -72,10 +72,11 @@ public class EventParticipantService {
                 .setCompany(invitation.getCompany())
                 .setAge(input.getAge())
                 .setYearsOfExperience(input.getYearsOfExperience())
-                .setGender(input.getGender());
+                .setGender(input.getGender())
+                .setEducationLevel(input.getEducationLevel())
+                .setOccupation(input.getOccupation());
 
         eventParticipantRepository.save(participant);
-
         invitationService.markAsAccepted(invitation);
     }
 
