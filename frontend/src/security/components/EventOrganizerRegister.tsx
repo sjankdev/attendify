@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchRoles } from "../services/roleService";
 import axios from "axios";
+import { validateForm } from "../services/validation";
 
 interface Role {
   id: number;
@@ -55,53 +56,12 @@ const EventOrganizerRegister: React.FC = () => {
     });
   };
 
-  const validateForm = () => {
-    if (
-      !formData.email ||
-      !formData.password ||
-      !formData.fullName ||
-      !formData.companyName ||
-      !formData.companyDescription
-    ) {
-      setError("All fields are required");
-      return false;
-    }
-
-    if (formData.fullName.length < 8) {
-      setError("Full name must be at least 8 characters long");
-      return false;
-    }
-
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return false;
-    }
-
-    if (formData.companyName.length < 3) {
-      setError("Company Name must be at least 3 characters long");
-      return false;
-    }
-
-    if (formData.companyDescription.length < 10) {
-      setError("Company Description must be at least 10 characters long");
-      return false;
-    }
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(formData.email)) {
-      setError("Invalid email format");
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
   
-    if (!validateForm()) {
+    if (!validateForm(formData, setError)) { 
       return;
     }
   
