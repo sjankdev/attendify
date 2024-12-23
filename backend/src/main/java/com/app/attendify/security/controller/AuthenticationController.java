@@ -70,9 +70,19 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register-participant")
-    public ResponseEntity<String> registerEventParticipant(@RequestBody EventParticipantRegisterDto registerDto) {
+    public ResponseEntity<Object> registerEventParticipant(
+            @Valid @RequestBody EventParticipantRegisterDto registerDto,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errorMessages);
+        }
+
         try {
-            eventParticipantService.registerEventParticipant(registerDto);
+            authenticationService.registerEventParticipant(registerDto);
             return ResponseEntity.ok("Registration successful and email verified");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
