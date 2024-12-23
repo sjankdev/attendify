@@ -6,6 +6,7 @@ import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
+import com.app.attendify.exceptions.EmailAlreadyExistsException;
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.eventOrganizer.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.User;
@@ -14,11 +15,17 @@ import com.app.attendify.security.response.LoginResponse;
 import com.app.attendify.security.services.AuthenticationService;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.security.services.JwtService;
+import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/auth")
 @RestController
@@ -41,9 +48,25 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register-organizer")
-    public ResponseEntity<User> registerEventOrganizer(@RequestBody RegisterEventOrganizerDto registerEventOrganizerDto) {
-        User registeredOrganizer = authenticationService.registerEventOrganizer(registerEventOrganizerDto);
-        return ResponseEntity.ok(registeredOrganizer);
+    public ResponseEntity<Object> registerEventOrganizer(
+            @Valid @RequestBody RegisterEventOrganizerDto registerEventOrganizerDto,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errorMessages);
+        }
+
+        try {
+            User registeredOrganizer = authenticationService.registerEventOrganizer(registerEventOrganizerDto);
+            return ResponseEntity.ok(registeredOrganizer);
+        } catch (EmailAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed");
+        }
     }
 
     @PostMapping("/register-participant")

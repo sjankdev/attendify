@@ -1,10 +1,28 @@
 package com.app.attendify.eventOrganizer.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 public class RegisterEventOrganizerDto {
+    @NotEmpty(message = "Full Name cannot be empty")
+    @Size(min = 10, message = "Full Name must be at least 8 characters long")
     private String fullName;
+
+    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     private String email;
+
+    @NotEmpty(message = "Password cannot be empty")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotEmpty(message = "Company Name cannot be empty")
+    @Size(min = 3, message = "Company Name must be at least 3 characters long")
     private String companyName;
+
+    @NotEmpty(message = "Company Description cannot be empty")
+    @Size(min = 10, message = "Company Description must be at least 10 characters long")
     private String companyDescription;
 
     public String getFullName() {
