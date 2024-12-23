@@ -1,29 +1,19 @@
 package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
-import com.app.attendify.company.model.Invitation;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.event.repository.EventRepository;
-import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.event.repository.EventAttendanceRepository;
 import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
-import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
 import com.app.attendify.eventParticipant.model.EventParticipant;
-import com.app.attendify.security.model.Role;
-import com.app.attendify.security.model.RoleEnum;
-import com.app.attendify.security.model.User;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
-import com.app.attendify.security.repositories.RoleRepository;
-import com.app.attendify.security.repositories.UserRepository;
 import com.app.attendify.utils.EventFilterUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 
@@ -37,69 +27,16 @@ public class EventParticipantService {
 
     private static final Logger log = LoggerFactory.getLogger(EventParticipantService.class);
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final EventParticipantRepository eventParticipantRepository;
-    private final InvitationService invitationService;
-    private final PasswordEncoder passwordEncoder;
     private final EventRepository eventRepository;
     private final EventAttendanceRepository eventAttendanceRepository;
     private final EventFilterUtil eventFilterUtil;
 
-    @Autowired
-    public EventParticipantService(EventFilterUtil eventFilterUtil, EventAttendanceRepository eventAttendanceRepository, EventRepository eventRepository, PasswordEncoder passwordEncoder, InvitationService invitationService, EventParticipantRepository eventParticipantRepository, RoleRepository roleRepository, UserRepository userRepository) {
-        this.eventFilterUtil = eventFilterUtil;
-        this.eventAttendanceRepository = eventAttendanceRepository;
-        this.eventRepository = eventRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.invitationService = invitationService;
+    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil) {
         this.eventParticipantRepository = eventParticipantRepository;
-        this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
-    }
-
-    public void registerEventParticipant(EventParticipantRegisterDto input) {
-        Invitation invitation = validateInvitation(input.getToken());
-
-        if (userRepository.findByEmail(input.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("User already exists");
-        }
-
-        User newUser = createUser(input);
-
-        EventParticipant participant = new EventParticipant()
-                .setUser(newUser)
-                .setCompany(invitation.getCompany())
-                .setAge(input.getAge())
-                .setYearsOfExperience(input.getYearsOfExperience())
-                .setGender(input.getGender())
-                .setEducationLevel(input.getEducationLevel())
-                .setOccupation(input.getOccupation());
-
-        eventParticipantRepository.save(participant);
-        invitationService.markAsAccepted(invitation);
-    }
-
-    private Invitation validateInvitation(String token) {
-        Invitation invitation = invitationService.getInvitation(token);
-        if (invitation.isAccepted()) {
-            throw new IllegalArgumentException("Invitation already accepted");
-        }
-        return invitation;
-    }
-
-    private User createUser(EventParticipantRegisterDto input) {
-        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
-
-        User newUser = new User().setEmail(input.getEmail()).setFullName(input.getName()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(participantRole).setEmailVerificationToken(UUID.randomUUID().toString()).setEmailVerified(true);
-
-        return userRepository.save(newUser);
-    }
-
-    private EventParticipant createEventParticipant(User user, Invitation invitation) {
-        EventParticipant eventParticipant = new EventParticipant().setUser(user).setCompany(invitation.getCompany());
-
-        return eventParticipantRepository.save(eventParticipant);
+        this.eventRepository = eventRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
+        this.eventFilterUtil = eventFilterUtil;
     }
 
     @Transactional
@@ -148,7 +85,6 @@ public class EventParticipantService {
         }
     }
 
-
     @Transactional
     public void joinEvent(int eventId, String userEmail) {
         log.info("Received request to join event with ID: {}", eventId);
@@ -176,7 +112,6 @@ public class EventParticipantService {
 
         log.info("Successfully {}joined event with ID: {}", status == AttendanceStatus.ACCEPTED ? "" : "requested to ", eventId);
     }
-
 
     @Transactional
     public void unjoinEvent(Integer eventId, String userEmail) {

@@ -3,16 +3,41 @@ package com.app.attendify.eventParticipant.dto;
 import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.eventParticipant.enums.Occupation;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class EventParticipantRegisterDto {
+
+    @NotEmpty(message = "Name cannot be empty")
+    @Size(min = 3, message = "Name must be at least 3 characters long")
     private String name;
+
+    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     private String email;
+
+    @NotEmpty(message = "Password cannot be empty")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotEmpty(message = "Token cannot be empty")
     private String token;
+
+    @NotNull(message = "Age cannot be null")
     private Integer age;
+
+    @NotNull(message = "Years of Experience cannot be null")
     private Integer yearsOfExperience;
+
+    @NotNull(message = "Gender cannot be null")
     private Gender gender;
+
+    @NotNull(message = "Education Level cannot be null")
     private EducationLevel educationLevel;
+
+    @NotNull(message = "Occupation cannot be null")
     private Occupation occupation;
 
     public String getName() {

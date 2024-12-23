@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { validateFormParticipantRegistration } from "../services/validation";
+import { EducationLevel, Gender, Occupation } from "../../types/Enums";
 
 const EventParticipantRegister = () => {
   const [searchParams] = useSearchParams();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [age, setAge] = useState<number | "">("");
-  const [yearsOfExperience, setYearsOfExperience] = useState<number | "">("");
+  const [age, setAge] = useState<number | null>(null);
+  const [yearsOfExperience, setYearsOfExperience] = useState<number | null>(
+    null
+  );
   const [gender, setGender] = useState<string>("");
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
   const [token, setToken] = useState(searchParams.get("token") || "");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const occupationList = [
@@ -43,6 +47,25 @@ const EventParticipantRegister = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !validateFormParticipantRegistration(
+        {
+          name,
+          email,
+          password,
+          token,
+          age,
+          yearsOfExperience,
+          gender: gender as Gender,
+          educationLevel: educationLevel as EducationLevel,
+          occupation: occupation as Occupation,
+        },
+        setError
+      )
+    ) {
+      return;
+    }
 
     axios
       .post("http://localhost:8080/api/auth/register-participant", {
@@ -109,8 +132,10 @@ const EventParticipantRegister = () => {
             <input
               type="number"
               id="age"
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
+              value={age ?? ""}
+              onChange={(e) =>
+                setAge(e.target.value ? Number(e.target.value) : null)
+              }
               required
               className="px-4 py-3 border rounded-lg"
             />
@@ -123,8 +148,12 @@ const EventParticipantRegister = () => {
             <input
               type="number"
               id="yearsOfExperience"
-              value={yearsOfExperience}
-              onChange={(e) => setYearsOfExperience(Number(e.target.value))}
+              value={yearsOfExperience ?? ""}
+              onChange={(e) =>
+                setYearsOfExperience(
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
               required
               className="px-4 py-3 border rounded-lg"
             />
@@ -166,6 +195,7 @@ const EventParticipantRegister = () => {
               ))}
             </select>
           </div>
+
           <div className="flex flex-col">
             <label htmlFor="educationLevel" className="text-lg font-medium">
               Education Level
@@ -185,6 +215,7 @@ const EventParticipantRegister = () => {
               <option value="OTHER">Other</option>
             </select>
           </div>
+
           <div className="flex flex-col">
             <label htmlFor="email" className="text-lg font-medium">
               Email

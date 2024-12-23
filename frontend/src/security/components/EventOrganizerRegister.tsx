@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchRoles } from "../services/roleService";
 import axios from "axios";
-import { validateForm } from "../services/validation";
+import { validateFormOrganizerRegistration } from "../services/validation";
 
 interface Role {
   id: number;
@@ -61,7 +61,7 @@ const EventOrganizerRegister: React.FC = () => {
     setError(null);
     setSuccess(null);
   
-    if (!validateForm(formData, setError)) { 
+    if (!validateFormOrganizerRegistration(formData, setError)) { 
       return;
     }
   
