@@ -75,13 +75,13 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
     return false;
   }
 
-  if (formData.age <= 0) {
-    setError("Age must be a positive number");
+  if (formData.age <= 0 || formData.age < 16) {
+    setError("Age must be 16 or above and a positive number");
     return false;
   }
-
-  if (formData.yearsOfExperience < 0) {
-    setError("Years of Experience cannot be negative");
+  
+  if (formData.yearsOfExperience == null || formData.yearsOfExperience < 0) {
+    setError("Years of Experience cannot be negative or null");
     return false;
   }
 
