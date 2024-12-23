@@ -3,12 +3,14 @@ package com.app.attendify.security.services;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.repository.CompanyRepository;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
+import com.app.attendify.exceptions.EmailAlreadyExistsException;
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.eventOrganizer.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.*;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,15 +44,22 @@ public class AuthenticationService {
         this.javaMailSender = javaMailSender;
     }
 
-    public User registerEventOrganizer(RegisterEventOrganizerDto input) {
-        RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
+    public User registerEventOrganizer(@Valid RegisterEventOrganizerDto input) {
+        if (userRepository.existsByEmail(input.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists. Please use a different email.");
+        }
 
+        RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
 
-        var organizerUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
+        User organizerUser = new User()
+                .setFullName(input.getFullName())
+                .setEmail(input.getEmail())
+                .setPassword(passwordEncoder.encode(input.getPassword()))
+                .setRole(optionalRole.get());
 
         User savedUser = userRepository.save(organizerUser);
 
@@ -63,7 +72,10 @@ public class AuthenticationService {
         eventOrganizer.setUser(savedUser);
         eventOrganizerRepository.save(eventOrganizer);
 
-        Company company = new Company().setName(input.getCompanyName()).setDescription(input.getCompanyDescription()).setOwner(eventOrganizer);
+        Company company = new Company()
+                .setName(input.getCompanyName())
+                .setDescription(input.getCompanyDescription())
+                .setOwner(eventOrganizer);
 
         companyRepository.save(company);
 
@@ -72,6 +84,7 @@ public class AuthenticationService {
 
         return savedUser;
     }
+
 
     private void sendVerificationEmail(User user) {
         String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
