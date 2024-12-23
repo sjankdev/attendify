@@ -59,8 +59,8 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
     return false;
   }
 
-  if (formData.name.length < 3) {
-    setError("Name must be at least 3 characters long");
+  if (formData.name.length < 8) {
+    setError("Full Name must be at least 8 characters long");
     return false;
   }
 
