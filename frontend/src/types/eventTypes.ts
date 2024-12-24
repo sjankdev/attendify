@@ -18,10 +18,10 @@ export interface Event {
   joinApproval: boolean;
   companyName: string;
   organizerName: string;
-  participants: Participant[]; 
-  agendaItems: AgendaItemDTO[]; 
-  pendingRequests: number; 
-  acceptedParticipants: number; 
+  participants: Participant[];
+  agendaItems: AgendaItemDTO[];
+  pendingRequests: number;
+  acceptedParticipants: number;
 }
 
 
@@ -32,4 +32,23 @@ export interface Participant {
   status: string;
   joinedEventCount: number; 
   eventLinks: string[];    
+}
+
+export interface OccupationStatsDTO {
+  count: number;
+  percentage: number;
+}
+
+export interface EventStatistics {
+  averageAge: number;
+  highestAge: number;
+  lowestAge: number;
+  maleCount: number;
+  femaleCount: number;
+  otherCount: number;
+  averageExperience: number;
+  highestExperience: number;
+  lowestExperience: number;
+  educationLevelStats: Record<string, OccupationStatsDTO>;
+  occupationStats: Record<string, OccupationStatsDTO>; 
 }

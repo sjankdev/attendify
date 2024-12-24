@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,5 +21,14 @@ public interface EventAttendanceRepository extends JpaRepository<EventAttendance
     void deleteByParticipantIdAndEventId(@Param("participantId") Integer participantId, @Param("eventId") Integer eventId);
 
     Optional<EventAttendance> findByParticipantIdAndEventId(Integer participantId, Integer eventId);
+
+    @Query("SELECT ea.participant.age FROM EventAttendance ea WHERE ea.event.id = :eventId AND ea.status = 'ACCEPTED'")
+    List<Integer> findAcceptedParticipantAgesByEventId(@Param("eventId") Integer eventId);
+
+    @Query("SELECT e.event.id, p.gender, COUNT(p.id) " +
+            "FROM EventAttendance e " +
+            "JOIN e.participant p " +
+            "GROUP BY e.event.id, p.gender")
+    List<Object[]> countParticipantsByGender();
 
 }

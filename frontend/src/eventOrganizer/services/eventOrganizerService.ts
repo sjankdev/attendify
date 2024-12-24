@@ -1,4 +1,18 @@
+import axios from "axios";
 import { Event, Participant } from "../../types/eventTypes";
+
+export const fetchEventStatistics = async (eventId: string) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(
+    `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/event-stats/${eventId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
 export const fetchEventsWithParticipants = async (
   filter: string
@@ -31,7 +45,7 @@ export const fetchEventsWithParticipants = async (
     const data = await response.json();
 
     const eventsWithParticipants: Event[] = await Promise.all(
-      (data.events as Event[]).map(async (event): Promise<Event> => {
+      (data.events as Event[]).map(async (event: Event): Promise<Event> => {
         try {
           const participantsResponse = await fetch(
             `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${event.id}/participants`,

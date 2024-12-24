@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 public class EventForOrganizersDTO {
     private Integer id;
     private String name;
@@ -45,7 +46,6 @@ public class EventForOrganizersDTO {
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
         this.pendingRequests = pendingRequests;
-
     }
 
     public List<AgendaItemDTO> getAgendaItems() {

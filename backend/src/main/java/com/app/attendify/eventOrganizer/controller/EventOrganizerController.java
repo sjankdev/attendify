@@ -6,6 +6,7 @@ import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
+import com.app.attendify.eventParticipant.enums.Gender;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/auth/event-organizer")
@@ -21,7 +23,6 @@ import java.util.stream.Collectors;
 public class EventOrganizerController {
 
     private static final Logger logger = LoggerFactory.getLogger(EventOrganizerController.class);
-
 
     private final EventOrganizerService eventOrganizerService;
 
@@ -78,6 +79,12 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/statistics/gender")
+    public ResponseEntity<Map<Integer, Map<Gender, Long>>> getGenderStatistics() {
+        Map<Integer, Map<Gender, Long>> statistics = eventOrganizerService.getGenderStatistics();
+        return ResponseEntity.ok(statistics);
+    }
+
     @PutMapping("/events/{eventId}/participants/{participantId}/status")
     public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
         try {
@@ -123,6 +130,18 @@ public class EventOrganizerController {
             return ResponseEntity.ok(participants);
         } catch (Exception e) {
             logger.error("Error retrieving participants for organizer's company", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/event-stats/{eventId}")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<EventStatisticsDTO> getEventStatistics(@PathVariable Integer eventId) {
+        try {
+            EventStatisticsDTO stats = eventOrganizerService.getEventStatistics(eventId);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            logger.error("Error retrieving event statistics for eventId: {}", eventId, e);
             return ResponseEntity.status(500).body(null);
         }
     }

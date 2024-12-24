@@ -1,14 +1,21 @@
 package com.app.attendify.security.services;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
+import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
+import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
+import com.app.attendify.eventParticipant.model.EventParticipant;
+import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
+import com.app.attendify.exceptions.EmailAlreadyExistsException;
 import com.app.attendify.security.dto.LoginUserDto;
 import com.app.attendify.eventOrganizer.dto.RegisterEventOrganizerDto;
 import com.app.attendify.security.model.*;
 import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.app.attendify.security.model.User;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -31,8 +39,10 @@ public class AuthenticationService {
     private final EventOrganizerRepository eventOrganizerRepository;
     private final CompanyRepository companyRepository;
     private final JavaMailSender javaMailSender;
+    private final EventParticipantRepository eventParticipantRepository;
+    private final InvitationService invitationService;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -40,17 +50,26 @@ public class AuthenticationService {
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.companyRepository = companyRepository;
         this.javaMailSender = javaMailSender;
+        this.eventParticipantRepository = eventParticipantRepository;
+        this.invitationService = invitationService;
     }
 
-    public User registerEventOrganizer(RegisterEventOrganizerDto input) {
-        RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
+    public User registerEventOrganizer(@Valid RegisterEventOrganizerDto input) {
+        if (userRepository.existsByEmail(input.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists. Please use a different email.");
+        }
 
+        RoleEnum roleEnum = RoleEnum.EVENT_ORGANIZER;
         Optional<Role> optionalRole = roleRepository.findByName(roleEnum);
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Role not found");
         }
 
-        var organizerUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
+        User organizerUser = new User()
+                .setFullName(input.getFullName())
+                .setEmail(input.getEmail())
+                .setPassword(passwordEncoder.encode(input.getPassword()))
+                .setRole(optionalRole.get());
 
         User savedUser = userRepository.save(organizerUser);
 
@@ -63,7 +82,10 @@ public class AuthenticationService {
         eventOrganizer.setUser(savedUser);
         eventOrganizerRepository.save(eventOrganizer);
 
-        Company company = new Company().setName(input.getCompanyName()).setDescription(input.getCompanyDescription()).setOwner(eventOrganizer);
+        Company company = new Company()
+                .setName(input.getCompanyName())
+                .setDescription(input.getCompanyDescription())
+                .setOwner(eventOrganizer);
 
         companyRepository.save(company);
 
@@ -71,6 +93,51 @@ public class AuthenticationService {
         eventOrganizerRepository.save(eventOrganizer);
 
         return savedUser;
+    }
+
+    public void registerEventParticipant(@Valid EventParticipantRegisterDto input) {
+        Invitation invitation = validateInvitation(input.getToken());
+
+        if (userRepository.findByEmail(input.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        User newUser = createUser(input);
+
+        EventParticipant participant = new EventParticipant()
+                .setUser(newUser)
+                .setCompany(invitation.getCompany())
+                .setAge(input.getAge())
+                .setYearsOfExperience(input.getYearsOfExperience())
+                .setGender(input.getGender())
+                .setEducationLevel(input.getEducationLevel())
+                .setOccupation(input.getOccupation());
+
+        eventParticipantRepository.save(participant);
+        invitationService.markAsAccepted(invitation);
+    }
+
+    private Invitation validateInvitation(String token) {
+        Invitation invitation = invitationService.getInvitation(token);
+        if (invitation.isAccepted()) {
+            throw new IllegalArgumentException("Invitation already accepted");
+        }
+        return invitation;
+    }
+
+
+    private EventParticipant createEventParticipant(User user, Invitation invitation) {
+        EventParticipant eventParticipant = new EventParticipant().setUser(user).setCompany(invitation.getCompany());
+
+        return eventParticipantRepository.save(eventParticipant);
+    }
+
+    private User createUser(EventParticipantRegisterDto input) {
+        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
+
+        User newUser = new User().setEmail(input.getEmail()).setFullName(input.getName()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(participantRole).setEmailVerificationToken(UUID.randomUUID().toString()).setEmailVerified(true);
+
+        return userRepository.save(newUser);
     }
 
     private void sendVerificationEmail(User user) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchRoles } from "../services/roleService";
 import axios from "axios";
+import { validateFormOrganizerRegistration } from "../services/validation";
 
 interface Role {
   id: number;
@@ -59,7 +60,11 @@ const EventOrganizerRegister: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-
+  
+    if (!validateFormOrganizerRegistration(formData, setError)) { 
+      return;
+    }
+  
     try {
       const response = await axios.post(
         "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
@@ -69,7 +74,16 @@ const EventOrganizerRegister: React.FC = () => {
         "Registration successful! Please check your email for verification."
       );
     } catch (error: any) {
-      setError(error.response?.data?.message || "Registration failed");
+      if (error.response && error.response.data) {
+        const errorMessages = error.response.data;
+        if (errorMessages.includes("Email already exists")) {
+          setError("This email is already registered. Please use a different email.");
+        } else {
+          setError(errorMessages.join(", "));
+        }
+      } else {
+        setError("Registration failed");
+      }
     }
   };
 
@@ -80,14 +94,18 @@ const EventOrganizerRegister: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-teal-500 via-green-500 to-blue-500 flex items-center justify-center p-8">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Event Organizer Registration</h2>
-        
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          Event Organizer Registration
+        </h2>
+
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         {success && <p className="text-green-500 text-center mb-4">{success}</p>}
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col">
-            <label htmlFor="email" className="text-lg font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="text-lg font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -97,9 +115,11 @@ const EventOrganizerRegister: React.FC = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-          
+
           <div className="flex flex-col">
-            <label htmlFor="password" className="text-lg font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="text-lg font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -109,9 +129,11 @@ const EventOrganizerRegister: React.FC = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-          
+
           <div className="flex flex-col">
-            <label htmlFor="fullName" className="text-lg font-medium text-gray-700">Full Name</label>
+            <label htmlFor="fullName" className="text-lg font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               name="fullName"
@@ -121,9 +143,11 @@ const EventOrganizerRegister: React.FC = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-          
+
           <div className="flex flex-col">
-            <label htmlFor="companyName" className="text-lg font-medium text-gray-700">Company Name</label>
+            <label htmlFor="companyName" className="text-lg font-medium text-gray-700">
+              Company Name
+            </label>
             <input
               type="text"
               name="companyName"
@@ -133,9 +157,11 @@ const EventOrganizerRegister: React.FC = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-          
+
           <div className="flex flex-col">
-            <label htmlFor="companyDescription" className="text-lg font-medium text-gray-700">Company Description</label>
+            <label htmlFor="companyDescription" className="text-lg font-medium text-gray-700">
+              Company Description
+            </label>
             <textarea
               name="companyDescription"
               value={formData.companyDescription}
@@ -144,7 +170,7 @@ const EventOrganizerRegister: React.FC = () => {
               className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
-          
+
           <button
             type="submit"
             className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"

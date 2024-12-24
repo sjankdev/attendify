@@ -3,6 +3,7 @@ package com.app.attendify.eventOrganizer.services;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
+import com.app.attendify.event.services.StatisticsService;
 import com.app.attendify.event.validation.EventValidation;
 import com.app.attendify.eventOrganizer.dto.EventForOrganizersDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -15,6 +16,8 @@ import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
+import com.app.attendify.eventParticipant.enums.EducationLevel;
+import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
@@ -28,10 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,15 +46,32 @@ public class EventOrganizerService {
     private final EventValidation eventValidation;
     private final TimeZoneConversionUtil timeZoneConversionUtil;
     private final EventFilterUtil eventFilterUtil;
+    private final StatisticsService statisticsService;
 
-    public EventOrganizerService(EventFilterUtil eventFilterUtil, TimeZoneConversionUtil timeZoneConversionUtil, EventValidation eventValidation, EventAttendanceRepository eventAttendanceRepository, UserRepository userRepository, EventRepository eventRepository, EventOrganizerRepository eventOrganizerRepository) {
-        this.eventFilterUtil = eventFilterUtil;
-        this.timeZoneConversionUtil = timeZoneConversionUtil;
-        this.eventValidation = eventValidation;
-        this.eventAttendanceRepository = eventAttendanceRepository;
-        this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository, EventValidation eventValidation, TimeZoneConversionUtil timeZoneConversionUtil, EventFilterUtil eventFilterUtil, StatisticsService statisticsService) {
         this.eventOrganizerRepository = eventOrganizerRepository;
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.eventAttendanceRepository = eventAttendanceRepository;
+        this.eventValidation = eventValidation;
+        this.timeZoneConversionUtil = timeZoneConversionUtil;
+        this.eventFilterUtil = eventFilterUtil;
+        this.statisticsService = statisticsService;
+    }
+
+    public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
+        List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
+        Map<Integer, Map<Gender, Long>> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            Integer eventId = (Integer) result[0];
+            Gender gender = (Gender) result[1];
+            Long count = (Long) result[2];
+
+            statistics.computeIfAbsent(eventId, k -> new HashMap<>()).put(gender, count);
+        }
+
+        return statistics;
     }
 
     public Event createEvent(CreateEventRequest request) {
@@ -260,12 +277,9 @@ public class EventOrganizerService {
             List<EventForOrganizersDTO> eventForOrganizersDTOS = organizer.getEvents().stream().map(event -> {
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                long acceptedParticipantsCount = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).count();
+                List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
 
-                int pendingRequests = event.getPendingRequests();
-
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), event.getEventEndDate(), agendaItems, pendingRequests);
-
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedAttendances.size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests());
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();
@@ -375,5 +389,26 @@ public class EventOrganizerService {
             logger.error("Error retrieving event details", e);
             throw new RuntimeException("Error retrieving event details", e);
         }
+    }
+
+    @Transactional
+    public EventStatisticsDTO getEventStatistics(Integer eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
+
+        Map<String, Object> ageStats = statisticsService.calculateAgeStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getAge()).toList());
+
+        Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
+
+        Map<String, Object> experienceStats = statisticsService.calculateExperienceStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getYearsOfExperience()).toList());
+
+        Map<String, Map<String, Object>> educationLevelStats = statisticsService.calculateEducationLevelStats(acceptedAttendances);
+        Map<String, EducationLevelStatsDTO> educationLevelDTOMap = educationLevelStats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new EducationLevelStatsDTO((Long) entry.getValue().get("count"), (Double) entry.getValue().get("percentage"))));
+
+        Map<String, Map<String, Object>> occupationStats = statisticsService.calculateOccupationStats(acceptedAttendances);
+        Map<String, OccupationStatsDTO> occupationDTOMap = occupationStats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new OccupationStatsDTO((Long) entry.getValue().get("count"), (Double) entry.getValue().get("percentage"))));
+
+        return new EventStatisticsDTO((Double) ageStats.get("averageAge"), (Integer) ageStats.get("highestAge"), (Integer) ageStats.get("lowestAge"), genderCounts.get("maleCount"), genderCounts.get("femaleCount"), genderCounts.get("otherCount"), (Double) experienceStats.get("averageExperience"), (Integer) experienceStats.get("highestExperience"), (Integer) experienceStats.get("lowestExperience"), educationLevelDTOMap, occupationDTOMap);
     }
 }
