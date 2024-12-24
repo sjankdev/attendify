@@ -78,6 +78,10 @@ Events created by the currently logged-in organizer, along with participant join
 
 ![image](https://github.com/user-attachments/assets/04be20bf-225a-4f4f-8c4d-ae7d939e583f)
 
+Event statistics page:
+
+![image](https://github.com/user-attachments/assets/8be8c427-08bc-48a6-b853-bc5ca54bfd59)
+
 Participants joined in the company events, total counts, and events they are part of:
 
 ![image](https://github.com/user-attachments/assets/3094984f-274d-4462-aa45-3fdf21649a5b)
