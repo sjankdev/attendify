@@ -25,7 +25,7 @@ public class InvitationService {
         System.out.println("sendInvitationEmail called with email: " + toEmail + " and token: " + token);
 
         String subject = "You're Invited!";
-        String invitationLink = "https://attendify-frontend.onrender.com/register-participant?token=" + token;
+        String invitationLink = "http://localhost:3000/register-participant?token=" + token;
         String message = "Click the following link to complete your registration: " + invitationLink;
 
         System.out.println("Email content: ");
@@ -51,6 +51,10 @@ public class InvitationService {
 
     public Invitation createInvitation(String email, Company company) {
         System.out.println("Creating invitation for email: " + email + " and company: " + company.getName());
+
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty.");
+        }
 
         Invitation invitation = new Invitation();
         invitation.setEmail(email);

@@ -125,16 +125,20 @@ public class AuthenticationController {
 
     @PostMapping("/invitation/send")
     public ResponseEntity<String> sendInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
-        String email = invitationRequestDto.getEmail();
-        Integer companyId = invitationRequestDto.getCompanyId();
+        try {
+            String email = invitationRequestDto.getEmail();
+            Integer companyId = invitationRequestDto.getCompanyId();
 
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
+            Company company = companyRepository.findById(companyId)
+                    .orElseThrow(() -> new RuntimeException("Company not found"));
 
-        Invitation invitation = invitationService.createInvitation(email, company);
+            Invitation invitation = invitationService.createInvitation(email, company);
+            invitationService.sendInvitationEmail(email, invitation.getToken());
 
-        invitationService.sendInvitationEmail(email, invitation.getToken());
-
-        return ResponseEntity.ok("Invitation sent to " + email);
+            return ResponseEntity.ok("Invitation sent to " + email);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/accept")
