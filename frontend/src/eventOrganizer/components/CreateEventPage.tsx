@@ -13,7 +13,7 @@ const CreateEventPage: React.FC = () => {
   const [attendeeLimit, setAttendeeLimit] = useState<number | null>(null);
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
-  const [eventDate, setEventDate] = useState<string>("");
+  const [eventStartDate, setEventStartDate] = useState<string>("");
   const [eventEndDate, setEventEndDate] = useState<string>("");
   const [joinDeadline, setJoinDeadline] = useState<string>("");
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
@@ -51,7 +51,7 @@ const CreateEventPage: React.FC = () => {
 
   const validateDates = (): boolean => {
     const errors: string[] = [];
-    const eventStart = new Date(eventDate);
+    const eventStart = new Date(eventStartDate);
     const eventEnd = new Date(eventEndDate);
     const join = joinDeadline ? new Date(joinDeadline) : null;
 
@@ -94,36 +94,30 @@ const CreateEventPage: React.FC = () => {
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
-
+  
     const formData = {
       name,
       description,
       location,
       organizerId,
       attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
-      eventDate,
+      eventStartDate,
       eventEndDate,
       joinDeadline,
     };
-
-    if (!validateEventForm(formData, setError)) {
+  
+    if (!validateEventForm(formData, setError, agendaItems, isAttendeeLimitChecked, attendeeLimit, eventStartDate, eventEndDate, joinDeadline)) {
       return;
     }
-
-    if (!validateDates()) {
-      return;
-    }
-
+  
     setIsSubmitting(true);
-
+  
     try {
       const eventData = {
         ...formData,
-        eventDate: new Date(eventDate).toISOString(),
+        eventDate: new Date(eventStartDate).toISOString(),
         eventEndDate: new Date(eventEndDate).toISOString(),
-        joinDeadline: joinDeadline
-          ? new Date(joinDeadline).toISOString()
-          : null,
+        joinDeadline: joinDeadline ? new Date(joinDeadline).toISOString() : null,
         joinApproval,
         agendaItems: agendaItems.map((item) => ({
           ...item,
@@ -131,7 +125,7 @@ const CreateEventPage: React.FC = () => {
           endTime: new Date(item.endTime).toISOString(),
         })),
       };
-
+  
       await axios.post(
         "http://localhost:8080/api/auth/event-organizer/create-event",
         eventData,
@@ -142,17 +136,14 @@ const CreateEventPage: React.FC = () => {
           },
         }
       );
-
+  
       setSuccessMessage("Event created successfully!");
-      setAgendaItems([
-        { title: "", description: "", startTime: "", endTime: "" },
-      ]);
+      setAgendaItems([{ title: "", description: "", startTime: "", endTime: "" }]);
     } catch (err: any) {
       console.error("Error creating event: ", err);
-
+  
       if (err.response && err.response.data) {
-        const errorMessage =
-          err.response.data.message || "Failed to create the event.";
+        const errorMessage = err.response.data.message || "Failed to create the event.";
         setError(errorMessage);
       } else {
         setError("An unknown error occurred. Please try again.");
@@ -235,8 +226,8 @@ const CreateEventPage: React.FC = () => {
             </label>
             <input
               type="datetime-local"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
+              value={eventStartDate}
+              onChange={(e) => setEventStartDate(e.target.value)}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>

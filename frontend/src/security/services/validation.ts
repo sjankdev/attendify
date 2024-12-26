@@ -1,5 +1,5 @@
 import { EducationLevel, Gender, Occupation } from "../../types/Enums";
-import { CreateEventDto } from "../../types/eventTypes";
+import { AgendaItemDTO, CreateEventDto } from "../../types/eventTypes";
 import { RegisterParticipantDto, RegisterUserDto } from "../../types/userTypes";
 
 export const validateFormOrganizerRegistration = (formData: RegisterUserDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
@@ -109,7 +109,17 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
   return true;
 };
 
-export const validateEventForm = (formData: CreateEventDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
+export const validateEventForm = (
+  formData: CreateEventDto,
+  setError: React.Dispatch<React.SetStateAction<string | null>>,
+  agendaItems: AgendaItemDTO[],  // Pass agendaItems to validate dates
+  isAttendeeLimitChecked: boolean,
+  attendeeLimit: number | null,
+  eventDate: string,
+  eventEndDate: string,
+  joinDeadline: string | null
+): boolean => {
+  // Validation for basic form fields
   if (!formData.name || formData.name.length < 10) {
     setError("Event name must be at least 10 characters long.");
     return false;
@@ -132,6 +142,43 @@ export const validateEventForm = (formData: CreateEventDto, setError: React.Disp
 
   if (!formData.organizerId) {
     setError("Organizer ID is required.");
+    return false;
+  }
+
+  // Now validate dates
+  const errors: string[] = [];
+  const eventStart = new Date(eventDate);
+  const eventEnd = new Date(eventEndDate);
+  const join = joinDeadline ? new Date(joinDeadline) : null;
+
+  if (isAttendeeLimitChecked && (attendeeLimit === null || attendeeLimit < 1)) {
+    errors.push("Attendee limit must be at least 1.");
+  }
+
+  if (eventStart >= eventEnd) {
+    errors.push("Event start date must be before the event end date.");
+  }
+
+  if (join && join >= eventStart) {
+    errors.push("Join deadline must be before the event start date.");
+  }
+
+  agendaItems.forEach((item, index) => {
+    const start = new Date(item.startTime);
+    const end = new Date(item.endTime);
+
+    if (start < eventStart || end > eventEnd) {
+      errors.push(`Agenda item ${index + 1}: Times must be within event duration.`);
+    }
+
+    if (start >= end) {
+      errors.push(`Agenda item ${index + 1}: Start time must be before end time.`);
+    }
+  });
+
+  // If there are errors, set the first one and return false
+  if (errors.length > 0) {
+    setError(errors.join(" "));
     return false;
   }
 
