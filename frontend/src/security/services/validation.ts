@@ -2,7 +2,10 @@ import { EducationLevel, Gender, Occupation } from "../../types/Enums";
 import { AgendaItemDTO, CreateEventDto } from "../../types/eventTypes";
 import { RegisterParticipantDto, RegisterUserDto } from "../../types/userTypes";
 
-export const validateFormOrganizerRegistration = (formData: RegisterUserDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
+export const validateFormOrganizerRegistration = (
+  formData: RegisterUserDto,
+  setError: React.Dispatch<React.SetStateAction<string | null>>
+): boolean => {
   if (
     !formData.email ||
     !formData.password ||
@@ -43,8 +46,10 @@ export const validateFormOrganizerRegistration = (formData: RegisterUserDto, set
   return true;
 };
 
-
-export const validateFormParticipantRegistration = (formData: RegisterParticipantDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
+export const validateFormParticipantRegistration = (
+  formData: RegisterParticipantDto,
+  setError: React.Dispatch<React.SetStateAction<string | null>>
+): boolean => {
   if (
     !formData.name ||
     !formData.email ||
@@ -80,7 +85,7 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
     setError("Age must be 16 or above and a positive number");
     return false;
   }
-  
+
   if (formData.yearsOfExperience == null || formData.yearsOfExperience < 0) {
     setError("Years of Experience cannot be negative or null");
     return false;
@@ -112,7 +117,7 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
 export const validateEventForm = (
   formData: CreateEventDto,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
-  agendaItems: AgendaItemDTO[],  
+  agendaItems: AgendaItemDTO[],
   isAttendeeLimitChecked: boolean,
   attendeeLimit: number | null,
   eventStartDate: string,
@@ -158,9 +163,12 @@ export const validateEventForm = (
     const errors: string[] = [];
     const eventStart = new Date(eventStartDate);
     const eventEnd = new Date(eventEndDate);
-    const join = new Date(joinDeadline);  
+    const join = new Date(joinDeadline);
 
-    if (isAttendeeLimitChecked && (attendeeLimit === null || attendeeLimit < 1)) {
+    if (
+      isAttendeeLimitChecked &&
+      (attendeeLimit === null || attendeeLimit < 1)
+    ) {
       errors.push("Attendee limit must be at least 1.");
     }
 
@@ -201,5 +209,31 @@ export const validateEventForm = (
     return errors.length === 0;
   };
 
-  return validateDates();
+  const validateAgendaItems = (): boolean => {
+    const errors: string[] = [];
+
+    for (let i = 0; i < agendaItems.length; i++) {
+      const item = agendaItems[i];
+      if (!item.title || item.title.trim().length < 10) {
+        errors.push(
+          `Agenda item ${i + 1}: Title must be at least 10 characters long.`
+        );
+      }
+      if (!item.description || item.description.trim().length < 50) {
+        errors.push(
+          `Agenda item ${
+            i + 1
+          }: Description must be at least 50 characters long.`
+        );
+      }
+    }
+
+    if (errors.length > 0) {
+      setError(errors[0]);
+      return false;
+    }
+    return true;
+  };
+
+  return validateDates() && validateAgendaItems();
 };

@@ -91,10 +91,20 @@ public class EventOrganizerService {
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
+                if (agendaRequest.getTitle() == null || agendaRequest.getTitle().trim().isEmpty() ||
+                        agendaRequest.getDescription() == null || agendaRequest.getDescription().trim().isEmpty()) {
+                    logger.error("Agenda item missing title or description");
+                    throw new IllegalArgumentException("Each agenda item must have a title and description");
+                }
+
                 LocalDateTime agendaStartTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
                 LocalDateTime agendaEndTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartTime).setEndTime(agendaEndTime).setEvent(event);
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
+                        .setDescription(agendaRequest.getDescription())
+                        .setStartTime(agendaStartTime)
+                        .setEndTime(agendaEndTime)
+                        .setEvent(event);
 
                 agendaItems.add(agendaItem);
             }
