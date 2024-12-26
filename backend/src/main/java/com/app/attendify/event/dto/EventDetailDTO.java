@@ -10,20 +10,20 @@ public class EventDetailDTO {
     private String name;
     private String description;
     private String location;
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
     private String organizerName;
     private String attendeeLimit;
     private List<ParticipantDTO> joinedParticipants;
 
     public EventDetailDTO(int id, String name, String description, String location,
-                          LocalDateTime eventDate, LocalDateTime eventEndDate,
+                          LocalDateTime eventStartDate, LocalDateTime eventEndDate,
                           String organizerName, String attendeeLimit, List<ParticipantDTO> joinedParticipants) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;
-        this.eventDate = eventDate;
+        this.eventStartDate = eventStartDate;
         this.eventEndDate = eventEndDate;
         this.organizerName = organizerName;
         this.attendeeLimit = attendeeLimit;
@@ -63,12 +63,12 @@ public class EventDetailDTO {
         this.location = location;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public void setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public void setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public LocalDateTime getEventEndDate() {

@@ -142,7 +142,7 @@ const ListEventsPage: React.FC = () => {
                   </p>
                   <p>
                     <strong>Date:</strong>{" "}
-                    {new Date(event.eventDate).toLocaleString()}
+                    {new Date(event.eventStartDate).toLocaleString()}
                   </p>
                   <p>
                     <strong>End Date:</strong>{" "}

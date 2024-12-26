@@ -20,11 +20,11 @@ public class EventValidation {
     }
 
     public void validateEventBeforeCreate(CreateEventRequest request) {
-        if (request.getEventDate().isAfter(request.getEventEndDate())) {
+        if (request.getEventStartDate().isAfter(request.getEventEndDate())) {
             throw new IllegalArgumentException("Event start date must be before end date.");
         }
 
-        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventDate())) {
+        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventStartDate())) {
             throw new IllegalArgumentException("Join deadline must be before the event start date.");
         }
 
@@ -33,7 +33,7 @@ public class EventValidation {
         }
 
         for (AgendaItemRequest agendaItem : request.getAgendaItems()) {
-            if (agendaItem.getStartTime().isBefore(request.getEventDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
+            if (agendaItem.getStartTime().isBefore(request.getEventStartDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
                 throw new IllegalArgumentException("Agenda items must be within the event duration.");
             }
 
@@ -44,11 +44,11 @@ public class EventValidation {
     }
 
     public void validateEventDatesBeforeUpdate(UpdateEventRequest request) {
-        if (request.getEventDate().isAfter(request.getEventEndDate())) {
+        if (request.getEventStartDate().isAfter(request.getEventEndDate())) {
             throw new IllegalArgumentException("Event start date must be before end date.");
         }
 
-        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventDate())) {
+        if (request.getJoinDeadline() != null && request.getJoinDeadline().isAfter(request.getEventStartDate())) {
             throw new IllegalArgumentException("Join deadline must be before the event start date.");
         }
 
@@ -59,7 +59,7 @@ public class EventValidation {
         LocalDateTime joinDeadlineLocalDateTime = null;
         if (request.getJoinDeadline() != null) {
             joinDeadlineLocalDateTime = timeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline());
-            if (joinDeadlineLocalDateTime.isAfter(request.getEventDate())) {
+            if (joinDeadlineLocalDateTime.isAfter(request.getEventStartDate())) {
                 throw new IllegalArgumentException("Join deadline must be before the event start date.");
             }
         }
@@ -67,7 +67,7 @@ public class EventValidation {
         List<AgendaItemUpdateRequest> agendaItems = request.getAgendaItems();
         if (agendaItems != null) {
             for (AgendaItemUpdateRequest agendaItem : agendaItems) {
-                if (agendaItem.getStartTime().isBefore(request.getEventDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
+                if (agendaItem.getStartTime().isBefore(request.getEventStartDate()) || agendaItem.getEndTime().isAfter(request.getEventEndDate())) {
                     throw new IllegalArgumentException("Agenda items must be within the event duration.");
                 }
 
