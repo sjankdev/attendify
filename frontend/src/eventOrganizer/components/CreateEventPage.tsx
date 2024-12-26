@@ -49,52 +49,10 @@ const CreateEventPage: React.FC = () => {
     fetchOrganizerDetails();
   }, []);
 
-  const validateDates = (): boolean => {
-    const errors: string[] = [];
-    const eventStart = new Date(eventStartDate);
-    const eventEnd = new Date(eventEndDate);
-    const join = joinDeadline ? new Date(joinDeadline) : null;
-
-    if (
-      isAttendeeLimitChecked &&
-      (attendeeLimit === null || attendeeLimit < 1)
-    ) {
-      errors.push("Attendee limit must be at least 1.");
-    }
-
-    if (eventStart >= eventEnd) {
-      errors.push("Event start date must be before the event end date.");
-    }
-
-    if (join && join >= eventStart) {
-      errors.push("Join deadline must be before the event start date.");
-    }
-
-    agendaItems.forEach((item, index) => {
-      const start = new Date(item.startTime);
-      const end = new Date(item.endTime);
-
-      if (start < eventStart || end > eventEnd) {
-        errors.push(
-          `Agenda item ${index + 1}: Times must be within event duration.`
-        );
-      }
-
-      if (start >= end) {
-        errors.push(
-          `Agenda item ${index + 1}: Start time must be before end time.`
-        );
-      }
-    });
-
-    setValidationErrors(errors);
-    return errors.length === 0;
-  };
-
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
-  
+
     const formData = {
       name,
       description,
@@ -105,19 +63,32 @@ const CreateEventPage: React.FC = () => {
       eventEndDate,
       joinDeadline,
     };
-  
-    if (!validateEventForm(formData, setError, agendaItems, isAttendeeLimitChecked, attendeeLimit, eventStartDate, eventEndDate, joinDeadline)) {
+
+    if (
+      !validateEventForm(
+        formData,
+        setError,
+        agendaItems,
+        isAttendeeLimitChecked,
+        attendeeLimit,
+        eventStartDate,
+        eventEndDate,
+        joinDeadline
+      )
+    ) {
       return;
     }
-  
+
     setIsSubmitting(true);
-  
+
     try {
       const eventData = {
         ...formData,
         eventDate: new Date(eventStartDate).toISOString(),
         eventEndDate: new Date(eventEndDate).toISOString(),
-        joinDeadline: joinDeadline ? new Date(joinDeadline).toISOString() : null,
+        joinDeadline: joinDeadline
+          ? new Date(joinDeadline).toISOString()
+          : null,
         joinApproval,
         agendaItems: agendaItems.map((item) => ({
           ...item,
@@ -125,7 +96,7 @@ const CreateEventPage: React.FC = () => {
           endTime: new Date(item.endTime).toISOString(),
         })),
       };
-  
+
       await axios.post(
         "http://localhost:8080/api/auth/event-organizer/create-event",
         eventData,
@@ -136,14 +107,17 @@ const CreateEventPage: React.FC = () => {
           },
         }
       );
-  
+
       setSuccessMessage("Event created successfully!");
-      setAgendaItems([{ title: "", description: "", startTime: "", endTime: "" }]);
+      setAgendaItems([
+        { title: "", description: "", startTime: "", endTime: "" },
+      ]);
     } catch (err: any) {
       console.error("Error creating event: ", err);
-  
+
       if (err.response && err.response.data) {
-        const errorMessage = err.response.data.message || "Failed to create the event.";
+        const errorMessage =
+          err.response.data.message || "Failed to create the event.";
         setError(errorMessage);
       } else {
         setError("An unknown error occurred. Please try again.");
@@ -309,7 +283,6 @@ const CreateEventPage: React.FC = () => {
             )}
           </div>
 
-          {/* Require Join Approval */}
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               <input
