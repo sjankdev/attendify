@@ -39,7 +39,7 @@ const UpdateEventPage: React.FC = () => {
 
   const validateDates = (): boolean => {
     const errors: string[] = [];
-    const eventStart = new Date(updatedEvent.eventDate as string);
+    const eventStart = new Date(updatedEvent.eventStartDate as string);
     const eventEnd = new Date(updatedEvent.eventEndDate as string);
     const join = updatedEvent.joinDeadline
       ? new Date(updatedEvent.joinDeadline as string)
@@ -195,7 +195,7 @@ const UpdateEventPage: React.FC = () => {
             <input
               type="datetime-local"
               name="eventDate"
-              value={updatedEvent.eventDate}
+              value={updatedEvent.eventStartDate}
               onChange={handleInputChange}
             />
           </div>

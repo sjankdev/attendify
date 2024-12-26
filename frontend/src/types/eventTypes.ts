@@ -10,7 +10,7 @@ export interface Event {
   name: string;
   description: string;
   location: string;
-  eventDate: string;
+  eventStartDate: string;
   eventEndDate: string;
   joinDeadline?: string;
   attendeeLimit: number | null;

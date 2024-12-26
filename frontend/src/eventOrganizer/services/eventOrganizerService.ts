@@ -81,7 +81,7 @@ export const fetchEventsWithParticipants = async (
     return {
       events: eventsWithParticipants.map((event) => ({
         ...event,
-        eventDate: new Date(event.eventDate).toLocaleString("en-GB", {
+        eventDate: new Date(event.eventStartDate).toLocaleString("en-GB", {
           weekday: "short",
           year: "numeric",
           month: "short",
@@ -159,8 +159,8 @@ export const updateEvent = async (
   updatedEvent: Partial<Event>
 ): Promise<Event | null> => {
   try {
-    const formattedEventDate = updatedEvent.eventDate
-      ? new Date(updatedEvent.eventDate).toISOString()
+    const formattedEventDate = updatedEvent.eventStartDate
+      ? new Date(updatedEvent.eventStartDate).toISOString()
       : null;
     const formattedJoinDeadline = updatedEvent.joinDeadline
       ? new Date(updatedEvent.joinDeadline).toISOString()

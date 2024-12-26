@@ -31,7 +31,7 @@ public class CreateEventRequest {
 
     @NotNull
     @FutureOrPresent(message = "Event start date must be in the future.")
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
 
     @NotNull
     @FutureOrPresent(message = "Event end date must be in the future.")
@@ -88,12 +88,12 @@ public class CreateEventRequest {
         return this;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public CreateEventRequest setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public CreateEventRequest setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
         return this;
     }
 

@@ -29,7 +29,7 @@ public class Event {
     private Integer attendeeLimit;
 
     @Column(nullable = false)
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
 
     @Column(nullable = false)
     private LocalDateTime eventEndDate;
@@ -101,12 +101,12 @@ public class Event {
         return this;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public Event setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public Event setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
         return this;
     }
 
