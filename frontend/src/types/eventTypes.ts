@@ -52,3 +52,11 @@ export interface EventStatistics {
   educationLevelStats: Record<string, OccupationStatsDTO>;
   occupationStats: Record<string, OccupationStatsDTO>; 
 }
+
+export interface CreateEventDto {
+  name: string;
+  description: string;
+  location: string;
+  attendeeLimit: number | null;
+  organizerId: number | null;
+}

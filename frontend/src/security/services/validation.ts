@@ -1,4 +1,5 @@
 import { EducationLevel, Gender, Occupation } from "../../types/Enums";
+import { CreateEventDto } from "../../types/eventTypes";
 import { RegisterParticipantDto, RegisterUserDto } from "../../types/userTypes";
 
 export const validateFormOrganizerRegistration = (formData: RegisterUserDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
@@ -102,6 +103,35 @@ export const validateFormParticipantRegistration = (formData: RegisterParticipan
 
   if (!Object.values(Occupation).includes(formData.occupation)) {
     setError("Invalid occupation selection");
+    return false;
+  }
+
+  return true;
+};
+
+export const validateEventForm = (formData: CreateEventDto, setError: React.Dispatch<React.SetStateAction<string | null>>): boolean => {
+  if (!formData.name || formData.name.length < 10) {
+    setError("Event name must be at least 10 characters long.");
+    return false;
+  }
+
+  if (!formData.description || formData.description.length < 50) {
+    setError("Description must be at least 50 characters long.");
+    return false;
+  }
+
+  if (!formData.location || formData.location.length < 5) {
+    setError("Location must be at least 5 characters long.");
+    return false;
+  }
+
+  if (formData.attendeeLimit !== null && formData.attendeeLimit < 1) {
+    setError("Attendee limit must be at least 1.");
+    return false;
+  }
+
+  if (!formData.organizerId) {
+    setError("Organizer ID is required.");
     return false;
   }
 

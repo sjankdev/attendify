@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AgendaItemDTO } from "../../types/eventTypes";
 import Layout from "../../shared/components/Layout";
+import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -94,18 +95,18 @@ const CreateEventPage: React.FC = () => {
     setSuccessMessage(null);
     setError(null);
 
-    if (isAttendeeLimitChecked && attendeeLimit === null) {
-      setError("Please specify an attendee limit.");
-      return;
-    }
+    const formData = {
+      name,
+      description,
+      location,
+      organizerId,
+      attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+      eventDate,
+      eventEndDate,
+      joinDeadline,
+    };
 
-    if (isAttendeeLimitChecked && attendeeLimit === 0) {
-      setError("Attendee limit must be at least 1.");
-      return;
-    }
-
-    if (!organizerId) {
-      setError("Organizer ID not found. Please try again.");
+    if (!validateEventForm(formData, setError)) {
       return;
     }
 
@@ -117,11 +118,7 @@ const CreateEventPage: React.FC = () => {
 
     try {
       const eventData = {
-        name,
-        description,
-        location,
-        organizerId,
-        attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+        ...formData,
         eventDate: new Date(eventDate).toISOString(),
         eventEndDate: new Date(eventEndDate).toISOString(),
         joinDeadline: joinDeadline
@@ -197,14 +194,15 @@ const CreateEventPage: React.FC = () => {
           Create Event
         </h2>
 
-        {successMessage && (
-          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
-            {successMessage}
-          </div>
-        )}
         {error && (
           <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+            {successMessage}
           </div>
         )}
         {validationErrors.length > 0 && (
