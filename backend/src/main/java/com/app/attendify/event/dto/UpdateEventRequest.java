@@ -8,18 +8,18 @@ public class UpdateEventRequest {
     private String description;
     private String location;
     private Integer attendeeLimit;
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
     private LocalDateTime joinDeadline;
     private boolean joinApproval;
     private List<AgendaItemUpdateRequest> agendaItems;
 
-    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, boolean joinApproval, List<AgendaItemUpdateRequest> agendaItems) {
+    public UpdateEventRequest(String name, String description, String location, Integer attendeeLimit, LocalDateTime eventStartDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, boolean joinApproval, List<AgendaItemUpdateRequest> agendaItems) {
         this.name = name;
         this.description = description;
         this.location = location;
         this.attendeeLimit = attendeeLimit;
-        this.eventDate = eventDate;
+        this.eventStartDate = eventStartDate;
         this.eventEndDate = eventEndDate;
         this.joinDeadline = joinDeadline;
         this.joinApproval = joinApproval;
@@ -58,12 +58,12 @@ public class UpdateEventRequest {
         this.attendeeLimit = attendeeLimit;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public void setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public void setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public LocalDateTime getEventEndDate() {

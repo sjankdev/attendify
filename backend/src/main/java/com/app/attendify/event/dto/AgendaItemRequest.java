@@ -1,12 +1,20 @@
 package com.app.attendify.event.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
 public class AgendaItemRequest {
+
+    @NotBlank(message = "Agenda item title is required.")
+    @Size(min = 10, message = "Agenda item title must be at least 10 characters long.")
     private String title;
+
+    @NotBlank(message = "Agenda item description is required.")
+    @Size(min = 50, message = "Agenda item description must be at least 50 characters long.")
     private String description;
 
     @NotNull

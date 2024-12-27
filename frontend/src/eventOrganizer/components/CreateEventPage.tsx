@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AgendaItemDTO } from "../../types/eventTypes";
 import Layout from "../../shared/components/Layout";
+import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -12,7 +13,7 @@ const CreateEventPage: React.FC = () => {
   const [attendeeLimit, setAttendeeLimit] = useState<number | null>(null);
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
-  const [eventDate, setEventDate] = useState<string>("");
+  const [eventStartDate, setEventStartDate] = useState<string>("");
   const [eventEndDate, setEventEndDate] = useState<string>("");
   const [joinDeadline, setJoinDeadline] = useState<string>("");
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
@@ -48,68 +49,33 @@ const CreateEventPage: React.FC = () => {
     fetchOrganizerDetails();
   }, []);
 
-  const validateDates = (): boolean => {
-    const errors: string[] = [];
-    const eventStart = new Date(eventDate);
-    const eventEnd = new Date(eventEndDate);
-    const join = joinDeadline ? new Date(joinDeadline) : null;
-
-    if (
-      isAttendeeLimitChecked &&
-      (attendeeLimit === null || attendeeLimit < 1)
-    ) {
-      errors.push("Attendee limit must be at least 1.");
-    }
-
-    if (eventStart >= eventEnd) {
-      errors.push("Event start date must be before the event end date.");
-    }
-
-    if (join && join >= eventStart) {
-      errors.push("Join deadline must be before the event start date.");
-    }
-
-    agendaItems.forEach((item, index) => {
-      const start = new Date(item.startTime);
-      const end = new Date(item.endTime);
-
-      if (start < eventStart || end > eventEnd) {
-        errors.push(
-          `Agenda item ${index + 1}: Times must be within event duration.`
-        );
-      }
-
-      if (start >= end) {
-        errors.push(
-          `Agenda item ${index + 1}: Start time must be before end time.`
-        );
-      }
-    });
-
-    setValidationErrors(errors);
-    return errors.length === 0;
-  };
-
   const handleCreateEvent = async () => {
     setSuccessMessage(null);
     setError(null);
 
-    if (isAttendeeLimitChecked && attendeeLimit === null) {
-      setError("Please specify an attendee limit.");
-      return;
-    }
+    const formData = {
+      name,
+      description,
+      location,
+      organizerId,
+      attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
+      eventStartDate,
+      eventEndDate,
+      joinDeadline,
+    };
 
-    if (isAttendeeLimitChecked && attendeeLimit === 0) {
-      setError("Attendee limit must be at least 1.");
-      return;
-    }
-
-    if (!organizerId) {
-      setError("Organizer ID not found. Please try again.");
-      return;
-    }
-
-    if (!validateDates()) {
+    if (
+      !validateEventForm(
+        formData,
+        setError,
+        agendaItems,
+        isAttendeeLimitChecked,
+        attendeeLimit,
+        eventStartDate,
+        eventEndDate,
+        joinDeadline
+      )
+    ) {
       return;
     }
 
@@ -117,12 +83,8 @@ const CreateEventPage: React.FC = () => {
 
     try {
       const eventData = {
-        name,
-        description,
-        location,
-        organizerId,
-        attendeeLimit: isAttendeeLimitChecked ? attendeeLimit : null,
-        eventDate: new Date(eventDate).toISOString(),
+        ...formData,
+        eventDate: new Date(eventStartDate).toISOString(),
         eventEndDate: new Date(eventEndDate).toISOString(),
         joinDeadline: joinDeadline
           ? new Date(joinDeadline).toISOString()
@@ -197,14 +159,15 @@ const CreateEventPage: React.FC = () => {
           Create Event
         </h2>
 
-        {successMessage && (
-          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
-            {successMessage}
-          </div>
-        )}
         {error && (
           <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+            {successMessage}
           </div>
         )}
         {validationErrors.length > 0 && (
@@ -237,8 +200,8 @@ const CreateEventPage: React.FC = () => {
             </label>
             <input
               type="datetime-local"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
+              value={eventStartDate}
+              onChange={(e) => setEventStartDate(e.target.value)}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -320,7 +283,6 @@ const CreateEventPage: React.FC = () => {
             )}
           </div>
 
-          {/* Require Join Approval */}
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               <input

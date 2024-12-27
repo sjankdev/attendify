@@ -4,6 +4,7 @@ package com.app.attendify.event.dto;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,12 +12,15 @@ import java.util.List;
 public class CreateEventRequest {
 
     @NotNull
+    @Size(min = 10, message = "Name must be at least 10 characters long.")
     private String name;
 
     @NotNull
+    @Size(min = 50, message = "Description must be at least 50 characters long.")
     private String description;
 
     @NotNull
+    @Size(min = 5, message = "Location must be at least 5 characters long.")
     private String location;
 
     @NotNull
@@ -27,7 +31,7 @@ public class CreateEventRequest {
 
     @NotNull
     @FutureOrPresent(message = "Event start date must be in the future.")
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
 
     @NotNull
     @FutureOrPresent(message = "Event end date must be in the future.")
@@ -84,12 +88,12 @@ public class CreateEventRequest {
         return this;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public CreateEventRequest setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public CreateEventRequest setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
         return this;
     }
 

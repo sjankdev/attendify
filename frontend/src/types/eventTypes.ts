@@ -10,7 +10,7 @@ export interface Event {
   name: string;
   description: string;
   location: string;
-  eventDate: string;
+  eventStartDate: string;
   eventEndDate: string;
   joinDeadline?: string;
   attendeeLimit: number | null;
@@ -51,4 +51,12 @@ export interface EventStatistics {
   lowestExperience: number;
   educationLevelStats: Record<string, OccupationStatsDTO>;
   occupationStats: Record<string, OccupationStatsDTO>; 
+}
+
+export interface CreateEventDto {
+  name: string;
+  description: string;
+  location: string;
+  attendeeLimit: number | null;
+  organizerId: number | null;
 }

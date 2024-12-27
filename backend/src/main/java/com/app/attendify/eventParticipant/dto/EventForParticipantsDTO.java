@@ -22,14 +22,14 @@ public class EventForParticipantsDTO {
     private List<AgendaItemDTO> agendaItems;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime eventDate;
+    private LocalDateTime eventStartDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventEndDate;
 
     private Integer pendingRequests;
 
-    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
+    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,7 +37,7 @@ public class EventForParticipantsDTO {
         this.companyName = companyName;
         this.organizerName = organizerName;
         this.availableSeats = availableSeats;
-        this.eventDate = eventDate;
+        this.eventStartDate = eventStartDate;
         this.attendeeLimit = attendeeLimit;
         this.joinDeadline = joinDeadline;
         this.joinedParticipants = joinedParticipants;
@@ -114,11 +114,11 @@ public class EventForParticipantsDTO {
     }
 
     public LocalDateTime getDate() {
-        return eventDate;
+        return eventStartDate;
     }
 
-    public void setDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public void setDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public LocalDateTime getEventEndDate() {
@@ -137,12 +137,12 @@ public class EventForParticipantsDTO {
         this.attendeeLimit = attendeeLimit;
     }
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
+    public LocalDateTime getEventStartDate() {
+        return eventStartDate;
     }
 
-    public void setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
+    public void setEventStartDate(LocalDateTime eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public LocalDateTime getJoinDeadline() {

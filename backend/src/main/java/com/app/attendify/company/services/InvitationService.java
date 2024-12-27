@@ -52,6 +52,10 @@ public class InvitationService {
     public Invitation createInvitation(String email, Company company) {
         System.out.println("Creating invitation for email: " + email + " and company: " + company.getName());
 
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty.");
+        }
+
         Invitation invitation = new Invitation();
         invitation.setEmail(email);
         invitation.setCompany(company);

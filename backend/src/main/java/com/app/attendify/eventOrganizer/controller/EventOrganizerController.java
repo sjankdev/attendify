@@ -50,7 +50,7 @@ public class EventOrganizerController {
 
         List<AgendaItemDTO> agendaItems = updatedEvent.getAgendaItems().stream().map(item -> new AgendaItemDTO(item.getId(), item.getTitle(), item.getDescription(), item.getStartTime(), item.getEndTime())).collect(Collectors.toList());
 
-        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventDate(), updatedEvent.getEventEndDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval(), agendaItems);
+        EventUpdateDTO eventUpdateDTO = new EventUpdateDTO(updatedEvent.getId(), updatedEvent.getName(), updatedEvent.getDescription(), updatedEvent.getLocation(), updatedEvent.getCompany().getName(), updatedEvent.getOrganizer().getUser().getFullName(), updatedEvent.getAvailableSlots(), updatedEvent.getEventStartDate(), updatedEvent.getEventEndDate(), updatedEvent.getAttendeeLimit(), updatedEvent.getJoinDeadline(), updatedEvent.isJoinApproval(), agendaItems);
 
         return ResponseEntity.ok(eventUpdateDTO);
     }

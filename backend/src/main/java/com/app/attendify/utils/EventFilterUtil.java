@@ -17,7 +17,7 @@ public class EventFilterUtil {
         LocalDateTime startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
         return events.stream()
-                .filter(event -> isBetween(event.getEventDate(), startOfWeek, endOfWeek))
+                .filter(event -> isBetween(event.getEventStartDate(), startOfWeek, endOfWeek))
                 .collect(Collectors.toList());
     }
 
@@ -25,7 +25,7 @@ public class EventFilterUtil {
         LocalDateTime startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
         LocalDateTime endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
         return events.stream()
-                .filter(event -> isBetween(event.getEventDate(), startOfMonth, endOfMonth))
+                .filter(event -> isBetween(event.getEventStartDate(), startOfMonth, endOfMonth))
                 .collect(Collectors.toList());
     }
 
@@ -33,7 +33,7 @@ public class EventFilterUtil {
         LocalDateTime startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
         return events.stream()
-                .filter(event -> isBetween(event.getEventDate(), startOfWeek, endOfWeek))
+                .filter(event -> isBetween(event.getEventStartDate(), startOfWeek, endOfWeek))
                 .collect(Collectors.toList());
     }
 
@@ -41,7 +41,7 @@ public class EventFilterUtil {
         LocalDateTime startOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
         LocalDateTime endOfMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
         return events.stream()
-                .filter(event -> isBetween(event.getEventDate(), startOfMonth, endOfMonth))
+                .filter(event -> isBetween(event.getEventStartDate(), startOfMonth, endOfMonth))
                 .collect(Collectors.toList());
     }
 
