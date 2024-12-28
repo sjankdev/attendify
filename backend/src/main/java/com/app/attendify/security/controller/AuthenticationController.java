@@ -16,7 +16,6 @@ import com.app.attendify.security.services.AuthenticationService;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.security.services.JwtService;
 import jakarta.validation.Valid;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -128,11 +127,13 @@ public class AuthenticationController {
         try {
             String email = invitationRequestDto.getEmail();
             Integer companyId = invitationRequestDto.getCompanyId();
+            Integer departmentId = invitationRequestDto.getDepartmentId();
 
             Company company = companyRepository.findById(companyId)
                     .orElseThrow(() -> new RuntimeException("Company not found"));
 
-            Invitation invitation = invitationService.createInvitation(email, company);
+            Invitation invitation = invitationService.createInvitation(email, company, departmentId);
+
             invitationService.sendInvitationEmail(email, invitation.getToken());
 
             return ResponseEntity.ok("Invitation sent to " + email);

@@ -11,25 +11,37 @@ const InvitationPage: React.FC = () => {
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [departments, setDepartments] = useState<Array<{ id: number; name: string }>>([]);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<number | null>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
-        const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/api/auth/company",
+        const companyResponse = await axios.get(
+          "http://localhost:8080/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
-        setCompanyId(response.data.id);
-        setCompanyName(response.data.name);
+        setCompanyId(companyResponse.data.id);
+        setCompanyName(companyResponse.data.name);
+
+        const departmentResponse = await axios.get(
+          `http://localhost:8080/api/companies/${companyResponse.data.id}/departments`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDepartments(departmentResponse.data);
       } catch (err: any) {
-        console.error("Error fetching company information: ", err);
-        setError("Failed to fetch company information.");
+        console.error("Error fetching company or department information: ", err);
+        setError("Failed to fetch company or department information.");
       } finally {
         setLoading(false);
       }
@@ -59,10 +71,15 @@ const InvitationPage: React.FC = () => {
       return;
     }
 
+    if (!selectedDepartmentId) {
+      setError("Please select a department.");
+      return;
+    }
+
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/invitation/send",
-        { email, companyId },
+        "http://localhost:8080/api/auth/invitation/send",
+        { email, companyId, departmentId: selectedDepartmentId },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -86,7 +103,7 @@ const InvitationPage: React.FC = () => {
   if (loading) {
     return (
       <div className="text-center text-gray-600">
-        Loading company information...
+        Loading company and department information...
       </div>
     );
   }
@@ -125,6 +142,25 @@ const InvitationPage: React.FC = () => {
                 <p className="text-sm text-red-500">{emailError}</p>
               )}
 
+              <select
+                value={selectedDepartmentId || ""}
+                onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="" disabled>
+                  Select Department
+                </option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
+
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
+
               <button
                 onClick={handleSendInvitation}
                 className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
@@ -137,10 +173,6 @@ const InvitationPage: React.FC = () => {
               <div className="mt-4 text-green-600 text-center">
                 {successMessage}
               </div>
-            )}
-
-            {error && (
-              <div className="mt-4 text-red-500 text-center">{error}</div>
             )}
 
             <button

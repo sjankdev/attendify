@@ -1,8 +1,10 @@
 package com.app.attendify.security.services;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
+import com.app.attendify.company.repository.DepartmentRepository;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
@@ -41,8 +43,9 @@ public class AuthenticationService {
     private final JavaMailSender javaMailSender;
     private final EventParticipantRepository eventParticipantRepository;
     private final InvitationService invitationService;
+    private final DepartmentRepository departmentRepository;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, DepartmentRepository departmentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -52,6 +55,7 @@ public class AuthenticationService {
         this.javaMailSender = javaMailSender;
         this.eventParticipantRepository = eventParticipantRepository;
         this.invitationService = invitationService;
+        this.departmentRepository = departmentRepository;
     }
 
     public User registerEventOrganizer(@Valid RegisterEventOrganizerDto input) {
@@ -92,29 +96,54 @@ public class AuthenticationService {
         eventOrganizer.setCompany(company);
         eventOrganizerRepository.save(eventOrganizer);
 
+        if (input.getDepartmentNames() != null) {
+            for (String departmentName : input.getDepartmentNames()) {
+                Department department = new Department();
+                department.setName(departmentName);
+                department.setCompany(company);
+                departmentRepository.save(department);
+            }
+        }
+
         return savedUser;
     }
 
     public void registerEventParticipant(@Valid EventParticipantRegisterDto input) {
-        Invitation invitation = validateInvitation(input.getToken());
+        try {
+            Invitation invitation = validateInvitation(input.getToken());
 
-        if (userRepository.findByEmail(input.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("User already exists");
+            if (userRepository.findByEmail(input.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("User already exists");
+            }
+
+            User newUser = createUser(input);
+            if (newUser.getId() == null) {
+                throw new RuntimeException("Failed to create user: User ID is null");
+            }
+
+            Department department = invitation.getDepartment();
+            if (department == null) {
+                throw new IllegalArgumentException("Department ID is required");
+            }
+
+            EventParticipant participant = new EventParticipant()
+                    .setUser(newUser)
+                    .setCompany(invitation.getCompany())
+                    .setAge(input.getAge())
+                    .setYearsOfExperience(input.getYearsOfExperience())
+                    .setGender(input.getGender())
+                    .setEducationLevel(input.getEducationLevel())
+                    .setOccupation(input.getOccupation())
+                    .setDepartment(department);
+
+            eventParticipantRepository.save(participant);
+
+            invitationService.markAsAccepted(invitation);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error during registration: " + e.getMessage());
         }
-
-        User newUser = createUser(input);
-
-        EventParticipant participant = new EventParticipant()
-                .setUser(newUser)
-                .setCompany(invitation.getCompany())
-                .setAge(input.getAge())
-                .setYearsOfExperience(input.getYearsOfExperience())
-                .setGender(input.getGender())
-                .setEducationLevel(input.getEducationLevel())
-                .setOccupation(input.getOccupation());
-
-        eventParticipantRepository.save(participant);
-        invitationService.markAsAccepted(invitation);
     }
 
     private Invitation validateInvitation(String token) {
@@ -133,15 +162,22 @@ public class AuthenticationService {
     }
 
     private User createUser(EventParticipantRegisterDto input) {
-        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
+        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        User newUser = new User().setEmail(input.getEmail()).setFullName(input.getName()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(participantRole).setEmailVerificationToken(UUID.randomUUID().toString()).setEmailVerified(true);
+        User newUser = new User()
+                .setEmail(input.getEmail())
+                .setFullName(input.getName())
+                .setPassword(passwordEncoder.encode(input.getPassword()))
+                .setRole(participantRole)
+                .setEmailVerificationToken(UUID.randomUUID().toString())
+                .setEmailVerified(true);
 
         return userRepository.save(newUser);
     }
 
     private void sendVerificationEmail(User user) {
-        String verificationUrl = "https://attendify-backend-el2r.onrender.com/api/auth/verify-email?token=" + user.getEmailVerificationToken();
+        String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());

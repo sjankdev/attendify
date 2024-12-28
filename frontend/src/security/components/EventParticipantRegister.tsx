@@ -16,18 +16,10 @@ const EventParticipantRegister = () => {
   const [gender, setGender] = useState<string>("");
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const occupationList = [
-    { value: "", label: "Select Occupation" },
-    { value: "SOFTWARE_ENGINEER", label: "Software Engineer" },
-    { value: "DESIGNER", label: "Designer" },
-    { value: "PRODUCT_MANAGER", label: "Product Manager" },
-    { value: "DATA_SCIENTIST", label: "Data Scientist" },
-    { value: "OTHER", label: "Other" },
-  ];
 
   useEffect(() => {
     if (!token) {
@@ -36,9 +28,10 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .get(`https://attendify-backend-el2r.onrender.com/api/auth/accept?token=${token}`)
+      .get(`http://localhost:8080/api/auth/accept?token=${token}`)
       .then((response) => {
         setEmail(response.data.email);
+        setDepartmentId(response.data.departmentId);
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Error fetching invitation.");
@@ -68,22 +61,33 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .post("https://attendify-backend-el2r.onrender.com/api/auth/register-participant", {
-        name,
-        email,
-        password,
-        age,
-        yearsOfExperience,
-        gender,
-        educationLevel,
-        occupation,
-        token,
-      })
+      .post(
+        "http://localhost:8080/api/auth/register-participant",
+        {
+          name,
+          email,
+          password,
+          age,
+          yearsOfExperience,
+          gender,
+          educationLevel,
+          occupation,
+          token,
+          departmentId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
       .then(() => {
         navigate("/login");
       })
-      .catch(() => {
-        setError("Error registering participant.");
+      .catch((err) => {
+        setError(
+          err.response?.data?.message || "Error registering participant."
+        );
       });
   };
 
@@ -188,11 +192,12 @@ const EventParticipantRegister = () => {
               required
               className="px-4 py-3 border rounded-lg"
             >
-              {occupationList.map((occ) => (
-                <option key={occ.value} value={occ.value}>
-                  {occ.label}
-                </option>
-              ))}
+              <option value="">Select Occupation</option>
+              <option value="SOFTWARE_ENGINEER">Software Engineer</option>
+              <option value="DESIGNER">Designer</option>
+              <option value="PRODUCT_MANAGER">Product Manager</option>
+              <option value="DATA_SCIENTIST">Data Scientist</option>
+              <option value="OTHER">Other</option>
             </select>
           </div>
 
