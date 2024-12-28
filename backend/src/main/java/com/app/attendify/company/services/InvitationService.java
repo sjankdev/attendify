@@ -1,7 +1,9 @@
 package com.app.attendify.company.services;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.company.model.Invitation;
+import com.app.attendify.company.repository.DepartmentRepository;
 import com.app.attendify.company.repository.InvitationRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,10 +17,12 @@ public class InvitationService {
 
     private final InvitationRepository invitationRepository;
     private final JavaMailSender mailSender;
+    private final DepartmentRepository departmentRepository;
 
-    public InvitationService(InvitationRepository invitationRepository, JavaMailSender mailSender) {
+    public InvitationService(InvitationRepository invitationRepository, JavaMailSender mailSender, DepartmentRepository departmentRepository) {
         this.invitationRepository = invitationRepository;
         this.mailSender = mailSender;
+        this.departmentRepository = departmentRepository;
     }
 
     public void sendInvitationEmail(String toEmail, String token) {
@@ -49,27 +53,20 @@ public class InvitationService {
         }
     }
 
-    public Invitation createInvitation(String email, Company company) {
-        System.out.println("Creating invitation for email: " + email + " and company: " + company.getName());
-
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be empty.");
-        }
+    public Invitation createInvitation(String email, Company company, Integer departmentId) {
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid department"));
 
         Invitation invitation = new Invitation();
         invitation.setEmail(email);
         invitation.setCompany(company);
+        invitation.setDepartment(department);
         invitation.setToken(UUID.randomUUID().toString());
         invitation.setExpirationDate(LocalDateTime.now().plusDays(7));
         invitation.setAccepted(false);
-
         invitation.setCreatedAt(LocalDateTime.now());
 
-        System.out.println("Invitation details: Email: " + email + ", Token: " + invitation.getToken());
-
         invitation = invitationRepository.save(invitation);
-
-        System.out.println("Invitation saved with token: " + invitation.getToken());
         return invitation;
     }
 

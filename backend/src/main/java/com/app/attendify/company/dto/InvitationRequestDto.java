@@ -12,6 +12,16 @@ public class InvitationRequestDto {
     @NotNull(message = "Company ID is required.")
     private Integer companyId;
 
+    private Integer departmentId;
+
+    public Integer getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+
     public String getEmail() {
         return email;
     }

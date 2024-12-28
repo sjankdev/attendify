@@ -117,6 +117,9 @@ public class AuthenticationService {
 
         User newUser = createUser(input);
 
+        Department department = departmentRepository.findById(input.getDepartmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid department"));
+
         EventParticipant participant = new EventParticipant()
                 .setUser(newUser)
                 .setCompany(invitation.getCompany())
@@ -124,7 +127,8 @@ public class AuthenticationService {
                 .setYearsOfExperience(input.getYearsOfExperience())
                 .setGender(input.getGender())
                 .setEducationLevel(input.getEducationLevel())
-                .setOccupation(input.getOccupation());
+                .setOccupation(input.getOccupation())
+                .setDepartment(department);
 
         eventParticipantRepository.save(participant);
         invitationService.markAsAccepted(invitation);

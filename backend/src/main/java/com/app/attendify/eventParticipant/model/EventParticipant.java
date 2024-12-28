@@ -135,7 +135,8 @@ public class EventParticipant {
         return department;
     }
 
-    public void setDepartment(Department department) {
+    public EventParticipant setDepartment(Department department) {
         this.department = department;
+        return this;
     }
 }
