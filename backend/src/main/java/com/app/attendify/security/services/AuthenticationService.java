@@ -1,8 +1,10 @@
 package com.app.attendify.security.services;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
+import com.app.attendify.company.repository.DepartmentRepository;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
@@ -41,8 +43,9 @@ public class AuthenticationService {
     private final JavaMailSender javaMailSender;
     private final EventParticipantRepository eventParticipantRepository;
     private final InvitationService invitationService;
+    private final DepartmentRepository departmentRepository;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, DepartmentRepository departmentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -52,6 +55,7 @@ public class AuthenticationService {
         this.javaMailSender = javaMailSender;
         this.eventParticipantRepository = eventParticipantRepository;
         this.invitationService = invitationService;
+        this.departmentRepository = departmentRepository;
     }
 
     public User registerEventOrganizer(@Valid RegisterEventOrganizerDto input) {
@@ -91,6 +95,15 @@ public class AuthenticationService {
 
         eventOrganizer.setCompany(company);
         eventOrganizerRepository.save(eventOrganizer);
+
+        if (input.getDepartmentNames() != null) {
+            for (String departmentName : input.getDepartmentNames()) {
+                Department department = new Department();
+                department.setName(departmentName);
+                department.setCompany(company);
+                departmentRepository.save(department);
+            }
+        }
 
         return savedUser;
     }
@@ -141,7 +154,7 @@ public class AuthenticationService {
     }
 
     private void sendVerificationEmail(User user) {
-        String verificationUrl = "https://attendify-backend-el2r.onrender.com/api/auth/verify-email?token=" + user.getEmailVerificationToken();
+        String verificationUrl = "http://localhost:8080/api/auth/verify-email?token=" + user.getEmailVerificationToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());

@@ -16,6 +16,7 @@ interface RegisterUserDto {
   role: string;
   companyName: string;
   companyDescription: string;
+  departmentNames: string[]; 
 }
 
 const EventOrganizerRegister: React.FC = () => {
@@ -26,8 +27,10 @@ const EventOrganizerRegister: React.FC = () => {
     role: "EVENT_ORGANIZER",
     companyName: "",
     companyDescription: "",
+    departmentNames: [], 
   });
 
+  const [currentDepartment, setCurrentDepartment] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -56,18 +59,41 @@ const EventOrganizerRegister: React.FC = () => {
     });
   };
 
+  const handleDepartmentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentDepartment(e.target.value);
+  };
+
+  const handleSaveDepartment = () => {
+    if (currentDepartment && !formData.departmentNames.includes(currentDepartment)) {
+      setFormData({
+        ...formData,
+        departmentNames: [...formData.departmentNames, currentDepartment],
+      });
+      setCurrentDepartment(""); 
+    }
+  };
+
+  const handleRemoveDepartment = (department: string) => {
+    setFormData({
+      ...formData,
+      departmentNames: formData.departmentNames.filter(
+        (dept) => dept !== department
+      ),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-  
-    if (!validateFormOrganizerRegistration(formData, setError)) { 
+
+    if (!validateFormOrganizerRegistration(formData, setError)) {
       return;
     }
-  
+
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
+        "http://localhost:8080/api/auth/register-organizer",
         formData
       );
       setSuccess(
@@ -171,6 +197,41 @@ const EventOrganizerRegister: React.FC = () => {
             />
           </div>
 
+          <div className="flex flex-col">
+            <label className="text-lg font-medium text-gray-700">Departments</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                name="departmentName"
+                value={currentDepartment}
+                onChange={handleDepartmentInputChange}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Add a department"
+              />
+              <button
+                type="button"
+                onClick={handleSaveDepartment}
+                className="bg-teal-600 text-white px-4 py-2 rounded-lg"
+              >
+                Save
+              </button>
+            </div>
+            <ul>
+              {formData.departmentNames.map((department, index) => (
+                <li key={index} className="flex justify-between items-center">
+                  <span>{department}</span>
+                  <span className="text-green-500">✔</span> 
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveDepartment(department)}
+                    className="text-red-500"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
           <button
             type="submit"
             className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"

@@ -1,6 +1,7 @@
 package com.app.attendify.eventParticipant.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
@@ -45,6 +46,10 @@ public class EventParticipant {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Occupation occupation;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    private Department department;
 
     public Integer getId() {
         return id;
@@ -124,5 +129,13 @@ public class EventParticipant {
     public EventParticipant setOccupation(Occupation occupation) {
         this.occupation = occupation;
         return this;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }
