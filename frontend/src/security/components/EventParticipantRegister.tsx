@@ -16,12 +16,11 @@ const EventParticipantRegister = () => {
   const [gender, setGender] = useState<string>("");
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
-
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // UseEffect to fetch participant's email based on the token
   useEffect(() => {
     if (!token) {
       setError("Invalid or missing token");
@@ -32,6 +31,7 @@ const EventParticipantRegister = () => {
       .get(`http://localhost:8080/api/auth/accept?token=${token}`)
       .then((response) => {
         setEmail(response.data.email);
+        setDepartmentId(response.data.departmentId);
       })
       .catch((err) => {
         setError(err.response?.data?.message || "Error fetching invitation.");
@@ -61,23 +61,33 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .post("http://localhost:8080/api/auth/register-participant", {
-        name,
-        email,
-        password,
-        age,
-        yearsOfExperience,
-        gender,
-        educationLevel,
-        occupation,
-        token,
-        // No need to send departmentId here
-      })
+      .post(
+        "http://localhost:8080/api/auth/register-participant",
+        {
+          name,
+          email,
+          password,
+          age,
+          yearsOfExperience,
+          gender,
+          educationLevel,
+          occupation,
+          token,
+          departmentId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
       .then(() => {
         navigate("/login");
       })
-      .catch(() => {
-        setError("Error registering participant.");
+      .catch((err) => {
+        setError(
+          err.response?.data?.message || "Error registering participant."
+        );
       });
   };
 
@@ -91,7 +101,6 @@ const EventParticipantRegister = () => {
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Input */}
           <div className="flex flex-col">
             <label htmlFor="name" className="text-lg font-medium">
               Full Name
@@ -106,7 +115,6 @@ const EventParticipantRegister = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="flex flex-col">
             <label htmlFor="password" className="text-lg font-medium">
               Password
@@ -121,7 +129,6 @@ const EventParticipantRegister = () => {
             />
           </div>
 
-          {/* Age Input */}
           <div className="flex flex-col">
             <label htmlFor="age" className="text-lg font-medium">
               Age
@@ -138,7 +145,6 @@ const EventParticipantRegister = () => {
             />
           </div>
 
-          {/* Years of Experience Input */}
           <div className="flex flex-col">
             <label htmlFor="yearsOfExperience" className="text-lg font-medium">
               Years of Experience
@@ -157,7 +163,6 @@ const EventParticipantRegister = () => {
             />
           </div>
 
-          {/* Gender Select */}
           <div className="flex flex-col">
             <label htmlFor="gender" className="text-lg font-medium">
               Gender
@@ -176,7 +181,6 @@ const EventParticipantRegister = () => {
             </select>
           </div>
 
-          {/* Occupation Select */}
           <div className="flex flex-col">
             <label htmlFor="occupation" className="text-lg font-medium">
               Occupation
@@ -197,7 +201,6 @@ const EventParticipantRegister = () => {
             </select>
           </div>
 
-          {/* Education Level Select */}
           <div className="flex flex-col">
             <label htmlFor="educationLevel" className="text-lg font-medium">
               Education Level
@@ -218,7 +221,6 @@ const EventParticipantRegister = () => {
             </select>
           </div>
 
-          {/* Email Display */}
           <div className="flex flex-col">
             <label htmlFor="email" className="text-lg font-medium">
               Email

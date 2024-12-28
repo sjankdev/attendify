@@ -109,29 +109,41 @@ public class AuthenticationService {
     }
 
     public void registerEventParticipant(@Valid EventParticipantRegisterDto input) {
-        Invitation invitation = validateInvitation(input.getToken());
+        try {
+            Invitation invitation = validateInvitation(input.getToken());
 
-        if (userRepository.findByEmail(input.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("User already exists");
+            if (userRepository.findByEmail(input.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("User already exists");
+            }
+
+            User newUser = createUser(input);
+            if (newUser.getId() == null) {
+                throw new RuntimeException("Failed to create user: User ID is null");
+            }
+
+            Department department = invitation.getDepartment();
+            if (department == null) {
+                throw new IllegalArgumentException("Department ID is required");
+            }
+
+            EventParticipant participant = new EventParticipant()
+                    .setUser(newUser)
+                    .setCompany(invitation.getCompany())
+                    .setAge(input.getAge())
+                    .setYearsOfExperience(input.getYearsOfExperience())
+                    .setGender(input.getGender())
+                    .setEducationLevel(input.getEducationLevel())
+                    .setOccupation(input.getOccupation())
+                    .setDepartment(department);
+
+            eventParticipantRepository.save(participant);
+
+            invitationService.markAsAccepted(invitation);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error during registration: " + e.getMessage());
         }
-
-        User newUser = createUser(input);
-
-        Department department = departmentRepository.findById(input.getDepartmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid department"));
-
-        EventParticipant participant = new EventParticipant()
-                .setUser(newUser)
-                .setCompany(invitation.getCompany())
-                .setAge(input.getAge())
-                .setYearsOfExperience(input.getYearsOfExperience())
-                .setGender(input.getGender())
-                .setEducationLevel(input.getEducationLevel())
-                .setOccupation(input.getOccupation())
-                .setDepartment(department);
-
-        eventParticipantRepository.save(participant);
-        invitationService.markAsAccepted(invitation);
     }
 
     private Invitation validateInvitation(String token) {
@@ -150,9 +162,16 @@ public class AuthenticationService {
     }
 
     private User createUser(EventParticipantRegisterDto input) {
-        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
+        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        User newUser = new User().setEmail(input.getEmail()).setFullName(input.getName()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(participantRole).setEmailVerificationToken(UUID.randomUUID().toString()).setEmailVerified(true);
+        User newUser = new User()
+                .setEmail(input.getEmail())
+                .setFullName(input.getName())
+                .setPassword(passwordEncoder.encode(input.getPassword()))
+                .setRole(participantRole)
+                .setEmailVerificationToken(UUID.randomUUID().toString())
+                .setEmailVerified(true);
 
         return userRepository.save(newUser);
     }
