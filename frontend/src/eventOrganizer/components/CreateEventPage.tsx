@@ -84,7 +84,7 @@ const CreateEventPage: React.FC = () => {
     try {
       const eventData = {
         ...formData,
-        eventDate: new Date(eventStartDate).toISOString(),
+        eventStartDate: new Date(eventStartDate).toISOString(),
         eventEndDate: new Date(eventEndDate).toISOString(),
         joinDeadline: joinDeadline
           ? new Date(joinDeadline).toISOString()
