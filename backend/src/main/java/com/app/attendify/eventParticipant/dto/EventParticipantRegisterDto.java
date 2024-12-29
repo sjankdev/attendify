@@ -39,6 +39,16 @@ public class EventParticipantRegisterDto {
     @NotNull(message = "Occupation cannot be null")
     private Occupation occupation;
 
+    private Integer departmentId;
+
+    public Integer getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+
     public String getName() {
         return name;
     }

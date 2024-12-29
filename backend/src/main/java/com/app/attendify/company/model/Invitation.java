@@ -23,6 +23,10 @@ public class Invitation {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    private Department department;
+
     private boolean accepted;
 
     @Column(nullable = false, updatable = false)
@@ -60,6 +64,14 @@ public class Invitation {
         this.company = company;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     public boolean isAccepted() {
         return accepted;
     }
@@ -68,7 +80,6 @@ public class Invitation {
         this.accepted = accepted;
     }
 
-    // Getter and Setter for createdAt
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

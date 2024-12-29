@@ -30,7 +30,6 @@ public class EventDetailDTO {
         this.joinedParticipants = joinedParticipants;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

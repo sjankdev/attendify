@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 public class RegisterEventOrganizerDto {
     @NotEmpty(message = "Full Name cannot be empty")
     @Size(min = 10, message = "Full Name must be at least 8 characters long")
@@ -24,6 +26,9 @@ public class RegisterEventOrganizerDto {
     @NotEmpty(message = "Company Description cannot be empty")
     @Size(min = 10, message = "Company Description must be at least 10 characters long")
     private String companyDescription;
+
+    @NotEmpty(message = "Department name cannot be empty")
+    private List<String> departmentNames;
 
     public String getFullName() {
         return fullName;
@@ -63,5 +68,13 @@ public class RegisterEventOrganizerDto {
 
     public void setCompanyDescription(String companyDescription) {
         this.companyDescription = companyDescription;
+    }
+
+    public List<String> getDepartmentNames() {
+        return departmentNames;
+    }
+
+    public void setDepartmentNames(List<String> departmentNames) {
+        this.departmentNames = departmentNames;
     }
 }
