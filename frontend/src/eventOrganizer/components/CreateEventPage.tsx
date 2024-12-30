@@ -41,17 +41,20 @@ const CreateEventPage: React.FC = () => {
             },
           }
         );
+        const companyId = response.data.id; 
         setOrganizerId(response.data.owner.id);
+
+        fetchDepartments(companyId);
       } catch (err) {
         console.error("Error fetching organizer details: ", err);
         setError("Failed to fetch organizer details.");
       }
     };
 
-    const fetchDepartments = async () => {
+    const fetchDepartments = async (companyId: number) => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/companies/1/departments", 
+          `http://localhost:8080/api/companies/${companyId}/departments`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -66,7 +69,6 @@ const CreateEventPage: React.FC = () => {
     };
 
     fetchOrganizerDetails();
-    fetchDepartments();
   }, []);
 
   const handleCreateEvent = async () => {

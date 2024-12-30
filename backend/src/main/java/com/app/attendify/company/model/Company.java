@@ -25,6 +25,17 @@ public class Company {
     @OneToMany(mappedBy = "company")
     private List<EventParticipant> participants;
 
+    @OneToMany(mappedBy = "company")
+    private List<Department> departments;
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
     public Integer getId() {
         return id;
     }

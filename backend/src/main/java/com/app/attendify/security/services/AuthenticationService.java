@@ -28,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.app.attendify.security.model.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -206,7 +207,13 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
         EventOrganizer eventOrganizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new RuntimeException("Event organizer not found"));
-        return eventOrganizer.getCompany();
+        Company company = eventOrganizer.getCompany();
+
+        List<Department> departments = company.getDepartments();
+
+        company.setDepartments(departments);
+
+        return company;
     }
 
 }
