@@ -20,6 +20,8 @@ const CreateEventPage: React.FC = () => {
   const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
     { title: "", description: "", startTime: "", endTime: "" },
   ]);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -46,7 +48,25 @@ const CreateEventPage: React.FC = () => {
       }
     };
 
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/api/companies/1/departments", 
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDepartments(response.data);
+      } catch (err) {
+        console.error("Error fetching departments: ", err);
+        setError("Failed to fetch departments.");
+      }
+    };
+
     fetchOrganizerDetails();
+    fetchDepartments();
   }, []);
 
   const handleCreateEvent = async () => {
@@ -62,6 +82,7 @@ const CreateEventPage: React.FC = () => {
       eventStartDate,
       eventEndDate,
       joinDeadline,
+      departmentIds: selectedDepartments.length ? selectedDepartments : null,
     };
 
     if (
@@ -283,16 +304,41 @@ const CreateEventPage: React.FC = () => {
             )}
           </div>
 
-          <div className="col-span-2">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
-              <input
-                type="checkbox"
-                checked={joinApproval}
-                onChange={(e) => setJoinApproval(e.target.checked)}
-                className="mr-2"
-              />
-              Require Join Approval
+              Departments
             </label>
+            <select
+              multiple
+              value={selectedDepartments.map(String)}
+              onChange={(e) => {
+                const selected = Array.from(
+                  e.target.selectedOptions,
+                  (option) => parseInt(option.value)
+                );
+                setSelectedDepartments(selected);
+              }}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Join Approval
+            </label>
+            <input
+              type="checkbox"
+              checked={joinApproval}
+              onChange={(e) => setJoinApproval(e.target.checked)}
+              className="mr-2"
+            />
+            Enable join approval
           </div>
         </div>
 
@@ -359,11 +405,10 @@ const CreateEventPage: React.FC = () => {
             </div>
           ))}
           <button
-            type="button"
-            onClick={handleAddAgendaItem}
-            className="mt-4 inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700"
+            onClick={handleGoBack}
+            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
-            Add Agenda Item
+            Go Back
           </button>
         </div>
 
@@ -371,15 +416,9 @@ const CreateEventPage: React.FC = () => {
           <button
             onClick={handleCreateEvent}
             disabled={isSubmitting}
-            className="inline-block bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 disabled:opacity-50"
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
           >
-            {isSubmitting ? "Creating Event..." : "Create Event"}
-          </button>
-          <button
-            onClick={handleGoBack}
-            className="inline-block bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700"
-          >
-            Go Back
+            {isSubmitting ? "Submitting..." : "Create Event"}
           </button>
         </div>
       </div>
