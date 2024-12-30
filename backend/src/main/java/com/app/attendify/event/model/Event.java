@@ -1,6 +1,7 @@
 package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,6 +56,25 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AgendaItem> agendaItems = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "event_department",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id")
+    )
+    private List<Department> departments = new ArrayList<>();
+
+    public boolean isAvailableForAllDepartments() {
+        return departments == null || departments.isEmpty();
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
 
     public Integer getId() {
         return id;

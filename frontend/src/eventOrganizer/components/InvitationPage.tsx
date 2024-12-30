@@ -20,7 +20,7 @@ const InvitationPage: React.FC = () => {
     const fetchCompanyData = async () => {
       try {
         const companyResponse = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/api/auth/company",
+          "http://localhost:8080/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -31,7 +31,7 @@ const InvitationPage: React.FC = () => {
         setCompanyName(companyResponse.data.name);
 
         const departmentResponse = await axios.get(
-          `https://attendify-backend-el2r.onrender.com/api/companies/${companyResponse.data.id}/departments`,
+          `http://localhost:8080/api/companies/${companyResponse.data.id}/departments`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -78,7 +78,7 @@ const InvitationPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/invitation/send",
+        "http://localhost:8080/api/auth/invitation/send",
         { email, companyId, departmentId: selectedDepartmentId },
         {
           headers: {

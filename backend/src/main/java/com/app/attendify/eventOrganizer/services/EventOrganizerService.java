@@ -1,6 +1,8 @@
 package com.app.attendify.eventOrganizer.services;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
+import com.app.attendify.company.repository.DepartmentRepository;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.model.AgendaItem;
 import com.app.attendify.event.services.StatisticsService;
@@ -47,8 +49,9 @@ public class EventOrganizerService {
     private final TimeZoneConversionUtil timeZoneConversionUtil;
     private final EventFilterUtil eventFilterUtil;
     private final StatisticsService statisticsService;
+    private final DepartmentRepository departmentRepository;
 
-    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository, EventValidation eventValidation, TimeZoneConversionUtil timeZoneConversionUtil, EventFilterUtil eventFilterUtil, StatisticsService statisticsService) {
+    public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository, EventValidation eventValidation, TimeZoneConversionUtil timeZoneConversionUtil, EventFilterUtil eventFilterUtil, StatisticsService statisticsService, DepartmentRepository departmentRepository) {
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
@@ -57,6 +60,7 @@ public class EventOrganizerService {
         this.timeZoneConversionUtil = timeZoneConversionUtil;
         this.eventFilterUtil = eventFilterUtil;
         this.statisticsService = statisticsService;
+        this.departmentRepository = departmentRepository;
     }
 
     public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
@@ -76,18 +80,38 @@ public class EventOrganizerService {
 
     public Event createEvent(CreateEventRequest request) {
         try {
+            logger.info("Received request to create event: {}", request);
+
             Optional<EventOrganizer> optionalOrganizer = eventOrganizerRepository.findById(request.getOrganizerId());
             if (optionalOrganizer.isEmpty()) {
                 logger.error("Organizer not found for ID: {}", request.getOrganizerId());
                 throw new IllegalArgumentException("Organizer not found");
             }
             EventOrganizer organizer = optionalOrganizer.get();
+            logger.info("Organizer found: {}", organizer.getUser().getFullName());
 
             LocalDateTime eventDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventStartDate());
             LocalDateTime eventEndDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
             LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? timeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
 
-            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventStartDate(eventDateInBelgrade).setEventEndDate(eventEndDateInBelgrade).setJoinDeadline(joinDeadlineInBelgrade).setJoinApproval(request.isJoinApproval());
+            Event event = new Event()
+                    .setName(request.getName())
+                    .setDescription(request.getDescription())
+                    .setCompany(organizer.getCompany())
+                    .setOrganizer(organizer)
+                    .setLocation(request.getLocation())
+                    .setAttendeeLimit(request.getAttendeeLimit())
+                    .setEventStartDate(eventDateInBelgrade)
+                    .setEventEndDate(eventEndDateInBelgrade)
+                    .setJoinDeadline(joinDeadlineInBelgrade)
+                    .setJoinApproval(request.isJoinApproval());
+
+            if (request.getDepartmentIds() != null && !request.getDepartmentIds().isEmpty()) {
+                List<Department> departments = departmentRepository.findAllById(request.getDepartmentIds());
+                event.setDepartments(departments);
+            } else {
+                event.setDepartments(new ArrayList<>());
+            }
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
@@ -100,7 +124,8 @@ public class EventOrganizerService {
                 LocalDateTime agendaStartTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
                 LocalDateTime agendaEndTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle())
+                AgendaItem agendaItem = new AgendaItem()
+                        .setTitle(agendaRequest.getTitle())
                         .setDescription(agendaRequest.getDescription())
                         .setStartTime(agendaStartTime)
                         .setEndTime(agendaEndTime)
@@ -110,10 +135,15 @@ public class EventOrganizerService {
             }
 
             event.setAgendaItems(agendaItems);
+            logger.info("Agenda items set for event: {}", agendaItems);
 
             eventValidation.validateEventBeforeCreate(request);
+            logger.info("Event validation passed");
 
-            return eventRepository.save(event);
+            Event savedEvent = eventRepository.save(event);
+            logger.info("Event created successfully: {}", savedEvent);
+
+            return savedEvent;
         } catch (Exception e) {
             logger.error("Error creating event", e);
             throw new RuntimeException("Error creating event", e);

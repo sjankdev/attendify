@@ -25,6 +25,9 @@ const CreateEventPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
+  const [isAllDepartments, setIsAllDepartments] = useState<boolean>(false); 
 
   const navigate = useNavigate();
 
@@ -32,17 +35,36 @@ const CreateEventPage: React.FC = () => {
     const fetchOrganizerDetails = async () => {
       try {
         const response = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/api/auth/company",
+          "http://localhost:8080/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
+        const companyId = response.data.id;
         setOrganizerId(response.data.owner.id);
+        fetchDepartments(companyId);
       } catch (err) {
         console.error("Error fetching organizer details: ", err);
         setError("Failed to fetch organizer details.");
+      }
+    };
+
+    const fetchDepartments = async (companyId: number) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/companies/${companyId}/departments`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDepartments(response.data);
+      } catch (err) {
+        console.error("Error fetching departments: ", err);
+        setError("Failed to fetch departments.");
       }
     };
 
@@ -62,6 +84,7 @@ const CreateEventPage: React.FC = () => {
       eventStartDate,
       eventEndDate,
       joinDeadline,
+      departmentIds: isAllDepartments ? null : selectedDepartments, 
     };
 
     if (
@@ -98,7 +121,7 @@ const CreateEventPage: React.FC = () => {
       };
 
       await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/create-event",
+        "http://localhost:8080/api/auth/event-organizer/create-event",
         eventData,
         {
           headers: {
@@ -283,16 +306,55 @@ const CreateEventPage: React.FC = () => {
             )}
           </div>
 
-          <div className="col-span-2">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
               <input
                 type="checkbox"
-                checked={joinApproval}
-                onChange={(e) => setJoinApproval(e.target.checked)}
+                checked={isAllDepartments}
+                onChange={() => setIsAllDepartments(!isAllDepartments)}
                 className="mr-2"
               />
-              Require Join Approval
+              Event for all departments
             </label>
+
+            {!isAllDepartments && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Departments
+                </label>
+                <select
+                  multiple
+                  value={selectedDepartments.map(String)}
+                  onChange={(e) => {
+                    const selected = Array.from(
+                      e.target.selectedOptions,
+                      (option) => parseInt(option.value)
+                    );
+                    setSelectedDepartments(selected);
+                  }}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Join Approval
+            </label>
+            <input
+              type="checkbox"
+              checked={joinApproval}
+              onChange={(e) => setJoinApproval(e.target.checked)}
+              className="mr-2"
+            />
+            Enable join approval
           </div>
         </div>
 
@@ -359,11 +421,10 @@ const CreateEventPage: React.FC = () => {
             </div>
           ))}
           <button
-            type="button"
-            onClick={handleAddAgendaItem}
-            className="mt-4 inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700"
+            onClick={handleGoBack}
+            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
-            Add Agenda Item
+            Go Back
           </button>
         </div>
 
@@ -371,15 +432,9 @@ const CreateEventPage: React.FC = () => {
           <button
             onClick={handleCreateEvent}
             disabled={isSubmitting}
-            className="inline-block bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 disabled:opacity-50"
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
           >
-            {isSubmitting ? "Creating Event..." : "Create Event"}
-          </button>
-          <button
-            onClick={handleGoBack}
-            className="inline-block bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700"
-          >
-            Go Back
+            {isSubmitting ? "Submitting..." : "Create Event"}
           </button>
         </div>
       </div>
