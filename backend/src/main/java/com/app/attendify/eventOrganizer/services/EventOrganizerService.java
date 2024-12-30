@@ -109,7 +109,8 @@ public class EventOrganizerService {
             if (request.getDepartmentIds() != null && !request.getDepartmentIds().isEmpty()) {
                 List<Department> departments = departmentRepository.findAllById(request.getDepartmentIds());
                 event.setDepartments(departments);
-                logger.info("Assigned departments to event: {}", departments);
+            } else {
+                event.setDepartments(new ArrayList<>());
             }
 
             List<AgendaItem> agendaItems = new ArrayList<>();

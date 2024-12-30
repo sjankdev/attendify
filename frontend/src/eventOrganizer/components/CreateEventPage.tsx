@@ -20,13 +20,14 @@ const CreateEventPage: React.FC = () => {
   const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
     { title: "", description: "", startTime: "", endTime: "" },
   ]);
-  const [departments, setDepartments] = useState<any[]>([]);
-  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
+  const [isAllDepartments, setIsAllDepartments] = useState<boolean>(false); 
 
   const navigate = useNavigate();
 
@@ -41,9 +42,8 @@ const CreateEventPage: React.FC = () => {
             },
           }
         );
-        const companyId = response.data.id; 
+        const companyId = response.data.id;
         setOrganizerId(response.data.owner.id);
-
         fetchDepartments(companyId);
       } catch (err) {
         console.error("Error fetching organizer details: ", err);
@@ -84,7 +84,7 @@ const CreateEventPage: React.FC = () => {
       eventStartDate,
       eventEndDate,
       joinDeadline,
-      departmentIds: selectedDepartments.length ? selectedDepartments : null,
+      departmentIds: isAllDepartments ? null : selectedDepartments, 
     };
 
     if (
@@ -308,26 +308,40 @@ const CreateEventPage: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Departments
+              <input
+                type="checkbox"
+                checked={isAllDepartments}
+                onChange={() => setIsAllDepartments(!isAllDepartments)}
+                className="mr-2"
+              />
+              Event for all departments
             </label>
-            <select
-              multiple
-              value={selectedDepartments.map(String)}
-              onChange={(e) => {
-                const selected = Array.from(
-                  e.target.selectedOptions,
-                  (option) => parseInt(option.value)
-                );
-                setSelectedDepartments(selected);
-              }}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              {departments.map((department) => (
-                <option key={department.id} value={department.id}>
-                  {department.name}
-                </option>
-              ))}
-            </select>
+
+            {!isAllDepartments && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Departments
+                </label>
+                <select
+                  multiple
+                  value={selectedDepartments.map(String)}
+                  onChange={(e) => {
+                    const selected = Array.from(
+                      e.target.selectedOptions,
+                      (option) => parseInt(option.value)
+                    );
+                    setSelectedDepartments(selected);
+                  }}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div>
