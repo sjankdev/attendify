@@ -39,7 +39,9 @@ public class EventOrganizerController {
     @PostMapping("/create-event")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody CreateEventRequest request) {
+        logger.info("Creating event with request: {}", request);
         Event event = eventOrganizerService.createEvent(request);
+        logger.info("Event created successfully: {}", event);
         return ResponseEntity.ok(event);
     }
 
