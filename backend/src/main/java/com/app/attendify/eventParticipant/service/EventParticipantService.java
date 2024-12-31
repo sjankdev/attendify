@@ -1,6 +1,7 @@
 package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -49,7 +50,10 @@ public class EventParticipantService {
                 throw new RuntimeException("The participant does not belong to any company.");
             }
 
+            Department participantDepartment = eventParticipant.getDepartment();
             List<Event> events = eventRepository.findByCompany(participantCompany);
+
+            events = events.stream().filter(event -> event.isAvailableForAllDepartments() || event.getDepartments().contains(participantDepartment)).collect(Collectors.toList());
 
             List<EventForParticipantsDTO> eventForParticipantsDTOS = events.stream().map(event -> {
                 EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
@@ -62,10 +66,18 @@ public class EventParticipantService {
 
                 Integer pendingRequests = event.getPendingRequests();
 
+                List<String> departmentNames;
+                if (event.isAvailableForAllDepartments()) {
+                    departmentNames = List.of("All");
+                } else {
+                    departmentNames = event.getDepartments().stream().map(Department::getName).collect(Collectors.toList());
+                }
+
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests);
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames);
             }).collect(Collectors.toList());
+
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS).size();

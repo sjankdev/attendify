@@ -159,13 +159,22 @@ const EventParticipantPage: React.FC = () => {
                 <strong>Company:</strong> {event.companyName}
               </p>
               <p className="text-gray-500">
-                <strong>Date & Time:</strong> {event.eventDate}
+                <strong>Departments:</strong>{" "}
+                {event.departmentNames.includes("All")
+                  ? "All"
+                  : event.departmentNames.join(", ")}
               </p>
               <p className="text-gray-500">
-                <strong>End Date & Time:</strong> {event.eventEndDate}
+                <strong>Date & Time:</strong>{" "}
+                {new Date(event.eventStartDate).toLocaleString()}
               </p>
               <p className="text-gray-500">
-                <strong>Join Deadline:</strong> {event.joinDeadline}
+                <strong>End Date & Time:</strong>{" "}
+                {new Date(event.eventEndDate).toLocaleString()}
+              </p>
+              <p className="text-gray-500">
+                <strong>Join Deadline:</strong>{" "}
+                {new Date(event.joinDeadline).toLocaleString()}
               </p>
               <p className="text-gray-500">
                 <strong>Status:</strong> {event.status}
