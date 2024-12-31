@@ -56,6 +56,7 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AgendaItem> agendaItems = new ArrayList<>();
+
     @ManyToMany
     @JoinTable(name = "event_department", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "department_id"))
     private List<Department> departments = new ArrayList<>();

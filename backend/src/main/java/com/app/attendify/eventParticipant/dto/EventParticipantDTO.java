@@ -9,14 +9,24 @@ public class EventParticipantDTO {
     private String companyName;
     private Integer joinedEventCount;
     private List<String> eventLinks;
+    private String departmentName;
 
-    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount, List<String> eventLinks) {
+    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount, List<String> eventLinks, String departmentName) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.companyName = companyName;
         this.joinedEventCount = joinedEventCount;
         this.eventLinks = eventLinks;
+        this.departmentName = departmentName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
     public Integer getId() {

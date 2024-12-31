@@ -396,7 +396,9 @@ public class EventOrganizerService {
 
                 Integer joinedEventCount = eventLinks.size();
 
-                return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks);
+                String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "N/A";
+
+                return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks, departmentName);
             }).collect(Collectors.toList());
 
         } catch (Exception e) {
