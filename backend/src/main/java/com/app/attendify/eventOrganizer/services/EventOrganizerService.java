@@ -434,17 +434,32 @@ public class EventOrganizerService {
         List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
 
         Map<String, Object> ageStats = statisticsService.calculateAgeStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getAge()).toList());
-
         Map<String, Long> genderCounts = statisticsService.calculateGenderCounts(acceptedAttendances);
-
         Map<String, Object> experienceStats = statisticsService.calculateExperienceStats(acceptedAttendances.stream().map(attendance -> attendance.getParticipant().getYearsOfExperience()).toList());
-
         Map<String, Map<String, Object>> educationLevelStats = statisticsService.calculateEducationLevelStats(acceptedAttendances);
         Map<String, EducationLevelStatsDTO> educationLevelDTOMap = educationLevelStats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new EducationLevelStatsDTO((Long) entry.getValue().get("count"), (Double) entry.getValue().get("percentage"))));
-
         Map<String, Map<String, Object>> occupationStats = statisticsService.calculateOccupationStats(acceptedAttendances);
         Map<String, OccupationStatsDTO> occupationDTOMap = occupationStats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new OccupationStatsDTO((Long) entry.getValue().get("count"), (Double) entry.getValue().get("percentage"))));
 
-        return new EventStatisticsDTO((Double) ageStats.get("averageAge"), (Integer) ageStats.get("highestAge"), (Integer) ageStats.get("lowestAge"), genderCounts.get("maleCount"), genderCounts.get("femaleCount"), genderCounts.get("otherCount"), (Double) experienceStats.get("averageExperience"), (Integer) experienceStats.get("highestExperience"), (Integer) experienceStats.get("lowestExperience"), educationLevelDTOMap, occupationDTOMap);
+        Map<String, Long> departmentStats = new HashMap<>();
+        if (event.getDepartments().size() > 1 || event.isAvailableForAllDepartments()) {
+            departmentStats = statisticsService.calculateDepartmentStats(acceptedAttendances, event.getDepartments());
+        }
+
+        return new EventStatisticsDTO(
+                (Double) ageStats.get("averageAge"),
+                (Integer) ageStats.get("highestAge"),
+                (Integer) ageStats.get("lowestAge"),
+                genderCounts.get("maleCount"),
+                genderCounts.get("femaleCount"),
+                genderCounts.get("otherCount"),
+                (Double) experienceStats.get("averageExperience"),
+                (Integer) experienceStats.get("highestExperience"),
+                (Integer) experienceStats.get("lowestExperience"),
+                educationLevelDTOMap,
+                occupationDTOMap,
+                departmentStats
+        );
     }
+
 }

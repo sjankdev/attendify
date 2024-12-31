@@ -59,6 +59,7 @@ export interface EventStatistics {
   lowestExperience: number;
   educationLevelStats: Record<string, OccupationStatsDTO>;
   occupationStats: Record<string, OccupationStatsDTO>; 
+  departmentStats: Record<string, number>; 
 }
 
 export interface CreateEventDto {

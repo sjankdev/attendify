@@ -134,6 +134,33 @@ const EventStatisticsPage: React.FC = () => {
     ],
   };
 
+  const departmentData = {
+    labels: Object.keys(stats.departmentStats || {}),
+    datasets: [
+      {
+        label: "Participants per Department",
+        data: Object.values(stats.departmentStats || {}),
+        backgroundColor: "#34d399",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const departmentChartOptions = {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem: any) => {
+            const department = tooltipItem.label || "";
+            const participants = tooltipItem.raw || 0;
+            return `${department}: ${participants}`;
+          },
+        },
+      },
+    },
+  };
+
   const formatLabel = (label: string) => {
     return label
       .toLowerCase()
@@ -306,6 +333,14 @@ const EventStatisticsPage: React.FC = () => {
                 data={occupationChartData}
                 options={occupationChartOptions}
               />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Participants per Department
+            </h3>
+            <div className="w-3/4 mx-auto">
+              <Bar data={departmentData} options={departmentChartOptions} />
             </div>
           </div>
         </div>

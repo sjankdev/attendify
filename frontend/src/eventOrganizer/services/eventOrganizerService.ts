@@ -3,15 +3,38 @@ import { Event, Participant } from "../../types/eventTypes";
 
 export const fetchEventStatistics = async (eventId: string) => {
   const token = localStorage.getItem("token");
-  const response = await axios.get(
-    `http://localhost:8080/api/auth/event-organizer/event-stats/${eventId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return response.data;
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/api/auth/event-organizer/event-stats/${eventId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = response.data;
+
+    return {
+      ...data,
+      departmentStats: data.departmentStats || {}, 
+      educationLevelStats: data.educationLevelStats || {}, 
+      occupationStats: data.occupationStats || {}, 
+      maleCount: data.maleCount || 0,
+      femaleCount: data.femaleCount || 0,
+      otherCount: data.otherCount || 0,
+      averageAge: data.averageAge || 0,
+      highestAge: data.highestAge || 0,
+      lowestAge: data.lowestAge || 0,
+      averageExperience: data.averageExperience || 0,
+      highestExperience: data.highestExperience || 0,
+      lowestExperience: data.lowestExperience || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching event statistics:", error);
+    throw new Error("Failed to load event statistics.");
+  }
 };
 
 export const fetchEventsWithParticipants = async (
