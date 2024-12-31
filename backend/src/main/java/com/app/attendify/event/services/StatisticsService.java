@@ -1,5 +1,6 @@
 package com.app.attendify.event.services;
 
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.model.EventAttendance;
 import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
@@ -99,5 +100,21 @@ public class StatisticsService {
                             return stats;
                         }
                 ));
+    }
+
+    public Map<String, Long> calculateDepartmentStats(List<EventAttendance> attendances, List<Department> departments) {
+        Map<String, Long> departmentCounts = new HashMap<>();
+
+        for (EventAttendance attendance : attendances) {
+            Department department = attendance.getParticipant().getDepartment();
+            if (department != null) {
+                departmentCounts.put(department.getName(), departmentCounts.getOrDefault(department.getName(), 0L) + 1);
+            }
+        }
+        for (Department department : departments) {
+            departmentCounts.putIfAbsent(department.getName(), 0L);
+        }
+
+        return departmentCounts;
     }
 }
