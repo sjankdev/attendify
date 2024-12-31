@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.services;
 
+import com.app.attendify.company.dto.DepartmentDto;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Department;
 import com.app.attendify.company.repository.DepartmentRepository;
@@ -308,7 +309,9 @@ public class EventOrganizerService {
 
                 List<EventAttendance> acceptedAttendances = event.getEventAttendances().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).toList();
 
-                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventStartDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedAttendances.size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests());
+                List<DepartmentDto> departmentDTOS = event.getDepartments().stream().map(department -> new DepartmentDto(department.getId(), department.getName())).collect(Collectors.toList());
+
+                return new EventForOrganizersDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", event.getAvailableSlots(), event.getEventStartDate(), event.getAttendeeLimit(), event.getJoinDeadline(), (int) acceptedAttendances.size(), event.isJoinApproval(), event.getEventEndDate(), agendaItems, event.getPendingRequests(), event.isAvailableForAllDepartments(), departmentDTOS);
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS).size();

@@ -65,6 +65,8 @@ export const fetchEventsWithParticipants = async (
               ...event,
               participants,
               pendingRequests: event.pendingRequests,
+              availableForAllDepartments: event.availableForAllDepartments,
+              departments: event.departments,
             };
           }
           return event;

@@ -22,8 +22,15 @@ export interface Event {
   agendaItems: AgendaItemDTO[];
   pendingRequests: number;
   acceptedParticipants: number;
+  availableForAllDepartments: boolean; 
+  departments: DepartmentDTO[]; 
 }
 
+export interface DepartmentDTO {
+  id: number;
+  name: string;
+  
+}
 
 export interface Participant {
   participantId: number;
