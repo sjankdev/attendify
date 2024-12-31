@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.dto;
 
+import com.app.attendify.company.dto.DepartmentDto;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -30,7 +31,10 @@ public class EventForOrganizersDTO {
 
     private Integer pendingRequests;
 
-    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
+    private boolean availableForAllDepartments;
+    private List<DepartmentDto> departments;
+
+    public EventForOrganizersDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer acceptedParticipants, boolean joinApproval, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, boolean availableForAllDepartments, List<DepartmentDto> departments) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,6 +50,24 @@ public class EventForOrganizersDTO {
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
         this.pendingRequests = pendingRequests;
+        this.availableForAllDepartments = availableForAllDepartments;
+        this.departments = departments;
+    }
+
+    public boolean isAvailableForAllDepartments() {
+        return availableForAllDepartments;
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
+    }
+
+    public List<DepartmentDto> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<DepartmentDto> departments) {
+        this.departments = departments;
     }
 
     public List<AgendaItemDTO> getAgendaItems() {

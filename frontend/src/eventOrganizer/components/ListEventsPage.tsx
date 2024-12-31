@@ -163,6 +163,21 @@ const ListEventsPage: React.FC = () => {
                   <p>
                     <strong>Pending Requests:</strong> {event.pendingRequests}
                   </p>
+                  <p>
+                    <strong>Available for All Departments: </strong>
+                    {event.availableForAllDepartments ? "Yes" : "No"}
+                  </p>
+                  {event.departments && event.departments.length > 0 && (
+                    <p>
+                      <strong>Departments: </strong>
+                      {event.departments.map((dept, index) => (
+                        <span key={index}>
+                          {dept.name}
+                          {index < event.departments.length - 1 ? ", " : ""}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={() => navigate(`/event-stats/${event.id}`)}
@@ -187,8 +202,7 @@ const ListEventsPage: React.FC = () => {
                     Delete
                   </button>
                 </div>
-
-                {event.agendaItems.length > 0 && (
+                {event.agendaItems && event.agendaItems.length > 0 && (
                   <div className="mt-6">
                     <h4 className="text-xl font-semibold text-gray-800">
                       Agenda:
@@ -211,8 +225,7 @@ const ListEventsPage: React.FC = () => {
                     </ul>
                   </div>
                 )}
-
-                {event.participants?.length > 0 && (
+                {event.participants && event.participants.length > 0 && (
                   <div className="mt-6">
                     <h4 className="text-xl font-semibold text-gray-800">
                       Participants:
