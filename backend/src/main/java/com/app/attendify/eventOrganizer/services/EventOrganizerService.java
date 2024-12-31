@@ -415,7 +415,8 @@ public class EventOrganizerService {
 
             List<ParticipantDTO> participants = event.getEventAttendances().stream().map(eventAttendance -> {
                 EventParticipant participant = eventAttendance.getParticipant();
-                return new ParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail());
+                String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "No Department";
+                return new ParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), departmentName);
             }).collect(Collectors.toList());
 
             String attendeeLimit = (event.getAttendeeLimit() == null) ? "No Limit" : String.valueOf(event.getAttendeeLimit());

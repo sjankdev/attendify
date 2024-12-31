@@ -76,10 +76,26 @@ const EventDetailsPage: React.FC = () => {
                 {eventDetails?.joinedParticipants.map(
                   (participant: any, index: number) => (
                     <li key={index} className="text-gray-700">
-                      {participant.participantName}{" "}
-                      <span className="text-sm text-gray-500">
-                        ({participant.participantEmail})
-                      </span>
+                      <div className="flex items-center">
+                        <div className="mr-4">
+                          <strong className="text-sm text-gray-500">
+                            Name:
+                          </strong>{" "}
+                          {participant.participantName}
+                        </div>
+                        <div className="mr-4">
+                          <strong className="text-sm text-gray-500">
+                            Email:
+                          </strong>{" "}
+                          {participant.participantEmail}
+                        </div>
+                        <div>
+                          <strong className="text-sm text-gray-500">
+                            Department:
+                          </strong>{" "}
+                          {participant.departmentName}
+                        </div>
+                      </div>
                     </li>
                   )
                 )}
