@@ -111,10 +111,10 @@ public class StatisticsService {
                 departmentCounts.put(department.getName(), departmentCounts.getOrDefault(department.getName(), 0L) + 1);
             }
         }
-        if (departments.isEmpty()) {
-            departments.forEach(department -> departmentCounts.put(department.getName(), 0L));
+        for (Department department : departments) {
+            departmentCounts.putIfAbsent(department.getName(), 0L);
         }
+
         return departmentCounts;
     }
-
 }
