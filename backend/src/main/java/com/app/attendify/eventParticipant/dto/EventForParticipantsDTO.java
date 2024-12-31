@@ -29,7 +29,9 @@ public class EventForParticipantsDTO {
 
     private Integer pendingRequests;
 
-    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
+    private List<String> departmentNames;
+
+    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, List<String> departmentNames) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,7 +48,7 @@ public class EventForParticipantsDTO {
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
         this.pendingRequests = pendingRequests;
-
+        this.departmentNames = departmentNames;
     }
 
     public Integer getId() {
@@ -183,5 +185,13 @@ public class EventForParticipantsDTO {
 
     public void setPendingRequests(Integer pendingRequests) {
         this.pendingRequests = pendingRequests;
+    }
+
+    public List<String> getDepartmentNames() {
+        return departmentNames;
+    }
+
+    public void setDepartmentNames(List<String> departmentNames) {
+        this.departmentNames = departmentNames;
     }
 }
