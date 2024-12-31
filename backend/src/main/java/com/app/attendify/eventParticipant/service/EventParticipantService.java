@@ -1,6 +1,7 @@
 package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
@@ -49,7 +50,10 @@ public class EventParticipantService {
                 throw new RuntimeException("The participant does not belong to any company.");
             }
 
+            Department participantDepartment = eventParticipant.getDepartment();
             List<Event> events = eventRepository.findByCompany(participantCompany);
+
+            events = events.stream().filter(event -> event.isAvailableForAllDepartments() || event.getDepartments().contains(participantDepartment)).collect(Collectors.toList());
 
             List<EventForParticipantsDTO> eventForParticipantsDTOS = events.stream().map(event -> {
                 EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
