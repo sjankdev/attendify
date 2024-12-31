@@ -57,15 +57,18 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AgendaItem> agendaItems = new ArrayList<>();
     @ManyToMany
-    @JoinTable(
-            name = "event_department",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "department_id")
-    )
+    @JoinTable(name = "event_department", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "department_id"))
     private List<Department> departments = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean availableForAllDepartments;
+
     public boolean isAvailableForAllDepartments() {
-        return departments == null || departments.isEmpty();
+        return availableForAllDepartments;
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
     }
 
     public List<Department> getDepartments() {
