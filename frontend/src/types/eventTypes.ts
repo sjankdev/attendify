@@ -37,8 +37,9 @@ export interface Participant {
   participantName: string;
   participantEmail: string;
   status: string;
-  joinedEventCount: number; 
-  eventLinks: string[];    
+  joinedEventCount: number;
+  eventLinks: string[];
+  departmentName: string; 
 }
 
 export interface OccupationStatsDTO {
