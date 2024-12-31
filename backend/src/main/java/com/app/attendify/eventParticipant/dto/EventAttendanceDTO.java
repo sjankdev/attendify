@@ -7,12 +7,14 @@ public class EventAttendanceDTO {
     private String participantEmail;
     private int participantId;
     private AttendanceStatus status;
+    private String departmentName;
 
-    public EventAttendanceDTO(String participantName, String participantEmail, int participantId, AttendanceStatus status) {
+    public EventAttendanceDTO(String participantName, String participantEmail, int participantId, AttendanceStatus status, String departmentName) {
         this.participantName = participantName;
         this.participantEmail = participantEmail;
         this.participantId = participantId;
         this.status = status;
+        this.departmentName = departmentName;
     }
 
     public String getParticipantName() {
@@ -46,5 +48,13 @@ public class EventAttendanceDTO {
 
     public void setStatus(AttendanceStatus status) {
         this.status = status;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 }

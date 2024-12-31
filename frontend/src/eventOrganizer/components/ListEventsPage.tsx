@@ -241,6 +241,10 @@ const ListEventsPage: React.FC = () => {
                             <p className="text-sm text-gray-600">
                               {participant.participantEmail}
                             </p>
+                            <p className="text-sm text-gray-600">
+                              <strong>Department:</strong>{" "}
+                              {participant.departmentName}
+                            </p>{" "}
                           </div>
                           <div>
                             <span

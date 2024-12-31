@@ -277,9 +277,11 @@ public class EventOrganizerService {
                 String participantEmail = participant.getUser().getEmail();
                 AttendanceStatus status = participantEvent.getStatus();
 
-                logger.info("Participant details - ID: {}, Name: {}, Email: {}, Status: {}", participantId, participantName, participantEmail, status);
+                String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "No Department";
 
-                return new EventAttendanceDTO(participantName, participantEmail, participantId, status);
+                logger.info("Participant details - ID: {}, Name: {}, Email: {}, Status: {}, Department: {}", participantId, participantName, participantEmail, status, departmentName);
+
+                return new EventAttendanceDTO(participantName, participantEmail, participantId, status, departmentName);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving participants for event", e);
