@@ -339,9 +339,17 @@ const EventStatisticsPage: React.FC = () => {
             <h3 className="text-xl font-semibold mb-4 text-center">
               Participants per Department
             </h3>
-            <div className="w-3/4 mx-auto">
-              <Bar data={departmentData} options={departmentChartOptions} />
-            </div>
+
+            {Object.keys(stats.departmentStats || {}).length > 1 ? (
+              <div className="w-3/4 mx-auto">
+                <Bar data={departmentData} options={departmentChartOptions} />
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">
+                Stats are not available since only one department is
+                participating in this event.
+              </p>
+            )}
           </div>
         </div>
       </div>
