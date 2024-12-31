@@ -94,29 +94,23 @@ public class EventOrganizerService {
             LocalDateTime eventEndDateInBelgrade = timeZoneConversionUtil.convertToBelgradeTime(request.getEventEndDate());
             LocalDateTime joinDeadlineInBelgrade = request.getJoinDeadline() != null ? timeZoneConversionUtil.convertToBelgradeTime(request.getJoinDeadline()) : null;
 
-            Event event = new Event()
-                    .setName(request.getName())
-                    .setDescription(request.getDescription())
-                    .setCompany(organizer.getCompany())
-                    .setOrganizer(organizer)
-                    .setLocation(request.getLocation())
-                    .setAttendeeLimit(request.getAttendeeLimit())
-                    .setEventStartDate(eventDateInBelgrade)
-                    .setEventEndDate(eventEndDateInBelgrade)
-                    .setJoinDeadline(joinDeadlineInBelgrade)
-                    .setJoinApproval(request.isJoinApproval());
+            Event event = new Event().setName(request.getName()).setDescription(request.getDescription()).setCompany(organizer.getCompany()).setOrganizer(organizer).setLocation(request.getLocation()).setAttendeeLimit(request.getAttendeeLimit()).setEventStartDate(eventDateInBelgrade).setEventEndDate(eventEndDateInBelgrade).setJoinDeadline(joinDeadlineInBelgrade).setJoinApproval(request.isJoinApproval());
 
             if (request.getDepartmentIds() != null && !request.getDepartmentIds().isEmpty()) {
-                List<Department> departments = departmentRepository.findAllById(request.getDepartmentIds());
+                List<Department> departments = departmentRepository.findByIdInAndCompany(request.getDepartmentIds(), organizer.getCompany());
+                if (departments.size() != request.getDepartmentIds().size()) {
+                    throw new IllegalArgumentException("Invalid departments specified or they do not belong to the organizer's company.");
+                }
                 event.setDepartments(departments);
+                event.setAvailableForAllDepartments(false);
             } else {
-                event.setDepartments(new ArrayList<>());
+                event.setDepartments(null);
+                event.setAvailableForAllDepartments(true);
             }
 
             List<AgendaItem> agendaItems = new ArrayList<>();
             for (AgendaItemRequest agendaRequest : request.getAgendaItems()) {
-                if (agendaRequest.getTitle() == null || agendaRequest.getTitle().trim().isEmpty() ||
-                        agendaRequest.getDescription() == null || agendaRequest.getDescription().trim().isEmpty()) {
+                if (agendaRequest.getTitle() == null || agendaRequest.getTitle().trim().isEmpty() || agendaRequest.getDescription() == null || agendaRequest.getDescription().trim().isEmpty()) {
                     logger.error("Agenda item missing title or description");
                     throw new IllegalArgumentException("Each agenda item must have a title and description");
                 }
@@ -124,12 +118,7 @@ public class EventOrganizerService {
                 LocalDateTime agendaStartTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getStartTime());
                 LocalDateTime agendaEndTime = timeZoneConversionUtil.convertToBelgradeTime(agendaRequest.getEndTime());
 
-                AgendaItem agendaItem = new AgendaItem()
-                        .setTitle(agendaRequest.getTitle())
-                        .setDescription(agendaRequest.getDescription())
-                        .setStartTime(agendaStartTime)
-                        .setEndTime(agendaEndTime)
-                        .setEvent(event);
+                AgendaItem agendaItem = new AgendaItem().setTitle(agendaRequest.getTitle()).setDescription(agendaRequest.getDescription()).setStartTime(agendaStartTime).setEndTime(agendaEndTime).setEvent(event);
 
                 agendaItems.add(agendaItem);
             }
