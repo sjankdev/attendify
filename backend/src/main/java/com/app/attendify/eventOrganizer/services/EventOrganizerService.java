@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class EventOrganizerService {
@@ -437,23 +438,21 @@ public class EventOrganizerService {
 
             List<Department> departments = company.getDepartments();
 
-            logger.debug("Fetched departments: {}", departments);
+            List<Event> globalEvents = eventRepository.findByAvailableForAllDepartmentsTrue();
 
             return departments.stream().map(department -> {
                 List<EventParticipantDTO> participants = department.getParticipants().stream().map(participant -> {
-                    List<String> eventLinks = participant.getParticipantEvents().stream()
-                            .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
-                            .map(attendance -> "/event-details/" + attendance.getEvent().getId())
-                            .collect(Collectors.toList());
+                    List<String> eventLinks = participant.getParticipantEvents().stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED).map(attendance -> "/event-details/" + attendance.getEvent().getId()).collect(Collectors.toList());
 
                     Integer joinedEventCount = eventLinks.size();
                     String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "N/A";
 
-                    return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(),
-                            company.getName(), joinedEventCount, eventLinks, departmentName);
+                    return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks, departmentName);
                 }).collect(Collectors.toList());
 
-                return new DepartmentDto(department.getId(), department.getName(), participants);
+                List<EventDetailDTO> events = Stream.concat(department.getEvents().stream(), globalEvents.stream()).map(event -> new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), event.getAttendeeLimit() != null ? event.getAttendeeLimit().toString() : "Unlimited", event.getEventAttendances().stream().filter(att -> att.getStatus() == AttendanceStatus.ACCEPTED).map(att -> new ParticipantDTO(att.getParticipant().getId(), att.getParticipant().getUser().getFullName(), att.getParticipant().getUser().getEmail(), att.getParticipant().getDepartment() != null ? att.getParticipant().getDepartment().getName() : "N/A")).collect(Collectors.toList()))).collect(Collectors.toList());
+
+                return new DepartmentDto(department.getId(), department.getName(), participants, events);
 
             }).collect(Collectors.toList());
 
@@ -501,20 +500,7 @@ public class EventOrganizerService {
             departmentStats = statisticsService.calculateDepartmentStats(acceptedAttendances, event.getDepartments());
         }
 
-        return new EventStatisticsDTO(
-                (Double) ageStats.get("averageAge"),
-                (Integer) ageStats.get("highestAge"),
-                (Integer) ageStats.get("lowestAge"),
-                genderCounts.get("maleCount"),
-                genderCounts.get("femaleCount"),
-                genderCounts.get("otherCount"),
-                (Double) experienceStats.get("averageExperience"),
-                (Integer) experienceStats.get("highestExperience"),
-                (Integer) experienceStats.get("lowestExperience"),
-                educationLevelDTOMap,
-                occupationDTOMap,
-                departmentStats
-        );
+        return new EventStatisticsDTO((Double) ageStats.get("averageAge"), (Integer) ageStats.get("highestAge"), (Integer) ageStats.get("lowestAge"), genderCounts.get("maleCount"), genderCounts.get("femaleCount"), genderCounts.get("otherCount"), (Double) experienceStats.get("averageExperience"), (Integer) experienceStats.get("highestExperience"), (Integer) experienceStats.get("lowestExperience"), educationLevelDTOMap, occupationDTOMap, departmentStats);
     }
 
 }
