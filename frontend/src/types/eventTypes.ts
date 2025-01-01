@@ -29,7 +29,7 @@ export interface Event {
 export interface DepartmentDTO {
   id: number;
   name: string;
-  
+  participants: Participant[]; 
 }
 
 export interface Participant {

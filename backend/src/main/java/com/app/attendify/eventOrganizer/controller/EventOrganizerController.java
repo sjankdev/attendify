@@ -1,5 +1,6 @@
 package com.app.attendify.eventOrganizer.controller;
 
+import com.app.attendify.company.dto.DepartmentDto;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
@@ -146,6 +147,18 @@ public class EventOrganizerController {
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             logger.error("Error retrieving event statistics for eventId: {}", eventId, e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/company/departments")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<DepartmentDto>> getDepartmentsByCompany() {
+        try {
+            List<DepartmentDto> departments = eventOrganizerService.getDepartmentsByCompany();
+            return ResponseEntity.ok(departments);
+        } catch (Exception e) {
+            logger.error("Error retrieving departments for organizer's company", e);
             return ResponseEntity.status(500).body(null);
         }
     }
