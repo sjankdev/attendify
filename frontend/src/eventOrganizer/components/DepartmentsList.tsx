@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchDepartmentsByCompany } from "../services/eventOrganizerService";
-import { DepartmentDTO } from "../../types/eventTypes";
+import { DepartmentDTO, Participant } from "../../types/eventTypes";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<DepartmentDTO[]>([]);
@@ -32,7 +32,26 @@ const DepartmentsList: React.FC = () => {
               key={department.id}
               className="flex justify-between items-center p-4 bg-gray-50 border rounded-lg hover:bg-gray-200 transition duration-300"
             >
-              <span className="text-xl font-semibold text-gray-800">{department.name}</span>
+              <span className="text-xl font-semibold text-gray-800">
+                {department.name}
+              </span>
+              <ul className="space-y-2">
+                {department.participants.length > 0 ? (
+                  department.participants.map((participant) => (
+                    <li
+                      key={participant.participantId}
+                      className="flex justify-between items-center p-2 bg-gray-100 border rounded-md"
+                    >
+                      <span>{participant.participantName}</span>
+                      <span className="text-sm text-gray-600">
+                        {participant.participantEmail}
+                      </span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-600">No participants</li>
+                )}
+              </ul>
             </li>
           ))}
         </ul>

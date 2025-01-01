@@ -305,8 +305,9 @@ export const fetchDepartmentsByCompany = async (): Promise<DepartmentDTO[]> => {
       throw new Error("Failed to fetch departments from company");
     }
 
-    const departments: DepartmentDTO[] = await response.json();
-    return departments;
+    const data = await response.json();
+
+    return data;
   } catch (error) {
     console.error("Error fetching departments from company:", error);
     throw error;

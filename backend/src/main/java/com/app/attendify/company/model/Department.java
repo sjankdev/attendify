@@ -20,6 +20,17 @@ public class Department {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
+    @OneToMany(mappedBy = "department")
+    private List<EventParticipant> participants;
+
+    public List<EventParticipant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<EventParticipant> participants) {
+        this.participants = participants;
+    }
+
     public Integer getId() {
         return id;
     }

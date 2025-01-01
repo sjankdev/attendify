@@ -3,18 +3,18 @@ package com.app.attendify.eventParticipant.dto;
 import java.util.List;
 
 public class EventParticipantDTO {
-    private Integer id;
-    private String fullName;
-    private String email;
+    private Integer participantId;
+    private String participantName;
+    private String participantEmail;
     private String companyName;
     private Integer joinedEventCount;
     private List<String> eventLinks;
     private String departmentName;
 
-    public EventParticipantDTO(Integer id, String fullName, String email, String companyName, Integer joinedEventCount, List<String> eventLinks, String departmentName) {
-        this.id = id;
-        this.fullName = fullName;
-        this.email = email;
+    public EventParticipantDTO(Integer participantId, String participantName, String participantEmail, String companyName, Integer joinedEventCount, List<String> eventLinks, String departmentName) {
+        this.participantId = participantId;
+        this.participantName = participantName;
+        this.participantEmail = participantEmail;
         this.companyName = companyName;
         this.joinedEventCount = joinedEventCount;
         this.eventLinks = eventLinks;
@@ -29,28 +29,28 @@ public class EventParticipantDTO {
         this.departmentName = departmentName;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getParticipantId() {
+        return participantId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setParticipantId(Integer participantId) {
+        this.participantId = participantId;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getParticipantName() {
+        return participantName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getParticipantEmail() {
+        return participantEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setParticipantEmail(String participantEmail) {
+        this.participantEmail = participantEmail;
     }
 
     public String getCompanyName() {

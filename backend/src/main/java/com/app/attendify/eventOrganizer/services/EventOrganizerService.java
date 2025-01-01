@@ -437,16 +437,31 @@ public class EventOrganizerService {
 
             List<Department> departments = company.getDepartments();
 
-            return departments.stream().map(department ->
-                    new DepartmentDto(department.getId(), department.getName())
-            ).collect(Collectors.toList());
+            logger.debug("Fetched departments: {}", departments);
+
+            return departments.stream().map(department -> {
+                List<EventParticipantDTO> participants = department.getParticipants().stream().map(participant -> {
+                    List<String> eventLinks = participant.getParticipantEvents().stream()
+                            .filter(attendance -> attendance.getStatus() == AttendanceStatus.ACCEPTED)
+                            .map(attendance -> "/event-details/" + attendance.getEvent().getId())
+                            .collect(Collectors.toList());
+
+                    Integer joinedEventCount = eventLinks.size();
+                    String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "N/A";
+
+                    return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(),
+                            company.getName(), joinedEventCount, eventLinks, departmentName);
+                }).collect(Collectors.toList());
+
+                return new DepartmentDto(department.getId(), department.getName(), participants);
+
+            }).collect(Collectors.toList());
 
         } catch (Exception e) {
             logger.error("Error retrieving departments for organizer's company", e);
             throw new RuntimeException("Error retrieving departments for organizer's company", e);
         }
     }
-
 
     public EventDetailDTO getEventDetails(int eventId) {
         try {
