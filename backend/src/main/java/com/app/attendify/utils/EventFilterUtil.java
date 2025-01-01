@@ -29,6 +29,14 @@ public class EventFilterUtil {
                 .collect(Collectors.toList());
     }
 
+    public List<EventForOrganizersDTO> filterEventsByDepartment(List<EventForOrganizersDTO> events, List<Integer> departmentIds) {
+        return events.stream()
+                .filter(event -> event.isAvailableForAllDepartments() ||
+                        event.getDepartments().stream()
+                                .anyMatch(dept -> departmentIds.contains(dept.getId())))
+                .collect(Collectors.toList());
+    }
+
     public List<EventForParticipantsDTO> filterEventsByCurrentWeekForParticipant(List<EventForParticipantsDTO> events) {
         LocalDateTime startOfWeek = LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
