@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Event, Participant } from "../../types/eventTypes";
+import { DepartmentDTO, Event, Participant } from "../../types/eventTypes";
 
 export const fetchEventStatistics = async (eventId: string) => {
   const token = localStorage.getItem("token");
@@ -287,6 +287,32 @@ export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
     throw error;
   }
 };
+
+export const fetchDepartmentsByCompany = async (): Promise<DepartmentDTO[]> => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/auth/event-organizer/company/departments",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch departments from company");
+    }
+
+    const departments: DepartmentDTO[] = await response.json();
+    return departments;
+  } catch (error) {
+    console.error("Error fetching departments from company:", error);
+    throw error;
+  }
+};
+
 
 export const fetchEventDetails = async (eventId: string): Promise<any> => {
   try {

@@ -420,6 +420,34 @@ public class EventOrganizerService {
         }
     }
 
+    @Transactional
+    public List<DepartmentDto> getDepartmentsByCompany() {
+        try {
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> new IllegalArgumentException("Organizer not found for user: " + email));
+
+            Company company = organizer.getCompany();
+            if (company == null) {
+                throw new IllegalArgumentException("Organizer does not have an associated company.");
+            }
+
+            List<Department> departments = company.getDepartments();
+
+            return departments.stream().map(department ->
+                    new DepartmentDto(department.getId(), department.getName())
+            ).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error retrieving departments for organizer's company", e);
+            throw new RuntimeException("Error retrieving departments for organizer's company", e);
+        }
+    }
+
+
     public EventDetailDTO getEventDetails(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));

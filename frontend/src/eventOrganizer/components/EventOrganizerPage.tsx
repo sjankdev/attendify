@@ -12,7 +12,8 @@ const EventOrganizerPage: React.FC = () => {
           Welcome, Event Organizer!
         </h1>
         <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
-          Manage events, invitations, and participants seamlessly with Attendify.
+          Manage events, invitations, and participants seamlessly with
+          Attendify.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
@@ -20,7 +21,9 @@ const EventOrganizerPage: React.FC = () => {
             onClick={() => navigate("/event-organizer/create-event")}
             className="cursor-pointer p-4 bg-green-100 rounded-lg shadow hover:bg-green-200 transition duration-300"
           >
-            <h2 className="text-xl font-bold text-green-800 mb-2">Create Event</h2>
+            <h2 className="text-xl font-bold text-green-800 mb-2">
+              Create Event
+            </h2>
             <p className="text-sm text-green-700">
               Start organizing your next event with ease.
             </p>
@@ -29,7 +32,9 @@ const EventOrganizerPage: React.FC = () => {
             onClick={() => navigate("/event-organizer/invitations")}
             className="cursor-pointer p-4 bg-blue-100 rounded-lg shadow hover:bg-blue-200 transition duration-300"
           >
-            <h2 className="text-xl font-bold text-blue-800 mb-2">Manage Invitations</h2>
+            <h2 className="text-xl font-bold text-blue-800 mb-2">
+              Manage Invitations
+            </h2>
             <p className="text-sm text-blue-700">
               View and manage event invitations for participants.
             </p>
@@ -54,11 +59,26 @@ const EventOrganizerPage: React.FC = () => {
               View participants from your organization.
             </p>
           </div>
+          <div
+            onClick={() => navigate("/event-organizer/company-departments")}
+            className="cursor-pointer p-4 bg-purple-100 rounded-lg shadow hover:bg-purple-200 transition duration-300"
+          >
+            <h2 className="text-xl font-bold text-purple-800 mb-2">
+              Company Departments
+            </h2>
+            <p className="text-sm text-purple-700">
+              View departments from your company.
+            </p>
+          </div>
         </div>
 
         <div className="mt-12 text-center">
           <p className="text-gray-700">
-            Need help? <a href="/support" className="text-blue-600 underline">Contact support</a>.
+            Need help?{" "}
+            <a href="/support" className="text-blue-600 underline">
+              Contact support
+            </a>
+            .
           </p>
         </div>
       </div>

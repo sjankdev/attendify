@@ -19,6 +19,7 @@ import UpdateEventPage from "./eventOrganizer/components/UpdateEventPage";
 import CompanyParticipantsPage from "./eventOrganizer/components/CompanyParticipantsPage";
 import EventDetailsPage from "./eventOrganizer/components/EventDetailsPage";
 import EventStatisticsPage from "./eventOrganizer/components/EventStatisticsPage";
+import DepartmentsList from "./eventOrganizer/components/DepartmentsList";
 
 function App() {
   return (
@@ -62,6 +63,10 @@ function App() {
           <Route
             path="/event-details/:eventId"
             element={<EventDetailsPage />}
+          />
+          <Route
+            path="/event-organizer/company-departments"
+            element={<DepartmentsList />}
           />
         </Routes>
       </div>
