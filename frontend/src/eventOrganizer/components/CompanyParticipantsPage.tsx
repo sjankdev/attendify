@@ -16,10 +16,10 @@ const CompanyParticipantsPage: React.FC = () => {
         console.log("Fetched participants:", data);
 
         const mappedParticipants = data.map((participant: any) => ({
-          participantId: participant.id,
-          participantName: participant.fullName,
-          participantEmail: participant.email,
-          departmentName: participant.departmentName,  
+          participantId: participant.participantId,
+          participantName: participant.participantName, 
+          participantEmail: participant.participantEmail,
+          departmentName: participant.departmentName,
           status: "PENDING" as "PENDING",
           joinedEventCount: participant.joinedEventCount,
           eventLinks: participant.eventLinks,
@@ -48,10 +48,14 @@ const CompanyParticipantsPage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Participants from Your Company</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Participants from Your Company
+        </h2>
 
         {participants.length === 0 ? (
-          <p className="text-center text-lg text-gray-500">No participants found for your company.</p>
+          <p className="text-center text-lg text-gray-500">
+            No participants found for your company.
+          </p>
         ) : (
           <ul className="space-y-4">
             {participants.map((participant) => (
@@ -61,10 +65,18 @@ const CompanyParticipantsPage: React.FC = () => {
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-xl font-medium text-gray-700">{participant.participantName}</h3>
-                    <p className="text-gray-500">{participant.participantEmail}</p>
-                    <p className="text-sm text-gray-600">Department: {participant.departmentName}</p> 
-                    <p className="text-sm text-gray-600">Events Joined: {participant.joinedEventCount}</p>
+                    <h3 className="text-xl font-medium text-gray-700">
+                      {participant.participantName}
+                    </h3>
+                    <p className="text-gray-500">
+                      {participant.participantEmail}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Department: {participant.departmentName}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Events Joined: {participant.joinedEventCount}
+                    </p>
                   </div>
                 </div>
 
