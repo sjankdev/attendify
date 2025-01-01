@@ -1,5 +1,6 @@
 package com.app.attendify.company.services;
 
+import com.app.attendify.company.dto.InvitationRequestDto;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Department;
 import com.app.attendify.company.model.Invitation;
@@ -10,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -70,6 +72,16 @@ public class InvitationService {
         return invitation;
     }
 
+    public void sendBulkInvitations(List<InvitationRequestDto.EmailDepartment> emailDepartments, Company company) {
+        for (InvitationRequestDto.EmailDepartment emailDepartment : emailDepartments) {
+            Integer departmentId = emailDepartment.getDepartmentId();
+            String email = emailDepartment.getEmail();
+
+            Invitation invitation = createInvitation(email, company, departmentId);
+
+            sendInvitationEmail(email, invitation.getToken());
+        }
+    }
 
     public Invitation getInvitation(String token) {
         return invitationRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Invalid or expired invitation token"));

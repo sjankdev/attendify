@@ -122,21 +122,18 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/invitation/send")
-    public ResponseEntity<String> sendInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
+    @PostMapping("/invitation/sendBulk")
+    public ResponseEntity<String> sendBulkInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
         try {
-            String email = invitationRequestDto.getEmail();
             Integer companyId = invitationRequestDto.getCompanyId();
-            Integer departmentId = invitationRequestDto.getDepartmentId();
+            List<InvitationRequestDto.EmailDepartment> emails = invitationRequestDto.getEmails();
 
             Company company = companyRepository.findById(companyId)
                     .orElseThrow(() -> new RuntimeException("Company not found"));
 
-            Invitation invitation = invitationService.createInvitation(email, company, departmentId);
+            invitationService.sendBulkInvitations(emails, company);
 
-            invitationService.sendInvitationEmail(email, invitation.getToken());
-
-            return ResponseEntity.ok("Invitation sent to " + email);
+            return ResponseEntity.ok("Invitations sent successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
