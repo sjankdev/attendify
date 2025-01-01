@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import {
   fetchEventsWithParticipants,
   deleteEvent,
@@ -13,7 +15,9 @@ const ListEventsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<string>("");
+  const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
 
+  const [departments, setDepartments] = useState<any[]>([]);
   const [counts, setCounts] = useState<{
     thisWeek: number;
     thisMonth: number;
@@ -37,10 +41,43 @@ const ListEventsPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const companyResponse = await axios.get(
+          "http://localhost:8080/api/auth/company",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        const departmentResponse = await axios.get(
+          `http://localhost:8080/api/companies/${companyResponse.data.id}/departments`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDepartments(departmentResponse.data);
+      } catch (err: any) {
+        console.error("Error fetching departments:", err);
+        setError("Failed to fetch departments.");
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
     const loadEvents = async () => {
       try {
         const { events, counts, acceptedParticipants } =
-          await fetchEventsWithParticipants(filter);
+          await fetchEventsWithParticipants(
+            filter,
+            departmentFilter ? [departmentFilter] : []
+          );
         setEvents(events);
         setCounts(counts);
         setAcceptedParticipants(acceptedParticipants);
@@ -50,7 +87,7 @@ const ListEventsPage: React.FC = () => {
       }
     };
     loadEvents();
-  }, [filter]);
+  }, [filter, departmentFilter]);
 
   const handleDeleteEvent = async (eventId: number) => {
     const success = await deleteEvent(eventId);
@@ -122,6 +159,36 @@ const ListEventsPage: React.FC = () => {
           </button>
         </div>
 
+        <div className="mb-6">
+          <label className="block text-gray-700 font-semibold mb-2">
+            Filter by Department
+          </label>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setDepartmentFilter(null)}
+              className={`px-4 py-2 rounded-md font-medium ${
+                departmentFilter === null
+                  ? "bg-teal-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              All Departments
+            </button>
+            {departments.map((department) => (
+              <button
+                key={department.id}
+                onClick={() => setDepartmentFilter(department.id)}
+                className={`px-4 py-2 rounded-md font-medium ${
+                  departmentFilter === department.id
+                    ? "bg-teal-600 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {department.name}
+              </button>
+            ))}
+          </div>
+        </div>
         {events.length === 0 ? (
           <p className="text-gray-500">No events found.</p>
         ) : (

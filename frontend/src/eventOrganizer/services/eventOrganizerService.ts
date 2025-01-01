@@ -38,7 +38,8 @@ export const fetchEventStatistics = async (eventId: string) => {
 };
 
 export const fetchEventsWithParticipants = async (
-  filter: string
+  filter: string,
+  departmentIds?: number[]
 ): Promise<{
   events: Event[];
   counts: { thisWeek: number; thisMonth: number; allEvents: number };
@@ -49,9 +50,13 @@ export const fetchEventsWithParticipants = async (
   };
 }> => {
   try {
-    const url = filter
-      ? `http://localhost:8080/api/auth/event-organizer/my-events?filter=${filter}`
-      : "http://localhost:8080/api/auth/event-organizer/my-events";
+    const queryParams = new URLSearchParams();
+    if (filter) queryParams.append("filter", filter);
+    if (departmentIds && departmentIds.length > 0) {
+      departmentIds.forEach((id) => queryParams.append("departmentIds", id.toString()));
+    }
+
+    const url = `http://localhost:8080/api/auth/event-organizer/my-events?${queryParams.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -67,44 +72,8 @@ export const fetchEventsWithParticipants = async (
 
     const data = await response.json();
 
-    const eventsWithParticipants: Event[] = await Promise.all(
-      (data.events as Event[]).map(async (event: Event): Promise<Event> => {
-        try {
-          const participantsResponse = await fetch(
-            `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          );
-
-          if (participantsResponse.ok) {
-            const participants: Participant[] =
-              await participantsResponse.json();
-            return {
-              ...event,
-              participants,
-              pendingRequests: event.pendingRequests,
-              availableForAllDepartments: event.availableForAllDepartments,
-              departments: event.departments,
-            };
-          }
-          return event;
-        } catch (error) {
-          console.error(
-            `Failed to fetch participants for event ID ${event.id}:`,
-            error
-          );
-          return event;
-        }
-      })
-    );
-
     return {
-      events: eventsWithParticipants.map((event) => ({
+      events: data.events.map((event: Event) => ({
         ...event,
         eventDate: new Date(event.eventStartDate).toLocaleString("en-GB", {
           weekday: "short",

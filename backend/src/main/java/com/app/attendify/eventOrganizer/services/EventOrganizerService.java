@@ -290,7 +290,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType) {
+    public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType, List<Integer> departmentIds) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String email = currentUser.getUsername();
@@ -333,6 +333,17 @@ public class EventOrganizerService {
             }
 
             logger.info("Found {} events for organizer: {}", eventForOrganizersDTOS.size(), email);
+
+
+            if ("week".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentWeekForOrganizer(eventForOrganizersDTOS);
+            } else if ("month".equalsIgnoreCase(filterType)) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByCurrentMonthForOrganizer(eventForOrganizersDTOS);
+            }
+
+            if (departmentIds != null && !departmentIds.isEmpty()) {
+                eventForOrganizersDTOS = eventFilterUtil.filterEventsByDepartment(eventForOrganizersDTOS, departmentIds);
+            }
 
             return new EventFilterSummaryForOrganizerDTO(eventForOrganizersDTOS, thisWeekCount, thisMonthCount, allEventsCount, thisWeekParticipants, thisMonthParticipants, allEventsParticipants);
 

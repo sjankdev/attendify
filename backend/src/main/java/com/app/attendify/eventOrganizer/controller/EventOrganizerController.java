@@ -59,9 +59,11 @@ public class EventOrganizerController {
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(@RequestParam(required = false) String filter) {
+    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) List<Integer> departmentIds) {
         try {
-            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter);
+            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter, departmentIds);
             return ResponseEntity.ok(summary);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
