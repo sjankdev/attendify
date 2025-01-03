@@ -13,7 +13,8 @@ const DepartmentsList: React.FC = () => {
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [newDepartmentNames, setNewDepartmentNames] = useState<string[]>([]);
-
+  const [isAddingDepartments, setIsAddingDepartments] = useState(false); 
+  
   useEffect(() => {
     const getDepartments = async () => {
       try {
@@ -67,6 +68,7 @@ const DepartmentsList: React.FC = () => {
       try {
         await addDepartments(newDepartmentNames, companyId);
         setNewDepartmentNames([]);
+        setIsAddingDepartments(false); // Hide the input field after departments are added
       } catch (error) {
         setError("Failed to add departments.");
       }
@@ -83,6 +85,37 @@ const DepartmentsList: React.FC = () => {
               {error}
             </p>
           )}
+
+          {/* Add New Departments Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => setIsAddingDepartments(!isAddingDepartments)} // Toggle the state to show/hide the input field
+              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200"
+            >
+              {isAddingDepartments ? "Cancel" : "Add New Departments"}
+            </button>
+          </div>
+
+          {/* Input field for adding new departments, only shown when isAddingDepartments is true */}
+          {isAddingDepartments && (
+            <div className="mb-4">
+              <input
+                type="text"
+                value={newDepartmentNames.join(",")}
+                onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
+                placeholder="Enter department names, separated by commas"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleAddDepartments}
+                className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+              >
+                Add Departments
+              </button>
+            </div>
+          )}
+
+          {/* List of departments */}
           <ul className="space-y-8">
             {departments.map((department) => (
               <li
@@ -153,14 +186,6 @@ const DepartmentsList: React.FC = () => {
               </li>
             ))}
           </ul>
-
-          <input
-            type="text"
-            value={newDepartmentNames.join(",")}
-            onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
-            placeholder="Add new departments"
-          />
-          <button onClick={handleAddDepartments}>Add Departments</button>
         </div>
       </div>
     </Layout>

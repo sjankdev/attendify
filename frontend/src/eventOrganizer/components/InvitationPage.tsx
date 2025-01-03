@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
+import Layout from "../../shared/components/Layout";
 
 const InvitationPage: React.FC = () => {
   const [companyName, setCompanyName] = useState<string | null>(null);
@@ -142,6 +143,7 @@ const InvitationPage: React.FC = () => {
   }
 
   return (
+    <Layout>
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-6">
       <h2 className="text-3xl font-semibold text-center text-gray-800">
         Invite Participants
@@ -247,7 +249,9 @@ const InvitationPage: React.FC = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
+  
 };
 
 export default InvitationPage;
