@@ -50,49 +50,88 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 flex items-center justify-center p-8">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Login to Attendify</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="flex flex-col">
-            <label htmlFor="email" className="text-lg font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
+    <div className="flex h-screen items-center justify-center bg-[#2A3439]">
+      <div className="flex w-[1200px] h-[800px] -ml-8 -mt-8">
+        <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-semibold text-white text-center mb-4">
+              Simplify Event Planning
+            </h1>
+            <h1 className="text-3xl font-medium text-white text-center">
+              and Connect with Your Audience
+            </h1>
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="password" className="text-lg font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
+          <img
+            src="/assets/logos/login-logo.png"
+            alt="Event Logo"
+            className="w-[450px] mt-12"
+          />
+        </div>
+        <div className="w-[600px] bg-[#0F213E] flex items-center justify-center relative">
+          <div className="absolute top-8 right-4 flex space-x-4">
+            <div className="flex rounded-lg overflow-hidden">
+              <button className="w-[100px] bg-[#DD3F43] text-white py-1 font-semibold hover:bg-[#D03A3E] rounded-l-lg">
+                Sign In
+              </button>
+              <button className="w-[100px] bg-[#7A7A7A] text-white py-1 font-semibold hover:bg-[#626262] rounded-r-lg">
+                Sign Up
+              </button>
+            </div>
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-300 transform hover:scale-105"
+
+          <form
+            className="w-full max-w-[500px] p-8 rounded-lg"
+            onSubmit={handleLogin}
           >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-        <div className="text-center mt-6">
-          <p className="text-gray-700">Don't have an account?</p>
-          <button
-            onClick={handleRegisterRedirect}
-            className="text-teal-600 font-semibold hover:underline"
-          >
-            Register as Event Organizer
-          </button>
+            <div className="mb-6">
+              <label
+                htmlFor="email"
+                className="block text-lg font-medium text-[#CFD0C6]"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
+              />
+            </div>
+            <div className="mb-6">
+              <label
+                htmlFor="password"
+                className="block text-lg font-medium text-[#CFD0C6]"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
+              />
+            </div>
+            <div className="mb-6 flex justify-start mt-16">
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-[140px] py-1.5 px-5 text-white font-semibold rounded-xl text-lg text-center ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#DD3F43] hover:bg-[#D03A3E]"
+                }`}
+              >
+                Sign In
+              </button>
+            </div>
+            {error && (
+              <p className="mt-4 text-lg text-red-600 text-center">{error}</p>
+            )}
+          </form>
         </div>
       </div>
     </div>
