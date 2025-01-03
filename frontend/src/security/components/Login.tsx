@@ -151,7 +151,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-[#2A3439]">
+    <div className="flex items-center justify-center min-h-screen bg-[#2A3439]">
       <div className="flex w-full max-w-[1200px] min-h-[80vh] mx-auto">
         <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col p-6">
           <div className="text-center mb-8">
@@ -325,8 +325,8 @@ const Login: React.FC = () => {
                 Register
               </button>
               {success && (
-                <div className="mt-4 text-lg text-green-600 text-center col-span-2">
-                  {success}
+                <div className="mt-4 p-4 bg-green-600 text-white rounded-lg shadow-lg transition-all duration-300 ease-in-out transform scale-105 w-full">
+                  <p className="text-lg text-center">{success}</p>
                 </div>
               )}
             </form>

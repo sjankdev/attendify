@@ -8,7 +8,6 @@ import {
 
 import Login from "./security/components/Login";
 import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
-import Homepage from "./public/Homepage";
 import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
 import EventParticipantRegister from "./security/components/EventParticipantRegister";
 import InvitationPage from "./eventOrganizer/components/InvitationPage";
@@ -25,8 +24,7 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<Homepage />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
           <Route path="/event-participant" element={<EventParticipantPage />} />
