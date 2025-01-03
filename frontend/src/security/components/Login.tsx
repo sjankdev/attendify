@@ -152,36 +152,44 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex h-screen items-center justify-center bg-[#2A3439]">
-      <div className="flex w-[1200px] h-[800px] -ml-8 -mt-8">
-        <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col">
+      <div className="flex w-full max-w-[1200px] min-h-[80vh] mx-auto">
+        <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col p-6">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-semibold text-white text-center mb-4">
+            <h1 className="text-4xl font-semibold text-white mb-4">
               Simplify Event Planning
             </h1>
-            <h1 className="text-3xl font-medium text-white text-center">
+            <h2 className="text-3xl font-medium text-white">
               and Connect with Your Audience
-            </h1>
+            </h2>
           </div>
           <img
             src="/assets/logos/login-logo.png"
             alt="Event Logo"
-            className="w-[450px] mt-12"
+            className="w-[400px] mt-12"
           />
         </div>
-        <div className="w-[600px] bg-[#0F213E] flex items-center justify-center relative">
-          <div className="absolute top-8 right-4 flex space-x-4">
+        <div className="w-[600px] bg-[#0F213E] flex items-center justify-center relative p-6">
+          <div className="absolute top-4 right-6 flex space-x-4 z-10">
             <div className="flex rounded-lg overflow-hidden">
               <button
                 onClick={handleToggleForm}
-                className="w-[100px] bg-[#DD3F43] text-white py-1 font-semibold hover:bg-[#D03A3E] rounded-l-lg"
+                className={`w-[100px] py-1 font-semibold rounded-l-lg ${
+                  showSignUp
+                    ? "bg-[#7A7A7A] hover:bg-[#626262]"
+                    : "bg-[#DD3F43] text-white hover:bg-[#D03A3E]"
+                }`}
               >
-                {showSignUp ? "Sign Up" : "Sign In"}
+                Sign In
               </button>
               <button
                 onClick={handleToggleForm}
-                className="w-[100px] bg-[#7A7A7A] text-white py-1 font-semibold hover:bg-[#626262] rounded-r-lg"
+                className={`w-[100px] py-1 font-semibold rounded-r-lg ${
+                  showSignUp
+                    ? "bg-[#DD3F43] text-white hover:bg-[#D03A3E]"
+                    : "bg-[#7A7A7A] hover:bg-[#626262]"
+                }`}
               >
-                {showSignUp ? "Sign In" : "Sign Up"}
+                Sign Up
               </button>
             </div>
           </div>
@@ -189,7 +197,7 @@ const Login: React.FC = () => {
           {showSignUp ? (
             <form
               onSubmit={handleSubmit}
-              className="w-full max-w-[500px] p-8 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-6"
+              className="w-full max-w-[500px] p-8 rounded-lg grid grid-cols-1 gap-6 mt-12"
             >
               <div className="mb-6">
                 <label
@@ -270,7 +278,8 @@ const Login: React.FC = () => {
                   className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
               </div>
-              <div className="mb-6 col-span-2">
+
+              <div className="mb-6 col-span-2 max-h-48 overflow-y-auto">
                 <label className="block text-lg font-medium text-[#CFD0C6]">
                   Departments
                 </label>
@@ -324,7 +333,7 @@ const Login: React.FC = () => {
           ) : (
             <form
               onSubmit={handleLogin}
-              className="w-full max-w-[500px] p-8 rounded-lg"
+              className="w-full max-w-[500px] p-8 rounded-lg mt-12"
             >
               <div className="mb-6">
                 <label
