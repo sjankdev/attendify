@@ -1,6 +1,7 @@
 package com.app.attendify.eventOrganizer.controller;
 
 import com.app.attendify.company.dto.DepartmentDto;
+import com.app.attendify.company.services.CompanyService;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
@@ -9,6 +10,7 @@ import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.enums.Gender;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +28,11 @@ public class EventOrganizerController {
     private static final Logger logger = LoggerFactory.getLogger(EventOrganizerController.class);
 
     private final EventOrganizerService eventOrganizerService;
+    private final CompanyService companyService;
 
-    public EventOrganizerController(EventOrganizerService eventOrganizerService) {
+    public EventOrganizerController(EventOrganizerService eventOrganizerService, CompanyService companyService) {
         this.eventOrganizerService = eventOrganizerService;
+        this.companyService = companyService;
     }
 
     @GetMapping("/home")
@@ -160,6 +164,18 @@ public class EventOrganizerController {
         } catch (Exception e) {
             logger.error("Error retrieving departments for organizer's company", e);
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @PostMapping("/{companyId}/add-departments")
+    public ResponseEntity<Void> addDepartments(
+            @PathVariable Integer companyId,
+            @RequestBody List<String> departmentNames) {
+        try {
+            companyService.addDepartmentsToCompany(companyId, departmentNames);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

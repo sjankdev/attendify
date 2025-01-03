@@ -339,3 +339,22 @@ export const fetchEventDetails = async (eventId: string): Promise<any> => {
     throw error;
   }
 };
+
+export const addDepartments = async (departmentNames: string[], companyId: number): Promise<void> => {
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.post(
+      `http://localhost:8080/api/auth/event-organizer/${companyId}/add-departments`,
+      departmentNames,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error adding departments:", error);
+    throw new Error("Failed to add departments");
+  }
+};

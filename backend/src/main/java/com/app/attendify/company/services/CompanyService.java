@@ -34,4 +34,22 @@ public class CompanyService {
                 .map(department -> new DepartmentDto(department.getId(), department.getName()))
                 .collect(Collectors.toList());
     }
+
+    public void addDepartmentsToCompany(Integer companyId, List<String> departmentNames) {
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+        for (String departmentName : departmentNames) {
+            Department department = new Department();
+            department.setName(departmentName);
+            department.setCompany(company);
+
+            try {
+                departmentRepository.save(department);
+            } catch (Exception e) {
+                System.err.println("Error saving department: " + e.getMessage());
+                throw new RuntimeException("Failed to save department: " + departmentName);
+            }
+        }
+    }
 }
