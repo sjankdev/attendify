@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [showSignUp, setShowSignUp] = useState<boolean>(false); 
+  const [showSignUp, setShowSignUp] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -172,13 +172,13 @@ const Login: React.FC = () => {
           <div className="absolute top-8 right-4 flex space-x-4">
             <div className="flex rounded-lg overflow-hidden">
               <button
-                onClick={handleToggleForm} 
+                onClick={handleToggleForm}
                 className="w-[100px] bg-[#DD3F43] text-white py-1 font-semibold hover:bg-[#D03A3E] rounded-l-lg"
               >
                 {showSignUp ? "Sign Up" : "Sign In"}
               </button>
               <button
-                onClick={handleToggleForm} 
+                onClick={handleToggleForm}
                 className="w-[100px] bg-[#7A7A7A] text-white py-1 font-semibold hover:bg-[#626262] rounded-r-lg"
               >
                 {showSignUp ? "Sign In" : "Sign Up"}
@@ -189,7 +189,7 @@ const Login: React.FC = () => {
           {showSignUp ? (
             <form
               onSubmit={handleSubmit}
-              className="w-full max-w-[500px] p-8 rounded-lg"
+              className="w-full max-w-[500px] p-8 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <div className="mb-6">
                 <label
@@ -255,7 +255,7 @@ const Login: React.FC = () => {
                   className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
               </div>
-              <div className="mb-6">
+              <div className="mb-6 col-span-2">
                 <label
                   htmlFor="companyDescription"
                   className="block text-lg font-medium text-[#CFD0C6]"
@@ -270,32 +270,37 @@ const Login: React.FC = () => {
                   className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
               </div>
-              <div className="mb-6">
-                <label>Departments</label>
-                <div>
+              <div className="mb-6 col-span-2">
+                <label className="block text-lg font-medium text-[#CFD0C6]">
+                  Departments
+                </label>
+                <div className="mt-2 flex items-center">
                   <input
                     type="text"
                     value={currentDepartment}
                     onChange={handleDepartmentInputChange}
                     placeholder="Add a department"
-                    className="p-2 mt-2 text-white bg-transparent"
+                    className="p-3 mt-2 w-full bg-transparent border border-[#BCB6AE] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#DD3F43] focus:border-[#DD3F43]"
                   />
                   <button
                     type="button"
                     onClick={handleSaveDepartment}
-                    className="ml-2 bg-[#DD3F43] text-white rounded px-4"
+                    className="ml-4 bg-[#DD3F43] text-white px-6 py-3 rounded-lg transition-colors duration-300 hover:bg-[#b83333]"
                   >
                     Save
                   </button>
                 </div>
-                <ul>
+                <ul className="mt-4 space-y-2">
                   {formData.departmentNames.map((department, index) => (
-                    <li key={index} className="flex justify-between">
-                      <span>{department}</span>
+                    <li
+                      key={index}
+                      className="flex justify-between items-center bg-[#1F1F1F] p-3 rounded-lg hover:bg-[#333333] transition-colors"
+                    >
+                      <span className="text-white">{department}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveDepartment(department)}
-                        className="text-red-500"
+                        className="text-red-500 hover:text-red-700 transition-colors"
                       >
                         Remove
                       </button>
@@ -303,14 +308,15 @@ const Login: React.FC = () => {
                   ))}
                 </ul>
               </div>
+
               <button
                 type="submit"
-                className="w-full bg-[#DD3F43] text-white py-3 rounded-lg"
+                className="w-full bg-[#DD3F43] text-white py-3 rounded-lg col-span-2"
               >
                 Register
               </button>
               {success && (
-                <div className="mt-4 text-lg text-green-600 text-center">
+                <div className="mt-4 text-lg text-green-600 text-center col-span-2">
                   {success}
                 </div>
               )}
