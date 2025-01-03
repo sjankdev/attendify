@@ -115,7 +115,6 @@ const DepartmentsList: React.FC = () => {
             </div>
           )}
 
-          {/* List of departments */}
           <ul className="space-y-8">
             {departments.map((department) => (
               <li
