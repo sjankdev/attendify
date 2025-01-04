@@ -27,7 +27,7 @@ const CreateEventPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [departments, setDepartments] = useState<any[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
-  const [isAllDepartments, setIsAllDepartments] = useState<boolean>(false); 
+  const [isAllDepartments, setIsAllDepartments] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -84,7 +84,7 @@ const CreateEventPage: React.FC = () => {
       eventStartDate,
       eventEndDate,
       joinDeadline,
-      departmentIds: isAllDepartments ? null : selectedDepartments, 
+      departmentIds: isAllDepartments ? null : selectedDepartments,
     };
 
     if (
@@ -177,25 +177,24 @@ const CreateEventPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-6">
-          Create Event
-        </h2>
+      <div className="p-6 bg-[#1F2937] rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
 
         {error && (
-          <div className="bg-red-100 text-red-800 p-4 rounded-md mb-4">
+          <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
             {error}
           </div>
         )}
 
         {successMessage && (
-          <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+          <div className="text-green-500 bg-green-800 p-4 rounded-lg mb-4">
             {successMessage}
           </div>
         )}
+
         {validationErrors.length > 0 && (
-          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4">
-            <ul>
+          <div className="bg-yellow-800 p-4 rounded-lg mb-4">
+            <ul className="list-disc pl-5 space-y-2 text-yellow-300">
               {validationErrors.map((err, index) => (
                 <li key={index}>{err}</li>
               ))}
@@ -203,59 +202,46 @@ const CreateEventPage: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 border border-gray-300 rounded-lg shadow-sm">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Event Name
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Event Title
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter event name"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Start Time
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Event Start Date & Time
             </label>
             <input
               type="datetime-local"
               value={eventStartDate}
               onChange={(e) => setEventStartDate(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Event Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter event description"
-              rows={4}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              End Time
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Event End Date & Time
             </label>
             <input
               type="datetime-local"
               value={eventEndDate}
               onChange={(e) => setEventEndDate(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event Location
             </label>
             <input
@@ -263,179 +249,191 @@ const CreateEventPage: React.FC = () => {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter event location"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Join Deadline
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Registration Deadline
             </label>
             <input
               type="datetime-local"
               value={joinDeadline}
               onChange={(e) => setJoinDeadline(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              <input
-                type="checkbox"
-                checked={isAttendeeLimitChecked}
-                onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-                className="mr-2"
-              />
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Event Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter event description"
+              rows={4}
+              className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+            />
+          </div>
+
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
+            <input
+              type="checkbox"
+              checked={isAttendeeLimitChecked}
+              onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+            />
+            <label className="text-sm font-semibold text-gray-300">
               Set Attendee Limit
             </label>
             {isAttendeeLimitChecked && (
               <div className="mt-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Attendee Limit
-                </label>
                 <input
                   type="number"
                   value={attendeeLimit ?? ""}
                   onChange={(e) => setAttendeeLimit(Number(e.target.value))}
                   placeholder="Enter attendee limit"
                   min="1"
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
                 />
               </div>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              <input
-                type="checkbox"
-                checked={isAllDepartments}
-                onChange={() => setIsAllDepartments(!isAllDepartments)}
-                className="mr-2"
-              />
-              Event for all departments
-            </label>
-
-            {!isAllDepartments && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Departments
-                </label>
-                <select
-                  multiple
-                  value={selectedDepartments.map(String)}
-                  onChange={(e) => {
-                    const selected = Array.from(
-                      e.target.selectedOptions,
-                      (option) => parseInt(option.value)
-                    );
-                    setSelectedDepartments(selected);
-                  }}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  {departments.map((department) => (
-                    <option key={department.id} value={department.id}>
-                      {department.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Join Approval
-            </label>
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
             <input
               type="checkbox"
               checked={joinApproval}
               onChange={(e) => setJoinApproval(e.target.checked)}
-              className="mr-2"
+              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
             />
-            Enable join approval
+            <label className="text-sm font-semibold text-gray-300">
+              Require Join Approval
+            </label>
           </div>
-        </div>
 
-        <div className="p-6 border border-gray-300 rounded-lg shadow-sm mb-6">
-          <label className="block text-sm font-medium text-gray-700">
-            Agenda Items
-          </label>
-          {agendaItems.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
-            >
-              <div>
-                <input
-                  type="text"
-                  value={item.title}
-                  onChange={(e) =>
-                    handleAgendaChange(index, "title", e.target.value)
-                  }
-                  placeholder="Agenda item title"
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  value={item.description}
-                  onChange={(e) =>
-                    handleAgendaChange(index, "description", e.target.value)
-                  }
-                  placeholder="Agenda item description"
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <input
-                  type="datetime-local"
-                  value={item.startTime}
-                  onChange={(e) =>
-                    handleAgendaChange(index, "startTime", e.target.value)
-                  }
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <input
-                  type="datetime-local"
-                  value={item.endTime}
-                  onChange={(e) =>
-                    handleAgendaChange(index, "endTime", e.target.value)
-                  }
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div className="col-span-2 flex justify-end mt-2">
-                <button
-                  type="button"
-                  onClick={() => handleRemoveAgendaItem(index)}
-                  className="text-red-500 font-semibold hover:text-red-700"
-                >
-                  Remove Agenda Item
-                </button>
-              </div>
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
+            <input
+              type="checkbox"
+              checked={isAllDepartments}
+              onChange={() => setIsAllDepartments(!isAllDepartments)}
+              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+            />
+            <label className="text-sm font-semibold text-gray-300">
+              Event Open to All Departments
+            </label>
+          </div>
+
+          {!isAllDepartments && (
+            <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                Select Departments
+              </label>
+              <select
+                multiple
+                value={selectedDepartments.map(String)}
+                onChange={(e) => {
+                  const selected = Array.from(
+                    e.target.selectedOptions,
+                    (option) => parseInt(option.value)
+                  );
+                  setSelectedDepartments(selected);
+                }}
+                className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+              >
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          ))}
-          <button
-            onClick={handleGoBack}
-            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-          >
-            Go Back
-          </button>
-        </div>
+          )}
 
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={handleCreateEvent}
-            disabled={isSubmitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
-          >
-            {isSubmitting ? "Submitting..." : "Create Event"}
-          </button>
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">
+              Agenda Items for the Event
+            </label>
+            {agendaItems.map((item, index) => (
+              <div key={index} className="space-y-4 mb-4">
+                <div>
+                  <input
+                    type="text"
+                    value={item.title}
+                    onChange={(e) =>
+                      handleAgendaChange(index, "title", e.target.value)
+                    }
+                    placeholder="Agenda item title"
+                    className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    value={item.description}
+                    onChange={(e) =>
+                      handleAgendaChange(index, "description", e.target.value)
+                    }
+                    placeholder="Agenda item description"
+                    className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="datetime-local"
+                    value={item.startTime}
+                    onChange={(e) =>
+                      handleAgendaChange(index, "startTime", e.target.value)
+                    }
+                    className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="datetime-local"
+                    value={item.endTime}
+                    onChange={(e) =>
+                      handleAgendaChange(index, "endTime", e.target.value)
+                    }
+                    className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
+                  />
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAgendaItem(index)}
+                    className="text-red-400 hover:underline"
+                  >
+                    Remove Agenda Item
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={handleAddAgendaItem}
+              className="bg-teal-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-teal-500"
+            >
+              Add New Agenda Item
+            </button>
+          </div>
+
+          <div className="flex justify-between col-span-2 lg:col-span-3">
+            <button
+              onClick={handleGoBack}
+              className="bg-gray-600 text-gray-200 px-6 py-2 rounded-lg hover:bg-gray-500"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleCreateEvent}
+              disabled={isSubmitting}
+              className="bg-teal-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-teal-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? "Submitting..." : "Create Event"}
+            </button>
+          </div>
         </div>
       </div>
     </Layout>
