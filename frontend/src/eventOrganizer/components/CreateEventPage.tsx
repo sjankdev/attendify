@@ -179,19 +179,19 @@ const CreateEventPage: React.FC = () => {
     <Layout>
       <div className="p-6 bg-[#1F2937] rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
-
+  
         {error && (
           <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
             {error}
           </div>
         )}
-
+  
         {successMessage && (
           <div className="text-green-500 bg-green-800 p-4 rounded-lg mb-4">
             {successMessage}
           </div>
         )}
-
+  
         {validationErrors.length > 0 && (
           <div className="bg-yellow-800 p-4 rounded-lg mb-4">
             <ul className="list-disc pl-5 space-y-2 text-yellow-300">
@@ -201,8 +201,8 @@ const CreateEventPage: React.FC = () => {
             </ul>
           </div>
         )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event Title
@@ -215,7 +215,7 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
+  
           <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event Start Date & Time
@@ -227,7 +227,7 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
+  
           <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event End Date & Time
@@ -239,7 +239,7 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
+  
           <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event Location
@@ -252,7 +252,7 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
+  
           <div className="bg-[#2D3748] p-5 rounded-lg shadow-md">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Registration Deadline
@@ -264,8 +264,8 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
-          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+  
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Event Description
             </label>
@@ -277,8 +277,8 @@ const CreateEventPage: React.FC = () => {
               className="w-full p-3 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#4A5568] text-white"
             />
           </div>
-
-          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
+  
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
             <input
               type="checkbox"
               checked={isAttendeeLimitChecked}
@@ -289,7 +289,7 @@ const CreateEventPage: React.FC = () => {
               Set Attendee Limit
             </label>
             {isAttendeeLimitChecked && (
-              <div className="mt-2">
+              <div className="mt-2 w-full">
                 <input
                   type="number"
                   value={attendeeLimit ?? ""}
@@ -301,8 +301,8 @@ const CreateEventPage: React.FC = () => {
               </div>
             )}
           </div>
-
-          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
+  
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
             <input
               type="checkbox"
               checked={joinApproval}
@@ -313,8 +313,8 @@ const CreateEventPage: React.FC = () => {
               Require Join Approval
             </label>
           </div>
-
-          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3 flex items-center space-x-3">
+  
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
             <input
               type="checkbox"
               checked={isAllDepartments}
@@ -325,9 +325,9 @@ const CreateEventPage: React.FC = () => {
               Event Open to All Departments
             </label>
           </div>
-
+  
           {!isAllDepartments && (
-            <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+            <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3">
               <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Select Departments
               </label>
@@ -351,8 +351,8 @@ const CreateEventPage: React.FC = () => {
               </select>
             </div>
           )}
-
-          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-2 lg:col-span-3">
+  
+          <div className="bg-[#2D3748] p-5 rounded-lg shadow-md col-span-1 sm:col-span-2 md:col-span-3">
             <label className="block text-sm font-semibold text-gray-300 mb-2">
               Agenda Items for the Event
             </label>
@@ -418,8 +418,8 @@ const CreateEventPage: React.FC = () => {
               Add New Agenda Item
             </button>
           </div>
-
-          <div className="flex justify-between col-span-2 lg:col-span-3">
+  
+          <div className="flex justify-between col-span-1 sm:col-span-2 md:col-span-3">
             <button
               onClick={handleGoBack}
               className="bg-gray-600 text-gray-200 px-6 py-2 rounded-lg hover:bg-gray-500"
@@ -438,6 +438,7 @@ const CreateEventPage: React.FC = () => {
       </div>
     </Layout>
   );
+  
 };
 
 export default CreateEventPage;
