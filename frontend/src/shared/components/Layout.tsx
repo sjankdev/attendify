@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlusCircle, FaClipboardList, FaCalendarAlt, FaUsers, FaBuilding, FaHome } from "react-icons/fa";
+import {
+  FaPlusCircle,
+  FaClipboardList,
+  FaCalendarAlt,
+  FaUsers,
+  FaBuilding,
+  FaHome,
+  FaBars,
+} from "react-icons/fa";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,10 +16,19 @@ interface LayoutProps {
 
 const SidebarLayout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   return (
-    <div className="min-h-screen bg-[#0d1b2a] flex">
-      <div className="w-64 bg-[#1b263b] p-6 flex flex-col justify-between">
+    <div className="min-h-screen bg-[#0d1b2a] flex flex-col lg:flex-row">
+      <div
+        className={`lg:w-64 w-full bg-[#1b263b] p-6 flex flex-col justify-between ${
+          isSidebarOpen ? "block" : "hidden lg:block"
+        }`}
+      >
         <div className="space-y-6">
           <h2 className="text-[#e0e1dd] text-2xl font-bold mb-10">Attendify</h2>
           <div
@@ -84,6 +101,14 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children }) => {
           />
         </div>
       </div>
+
+      <div className="lg:hidden p-4 flex items-center">
+        <FaBars
+          className="text-2xl text-teal-400 cursor-pointer"
+          onClick={toggleSidebar}
+        />
+      </div>
+
       <div className="flex-1 p-6">{children}</div>
     </div>
   );
