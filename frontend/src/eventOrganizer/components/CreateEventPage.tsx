@@ -278,7 +278,7 @@ const CreateEventPage: React.FC = () => {
             />
           </div>
 
-          <div className=" p-5 rounded-lg  col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
+          <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
             <input
               type="checkbox"
               checked={isAttendeeLimitChecked}
@@ -289,14 +289,14 @@ const CreateEventPage: React.FC = () => {
               Set Attendee Limit
             </label>
             {isAttendeeLimitChecked && (
-              <div className="mt-2 w-full">
+              <div className="mt-2">
                 <input
                   type="number"
                   value={attendeeLimit ?? ""}
                   onChange={(e) => setAttendeeLimit(Number(e.target.value))}
-                  placeholder="Enter attendee limit"
+                  placeholder="Limit"
                   min="1"
-                  className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+                  className="w-28 p-2 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white placeholder-gray-400"
                 />
               </div>
             )}
