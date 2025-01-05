@@ -419,19 +419,20 @@ const CreateEventPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex justify-between col-span-1 sm:col-span-2 md:col-span-3">
-            <button
-              onClick={handleGoBack}
-              className="bg-gray-600 text-gray-200 px-6 py-2 rounded-lg hover:bg-gray-500"
-            >
-              Go Back
-            </button>
+          <div className="flex justify-start space-x-4 col-span-1 sm:col-span-2 md:col-span-3">
             <button
               onClick={handleCreateEvent}
               disabled={isSubmitting}
-              className="bg-teal-600 text-white px-6 py-2 rounded-lg  hover:bg-teal-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+              className="bg-[#F6F6F7] text-[#151515] px-6 py-2 rounded-lg hover:bg-teal-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Submitting..." : "Create Event"}
+            </button>
+
+            <button
+              onClick={handleGoBack}
+              className="bg-red-100 text-red-700 px-6 py-2 rounded-lg hover:bg-red-200"
+            >
+              Go Back
             </button>
           </div>
         </div>
