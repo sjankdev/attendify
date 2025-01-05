@@ -278,40 +278,42 @@ const CreateEventPage: React.FC = () => {
             />
           </div>
 
-          <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={isAttendeeLimitChecked}
-              onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
-            />
-            <label className="text-sm font-semibold text-gray-300">
-              Set Attendee Limit
-            </label>
-            {isAttendeeLimitChecked && (
-              <div className="mt-2">
-                <input
-                  type="number"
-                  value={attendeeLimit ?? ""}
-                  onChange={(e) => setAttendeeLimit(Number(e.target.value))}
-                  placeholder="Limit"
-                  min="1"
-                  className="w-28 p-2 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white placeholder-gray-400"
-                />
-              </div>
-            )}
-          </div>
+          <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={joinApproval}
+                onChange={(e) => setJoinApproval(e.target.checked)}
+                className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+              />
+              <label className="text-sm font-semibold text-gray-300">
+                Require Join Approval
+              </label>
+            </div>
 
-          <div className=" p-5 rounded-lg  col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={joinApproval}
-              onChange={(e) => setJoinApproval(e.target.checked)}
-              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
-            />
-            <label className="text-sm font-semibold text-gray-300">
-              Require Join Approval
-            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={isAttendeeLimitChecked}
+                onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+                className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+              />
+              <label className="text-sm font-semibold text-gray-300">
+                Set Attendee Limit
+              </label>
+              {isAttendeeLimitChecked && (
+                <div className="mt-2">
+                  <input
+                    type="number"
+                    value={attendeeLimit ?? ""}
+                    onChange={(e) => setAttendeeLimit(Number(e.target.value))}
+                    placeholder="Limit"
+                    min="1"
+                    className="w-28 p-2 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white placeholder-gray-400"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
