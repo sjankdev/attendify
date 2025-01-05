@@ -41,6 +41,7 @@ const CreateEventPage: React.FC = () => {
   const [departments, setDepartments] = useState<any[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
   const [isAllDepartments, setIsAllDepartments] = useState<boolean>(false);
+  const [isAgendaVisible, setIsAgendaVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -367,68 +368,82 @@ const CreateEventPage: React.FC = () => {
                 </select>
               </div>
             )}
-
             <div className="p-5 rounded-lg">
               <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Agenda Items for the Event
               </label>
-              {agendaItems.map((item, index) => (
-                <div key={index} className="space-y-4 mb-4">
-                  <div>
-                    <input
-                      type="text"
-                      value={item.title}
-                      onChange={(e) =>
-                        handleAgendaChange(index, "title", e.target.value)
-                      }
-                      placeholder="Agenda item title"
-                      className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="text"
-                      value={item.description}
-                      onChange={(e) =>
-                        handleAgendaChange(index, "description", e.target.value)
-                      }
-                      placeholder="Agenda item description"
-                      className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="datetime-local"
-                      value={item.startTime}
-                      onChange={(e) =>
-                        handleAgendaChange(index, "startTime", e.target.value)
-                      }
-                      className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="datetime-local"
-                      value={item.endTime}
-                      onChange={(e) =>
-                        handleAgendaChange(index, "endTime", e.target.value)
-                      }
-                      className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                    />
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAgendaItem(index)}
-                      className="text-red-400 hover:underline"
-                    >
-                      Remove Agenda Item
-                    </button>
-                  </div>
+              {isAgendaVisible && (
+                <div className="p-5 rounded-lg">
+                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                    Agenda Items for the Event
+                  </label>
+                  {agendaItems.map((item, index) => (
+                    <div key={index} className="space-y-4 mb-4">
+                      <div>
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) =>
+                            handleAgendaChange(index, "title", e.target.value)
+                          }
+                          placeholder="Agenda item title"
+                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          value={item.description}
+                          onChange={(e) =>
+                            handleAgendaChange(
+                              index,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Agenda item description"
+                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="datetime-local"
+                          value={item.startTime}
+                          onChange={(e) =>
+                            handleAgendaChange(
+                              index,
+                              "startTime",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="datetime-local"
+                          value={item.endTime}
+                          onChange={(e) =>
+                            handleAgendaChange(index, "endTime", e.target.value)
+                          }
+                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+                        />
+                      </div>
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAgendaItem(index)}
+                          className="text-red-400 hover:underline"
+                        >
+                          Remove Agenda Item
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
               <button
-                onClick={handleAddAgendaItem}
+                onClick={() => setIsAgendaVisible(!isAgendaVisible)}
                 className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
               >
                 Add New Agenda Item
