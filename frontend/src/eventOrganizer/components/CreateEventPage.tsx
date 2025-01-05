@@ -6,6 +6,12 @@ import Layout from "../../shared/components/Layout";
 import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {
+  const getBelgradeTime = () => {
+    const options = { timeZone: "Europe/Belgrade", hour12: false };
+    const now = new Date().toLocaleString("sv-SE", options);
+    return now.replace(" ", "T");
+  };
+
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [location, setLocation] = useState<string>("");
@@ -13,9 +19,11 @@ const CreateEventPage: React.FC = () => {
   const [attendeeLimit, setAttendeeLimit] = useState<number | null>(null);
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
-  const [eventStartDate, setEventStartDate] = useState<string>("");
-  const [eventEndDate, setEventEndDate] = useState<string>("");
-  const [joinDeadline, setJoinDeadline] = useState<string>("");
+  const [eventStartDate, setEventStartDate] = useState<string>(
+    getBelgradeTime()
+  );
+  const [eventEndDate, setEventEndDate] = useState<string>(getBelgradeTime());
+  const [joinDeadline, setJoinDeadline] = useState<string>(getBelgradeTime());
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
   const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
     { title: "", description: "", startTime: "", endTime: "" },
