@@ -297,7 +297,7 @@ const CreateEventPage: React.FC = () => {
                 type="checkbox"
                 checked={joinApproval}
                 onChange={(e) => setJoinApproval(e.target.checked)}
-                className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+                className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
               />
               <label className="text-sm font-semibold text-gray-300">
                 Require Join Approval
@@ -309,7 +309,7 @@ const CreateEventPage: React.FC = () => {
                 type="checkbox"
                 checked={isAttendeeLimitChecked}
                 onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-                className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+                className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
               />
               <label className="text-sm font-semibold text-gray-300">
                 Set Attendee Limit
@@ -334,7 +334,7 @@ const CreateEventPage: React.FC = () => {
               type="checkbox"
               checked={isAllDepartments}
               onChange={() => setIsAllDepartments(!isAllDepartments)}
-              className="h-5 w-5 text-teal-500 border-gray-600 rounded"
+              className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
             />
             <label className="text-sm font-semibold text-gray-300">
               Event Open to All Departments
