@@ -327,33 +327,7 @@ const CreateEventPage: React.FC = () => {
           </div>
 
           {!isAllDepartments && (
-            <div className=" p-5 rounded-lg  col-span-1 sm:col-span-2 md:col-span-3">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
-                Select Departments
-              </label>
-              <select
-                multiple
-                value={selectedDepartments.map(String)}
-                onChange={(e) => {
-                  const selected = Array.from(
-                    e.target.selectedOptions,
-                    (option) => parseInt(option.value)
-                  );
-                  setSelectedDepartments(selected);
-                }}
-                className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-              >
-                {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {!isAllDepartments && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 col-span-1 sm:col-span-2 md:col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[35%_65%] gap-6 col-span-1 sm:col-span-2 md:col-span-3">
               <div className="p-5 rounded-lg">
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                   Select Departments
