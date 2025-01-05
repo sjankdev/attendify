@@ -26,7 +26,12 @@ const CreateEventPage: React.FC = () => {
   const [joinDeadline, setJoinDeadline] = useState<string>(getBelgradeTime());
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
   const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
-    { title: "", description: "", startTime: "", endTime: "" },
+    {
+      title: "",
+      description: "",
+      startTime: getBelgradeTime(),
+      endTime: getBelgradeTime(),
+    },
   ]);
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
