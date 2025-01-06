@@ -144,114 +144,117 @@ const InvitationPage: React.FC = () => {
 
   return (
     <Layout>
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-6">
-      <h2 className="text-3xl font-semibold text-center text-gray-800">
-        Invite Participants
-      </h2>
+      <div className="max-w-4xl mx-auto p-6 bg-[#151515] rounded-lg shadow-lg space-y-6">
+        <h2 className="text-3xl font-semibold text-center text-white">
+          Invite Participants
+        </h2>
+        <p className="text-gray-300 text-center text-sm">
+          As an organizer, you can use this page to send invitation emails to
+          your employees. Once invited, employees will be added to your company
+          on the platform, allowing them to join seamlessly.
+        </p>
 
-      {emails.map((emailData, index) => (
-        <div key={index} className="flex flex-col space-y-4">
-          <div className="flex gap-4 items-center">
-            <div className="w-full">
-              <input
-                type="email"
-                value={emailData.email}
-                onChange={(e) => handleEmailChange(index, e.target.value)}
-                placeholder="Enter participant's email"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  emailErrors[index]?.email
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-teal-500"
-                }`}
-              />
-              {emailErrors[index]?.email && (
-                <div className="mt-2 flex items-center space-x-2 text-red-600">
-                  <AiOutlineExclamationCircle className="text-lg" />
-                  <p className="text-sm">{emailErrors[index]?.email}</p>
-                </div>
-              )}
-            </div>
+        {emails.map((emailData, index) => (
+          <div key={index} className="flex flex-col space-y-4">
+            <div className="flex gap-4 items-center">
+              <div className="w-full">
+                <input
+                  type="email"
+                  value={emailData.email}
+                  onChange={(e) => handleEmailChange(index, e.target.value)}
+                  placeholder="Enter participant's email"
+                  className={`w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                    emailErrors[index]?.email
+                      ? "border-red-500 focus:ring-red-500 bg-[#313030] text-white"
+                      : "border-gray-600 focus:ring-teal-500 bg-[#313030] text-white"
+                  }`}
+                />
+                {emailErrors[index]?.email && (
+                  <div className="mt-2 flex items-center space-x-2 text-red-400">
+                    <AiOutlineExclamationCircle className="text-lg" />
+                    <p className="text-sm">{emailErrors[index]?.email}</p>
+                  </div>
+                )}
+              </div>
 
-            <div className="w-full">
-              <select
-                value={emailData.departmentId}
-                onChange={(e) =>
-                  handleDepartmentChange(index, Number(e.target.value))
-                }
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  emailErrors[index]?.departmentId
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-teal-500"
-                }`}
-              >
-                <option value={0} disabled>
-                  Select Department
-                </option>
-                {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.name}
+              <div className="w-full">
+                <select
+                  value={emailData.departmentId}
+                  onChange={(e) =>
+                    handleDepartmentChange(index, Number(e.target.value))
+                  }
+                  className={`w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+                    emailErrors[index]?.departmentId
+                      ? "border-red-500 focus:ring-red-500 bg-[#313030] text-white"
+                      : "border-gray-600 focus:ring-teal-500 bg-[#313030] text-white"
+                  }`}
+                >
+                  <option value={0} disabled>
+                    Select Department
                   </option>
-                ))}
-              </select>
-              {emailErrors[index]?.departmentId && (
-                <div className="mt-2 flex items-center space-x-2 text-red-600">
-                  <AiOutlineExclamationCircle className="text-lg" />
-                  <p className="text-sm">{emailErrors[index]?.departmentId}</p>
-                </div>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+                {emailErrors[index]?.departmentId && (
+                  <div className="mt-2 flex items-center space-x-2 text-red-400">
+                    <AiOutlineExclamationCircle className="text-lg" />
+                    <p className="text-sm">
+                      {emailErrors[index]?.departmentId}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {emails.length > 1 && (
+                <button
+                  onClick={() => handleRemoveEmail(index)}
+                  className="w-12 text-red-400 hover:text-red-600 text-sm"
+                >
+                  X
+                </button>
               )}
             </div>
-
-            {emails.length > 1 && (
-              <button
-                onClick={() => handleRemoveEmail(index)}
-                className="text-red-500 ml-2 hover:text-red-700"
-              >
-                X
-              </button>
-            )}
+          </div>
+        ))}
+        <div className="space-y-4">
+          <button
+            onClick={handleAddEmail}
+            className="w-40 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500"
+          >
+            Add Email
+          </button>
+          <div className="flex items-center gap-[20px]">
+            <button
+              onClick={handleSendInvitations}
+              className="w-40 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-500"
+            >
+              Send
+            </button>
+            <button
+              onClick={handleGoBack}
+              className="w-40 px-4 py-2 bg-red-800 text-white text-sm font-medium rounded-md hover:bg-red-700"
+            >
+              Back
+            </button>
           </div>
         </div>
-      ))}
 
-      <div className="flex justify-between items-center space-x-4">
-        <button
-          onClick={handleAddEmail}
-          className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 transition duration-200"
-        >
-          Add another email
-        </button>
-        <button
-          onClick={handleSendInvitations}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
-        >
-          Send Invitations
-        </button>
+        {successMessage && (
+          <div className="p-4 bg-green-800 text-green-400 rounded-lg shadow-md">
+            {successMessage}
+          </div>
+        )}
+        {error && (
+          <div className="p-4 bg-red-800 text-red-400 rounded-lg shadow-md">
+            {error}
+          </div>
+        )}
       </div>
-
-      {successMessage && (
-        <div className="p-4 bg-green-100 text-green-700 rounded-lg shadow-md">
-          {successMessage}
-        </div>
-      )}
-
-      <div className="flex justify-between space-x-4">
-        <button
-          onClick={handleGoBack}
-          className="px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition duration-200"
-        >
-          Go Back
-        </button>
-      </div>
-
-      {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-lg shadow-md">
-          {error}
-        </div>
-      )}
-    </div>
     </Layout>
   );
-  
 };
 
 export default InvitationPage;
