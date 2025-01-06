@@ -148,6 +148,11 @@ const InvitationPage: React.FC = () => {
         <h2 className="text-3xl font-semibold text-center text-white">
           Invite Participants
         </h2>
+        <p className="text-gray-300 text-center text-sm">
+          As an organizer, you can use this page to send invitation emails to
+          your employees. Once invited, employees will be added to your company
+          on the platform, allowing them to join seamlessly.
+        </p>
 
         {emails.map((emailData, index) => (
           <div key={index} className="flex flex-col space-y-4">
@@ -242,7 +247,6 @@ const InvitationPage: React.FC = () => {
             {successMessage}
           </div>
         )}
-
         {error && (
           <div className="p-4 bg-red-800 text-red-400 rounded-lg shadow-md">
             {error}
