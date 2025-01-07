@@ -79,9 +79,10 @@ public class EventParticipantService {
 
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames);
-            }).collect(Collectors.toList());
+                boolean isFeedbackSubmitted = feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId());
 
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames, isFeedbackSubmitted);
+            }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS).size();
@@ -162,6 +163,7 @@ public class EventParticipantService {
     @Transactional
     public void submitFeedback(Integer eventId, String userEmail, String comments, int rating) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
         if (LocalDateTime.now().isBefore(event.getEventEndDate())) {
             throw new RuntimeException("Feedback can only be submitted after the event has ended.");
         }
@@ -179,6 +181,9 @@ public class EventParticipantService {
         feedback.setRating(rating);
 
         feedbackRepository.save(feedback);
+
+        event.setFeedbackSubmitted(true);
+        eventRepository.save(event);
     }
 
 }

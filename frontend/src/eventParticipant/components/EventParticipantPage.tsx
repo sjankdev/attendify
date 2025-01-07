@@ -143,6 +143,7 @@ const EventParticipantPage: React.FC = () => {
       );
 
       if (response.data) {
+        console.log("Fetched events:", response.data.events);
         setEvents(response.data.events);
         setThisWeekCount(response.data.thisWeekCount);
         setThisMonthCount(response.data.thisMonthCount);

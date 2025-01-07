@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
 
+    boolean existsByEventIdAndParticipantId(Integer eventId, Integer participantId);
+
 }
