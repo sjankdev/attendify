@@ -61,6 +61,9 @@ public class Event {
     @JoinTable(name = "event_department", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "department_id"))
     private List<Department> departments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
     @Column(nullable = false)
     private boolean availableForAllDepartments;
 

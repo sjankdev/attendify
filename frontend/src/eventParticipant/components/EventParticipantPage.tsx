@@ -8,6 +8,10 @@ const EventParticipantPage: React.FC = () => {
   const [thisWeekCount, setThisWeekCount] = useState<number>(0);
   const [thisMonthCount, setThisMonthCount] = useState<number>(0);
   const [allEventsCount, setAllEventsCount] = useState<number>(0);
+  const [feedback, setFeedback] = useState<string>("");
+  const [rating, setRating] = useState<number | string>("");
+  const [isFeedbackFormVisible, setIsFeedbackFormVisible] =
+    useState<boolean>(false);
 
   const handleJoinEvent = async (eventId: number) => {
     const token = localStorage.getItem("token");
@@ -67,6 +71,53 @@ const EventParticipantPage: React.FC = () => {
       setError(
         err.response?.data ||
           "Error unjoining event. Please check your connection."
+      );
+    }
+  };
+
+  const handleSubmitFeedback = async (
+    eventId: number,
+    comments: string,
+    rating: number
+  ) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    if (rating < 1 || rating > 5) {
+      setError("Rating must be between 1 and 5");
+      return;
+    }
+
+    if (comments.trim() === "") {
+      setError("Feedback cannot be empty");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/auth/event-participant/submit-feedback/${eventId}`,
+        { comments, rating },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Feedback submitted successfully:", response.data);
+      setError(null);
+      alert("Feedback submitted successfully!");
+      setIsFeedbackFormVisible(false);
+      fetchEvents();
+    } catch (err: any) {
+      console.error("Error submitting feedback:", err);
+      setError(
+        err.response?.data ||
+          "Error submitting feedback. Please check your connection."
       );
     }
   };
@@ -144,6 +195,9 @@ const EventParticipantPage: React.FC = () => {
           const isPending = event.status === "PENDING";
           const isAccepted = event.status === "ACCEPTED";
           const isNotJoined = event.status === "NOT_JOINED";
+          const eventEndDate = new Date(event.eventEndDate);
+          const isEventEnded = currentTime > eventEndDate;
+          const isFeedbackSubmitted = event.feedbackSubmitted;
 
           return (
             <div
@@ -169,7 +223,7 @@ const EventParticipantPage: React.FC = () => {
                 {new Date(event.eventStartDate).toLocaleString()}
               </p>
               <p className="text-gray-500">
-                <strong>End Date & Time:</strong>{" "}
+                <strong>End Date:</strong>{" "}
                 {new Date(event.eventEndDate).toLocaleString()}
               </p>
               <p className="text-gray-500">
@@ -227,6 +281,63 @@ const EventParticipantPage: React.FC = () => {
                   Unjoin Event
                 </button>
               )}
+
+              {!isNotJoined && isEventEnded && !isFeedbackSubmitted && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => setIsFeedbackFormVisible(true)}
+                    className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 w-full"
+                  >
+                    Leave Feedback
+                  </button>
+                </div>
+              )}
+
+              {isFeedbackFormVisible &&
+                isAccepted &&
+                !isFeedbackSubmitted &&
+                isEventEnded &&
+                !isNotJoined && (
+                  <div className="mt-4">
+                    <textarea
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      placeholder="Write your feedback here..."
+                      className="w-full p-2 border rounded"
+                      rows={4}
+                    ></textarea>
+                    <input
+                      type="number"
+                      value={rating}
+                      onChange={(e) => setRating(e.target.value)}
+                      min="1"
+                      max="5"
+                      placeholder="Rating (1-5)"
+                      className="w-full p-2 border rounded mt-2"
+                    />
+                    {error && <p className="text-red-500 mt-2">{error}</p>}
+                    <div className="flex space-x-4 mt-2">
+                      <button
+                        onClick={() =>
+                          handleSubmitFeedback(
+                            event.id,
+                            feedback,
+                            parseInt(rating.toString())
+                          )
+                        }
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                      >
+                        Submit Feedback
+                      </button>
+                      <button
+                        onClick={() => setIsFeedbackFormVisible(false)}
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
             </div>
           );
         })}

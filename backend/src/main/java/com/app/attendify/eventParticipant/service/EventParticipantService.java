@@ -7,8 +7,10 @@ import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.event.model.Feedback;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.event.repository.EventAttendanceRepository;
+import com.app.attendify.event.repository.FeedbackRepository;
 import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
@@ -32,12 +34,14 @@ public class EventParticipantService {
     private final EventRepository eventRepository;
     private final EventAttendanceRepository eventAttendanceRepository;
     private final EventFilterUtil eventFilterUtil;
+    private final FeedbackRepository feedbackRepository;
 
-    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil) {
+    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil, FeedbackRepository feedbackRepository) {
         this.eventParticipantRepository = eventParticipantRepository;
         this.eventRepository = eventRepository;
         this.eventAttendanceRepository = eventAttendanceRepository;
         this.eventFilterUtil = eventFilterUtil;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @Transactional
@@ -153,6 +157,28 @@ public class EventParticipantService {
         }
 
         log.info("Successfully removed association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
+    }
+
+    @Transactional
+    public void submitFeedback(Integer eventId, String userEmail, String comments, int rating) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        if (LocalDateTime.now().isBefore(event.getEventEndDate())) {
+            throw new RuntimeException("Feedback can only be submitted after the event has ended.");
+        }
+
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+
+        if (eventAttendanceRepository.findByParticipantIdAndEventId(participant.getId(), eventId).isEmpty()) {
+            throw new RuntimeException("You did not attend this event.");
+        }
+
+        Feedback feedback = new Feedback();
+        feedback.setEvent(event);
+        feedback.setParticipant(participant);
+        feedback.setComments(comments);
+        feedback.setRating(rating);
+
+        feedbackRepository.save(feedback);
     }
 
 }
