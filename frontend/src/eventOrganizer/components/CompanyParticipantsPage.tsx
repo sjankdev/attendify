@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/Layout";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const CompanyParticipantsPage: React.FC = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadParticipants = async () => {
@@ -90,9 +90,9 @@ const CompanyParticipantsPage: React.FC = () => {
             No participants found for your company.
           </p>
         ) : (
-          <ul className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             {participants.map((participant) => (
-              <li
+              <div
                 key={participant.participantId}
                 className="bg-[#313030] p-4 rounded-lg shadow-sm hover:bg-[#3a3a3a] transition-colors"
               >
@@ -125,9 +125,9 @@ const CompanyParticipantsPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
 
         <div className="mt-6 text-center">
