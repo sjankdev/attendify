@@ -57,19 +57,6 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
             </div>
 
             <div
-              onClick={() => navigate("/event-organizer/invitations")}
-              className="flex items-center space-x-4 p-4 rounded-xl bg-[#57239F] shadow-md hover:shadow-lg hover:bg-[#0d1b2a] transition duration-300 cursor-pointer"
-            >
-              <FaClipboardList className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Manage Invitations
-              </span>
-            </div>
-
-            <div
               onClick={() => navigate("/event-organizer/events")}
               className="flex items-center space-x-4 p-4 rounded-xl bg-[#57239F] shadow-md hover:shadow-lg hover:bg-[#0d1b2a] transition duration-300 cursor-pointer"
             >
@@ -79,6 +66,19 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
                 className="text-lg font-medium"
               >
                 See Events
+              </span>
+            </div>
+
+            <div
+              onClick={() => navigate("/event-organizer/invitations")}
+              className="flex items-center space-x-4 p-4 rounded-xl bg-[#57239F] shadow-md hover:shadow-lg hover:bg-[#0d1b2a] transition duration-300 cursor-pointer"
+            >
+              <FaClipboardList className="text-2xl text-teal-400" />
+              <span
+                style={{ color: "#fffcf2" }}
+                className="text-lg font-medium"
+              >
+                Manage Invitations
               </span>
             </div>
 
