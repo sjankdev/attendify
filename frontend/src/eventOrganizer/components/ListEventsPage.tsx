@@ -250,7 +250,100 @@ const ListEventsPage: React.FC = () => {
                       ))}
                     </p>
                   )}
+                  {event.agendaItems.length > 0 && (
+                    <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
+                      <h4 className="text-lg font-semibold text-white">
+                        Agenda:
+                      </h4>
+                      <ul className="space-y-4 mt-4">
+                        {event.agendaItems.map((agendaItem, index) => (
+                          <li
+                            key={index}
+                            className="border-b border-gray-600 pb-4"
+                          >
+                            <h5 className="font-medium text-teal-400">
+                              {agendaItem.title}
+                            </h5>
+                            <p className="text-gray-300 mt-1">
+                              {agendaItem.description}
+                            </p>
+                            <p className="text-sm text-gray-400 mt-2">
+                              {new Date(agendaItem.startTime).toLocaleString()}{" "}
+                              - {new Date(agendaItem.endTime).toLocaleString()}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
+                {event.participants?.length > 0 && (
+                  <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
+                    <h4 className="text-lg font-semibold text-white">
+                      Participants:
+                    </h4>
+                    <ul className="space-y-4 mt-4">
+                      {event.participants.map((participant) => (
+                        <li
+                          key={participant.participantId}
+                          className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
+                        >
+                          <div>
+                            <p className="text-white">
+                              {participant.participantName}
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              {participant.participantEmail}
+                            </p>
+                          </div>
+                          <div>
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                participant.status === "PENDING"
+                                  ? "bg-yellow-500 text-black"
+                                  : participant.status === "ACCEPTED"
+                                  ? "bg-green-500 text-white"
+                                  : "bg-red-500 text-white"
+                              }`}
+                            >
+                              {participant.status}
+                            </span>
+                          </div>
+                          {participant.status === "PENDING" && (
+                            <div className="space-x-2">
+                              <button
+                                disabled={loading}
+                                onClick={() =>
+                                  handleReviewJoinRequest(
+                                    event.id,
+                                    participant.participantId,
+                                    "ACCEPTED"
+                                  )
+                                }
+                                className="bg-teal-600 text-white py-1 px-3 rounded-md hover:bg-teal-500"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                disabled={loading}
+                                onClick={() =>
+                                  handleReviewJoinRequest(
+                                    event.id,
+                                    participant.participantId,
+                                    "REJECTED"
+                                  )
+                                }
+                                className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-500"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <button
                   onClick={() => navigate(`/event-stats/${event.id}`)}
                   className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 w-full mt-2"
