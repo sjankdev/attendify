@@ -32,7 +32,9 @@ public class EventForParticipantsDTO {
     private List<String> departmentNames;
     private Boolean isFeedbackSubmitted;
 
-    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, List<String> departmentNames, Boolean isFeedbackSubmitted) {
+    private Boolean isEventOver;
+
+    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, List<String> departmentNames, Boolean isFeedbackSubmitted, Boolean isEventOver) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -51,6 +53,7 @@ public class EventForParticipantsDTO {
         this.pendingRequests = pendingRequests;
         this.departmentNames = departmentNames;
         this.isFeedbackSubmitted = isFeedbackSubmitted;
+        this.isEventOver = isEventOver;
     }
 
     public Integer getId() {
@@ -203,5 +206,13 @@ public class EventForParticipantsDTO {
 
     public void setFeedbackSubmitted(Boolean feedbackSubmitted) {
         isFeedbackSubmitted = feedbackSubmitted;
+    }
+
+    public Boolean getEventOver() {
+        return isEventOver;
+    }
+
+    public void setEventOver(Boolean eventOver) {
+        isEventOver = eventOver;
     }
 }

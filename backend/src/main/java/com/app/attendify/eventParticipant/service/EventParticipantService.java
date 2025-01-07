@@ -81,7 +81,27 @@ public class EventParticipantService {
 
                 boolean isFeedbackSubmitted = feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId());
 
-                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames, isFeedbackSubmitted);
+                return new EventForParticipantsDTO(
+                        event.getId(),
+                        event.getName(),
+                        event.getDescription(),
+                        event.getLocation(),
+                        event.getCompany() != null ? event.getCompany().getName() : "No company",
+                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
+                        availableSeats,
+                        event.getEventStartDate(),
+                        attendeeLimit,
+                        event.getJoinDeadline(),
+                        (int) acceptedParticipantsCount,
+                        event.isJoinApproval(),
+                        status,
+                        event.getEventEndDate(),
+                        agendaItems,
+                        pendingRequests,
+                        departmentNames,
+                        isFeedbackSubmitted,
+                        event.getEventEndDate().isBefore(LocalDateTime.now())
+                );
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
@@ -145,6 +165,16 @@ public class EventParticipantService {
         if (!isJoined) {
             log.warn("Participant with ID {} is not joined to event ID {}", eventParticipant.getId(), eventId);
             throw new RuntimeException("You are not joined to this event.");
+        }
+
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+            log.error("No event found with ID: {}", eventId);
+            return new RuntimeException("Event not found.");
+        });
+
+        if (event.getEventEndDate().isBefore(LocalDateTime.now())) {
+            log.warn("Event end date has passed. Cannot unjoin.");
+            throw new RuntimeException("You cannot unjoin this event as the end date has passed.");
         }
 
         log.info("Participant with ID {} is confirmed to be joined to event ID {}", eventParticipant.getId(), eventId);
