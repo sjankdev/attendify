@@ -77,11 +77,11 @@ const DepartmentsList: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-8">
-        <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Departments</h2>
+      <div className="min-h-screen bg-[#151515] flex flex-col items-center justify-center py-8">
+        <div className="max-w-3xl w-full bg-[#313030] p-6 rounded-lg shadow-lg mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-6">Departments</h2>
           {error && (
-            <p className="text-red-600 bg-red-100 p-2 rounded-md mb-4">
+            <p className="text-red-500 bg-red-800 p-2 rounded-md mb-4">
               {error}
             </p>
           )}
@@ -89,7 +89,7 @@ const DepartmentsList: React.FC = () => {
           <div className="mb-6">
             <button
               onClick={() => setIsAddingDepartments(!isAddingDepartments)}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200"
+              className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-500 transition duration-200"
             >
               {isAddingDepartments ? "Cancel" : "Add New Departments"}
             </button>
@@ -104,11 +104,11 @@ const DepartmentsList: React.FC = () => {
                   setNewDepartmentNames(e.target.value.split(","))
                 }
                 placeholder="Enter department names, separated by commas"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
               />
               <button
                 onClick={handleAddDepartments}
-                className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+                className="w-full mt-4 bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-500 transition duration-200"
               >
                 Add Departments
               </button>
@@ -119,13 +119,13 @@ const DepartmentsList: React.FC = () => {
             {departments.map((department) => (
               <li
                 key={department.id}
-                className="p-4 bg-gray-50 border rounded-lg hover:bg-gray-200 transition duration-300"
+                className="p-4 bg-[#3a3a3a] border rounded-lg hover:bg-[#4a4a4a] transition duration-300"
               >
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                <h3 className="text-2xl font-semibold text-white mb-2">
                   {department.name}
                 </h3>
                 <div className="mb-4">
-                  <h4 className="text-lg font-semibold text-gray-700 mb-2">
+                  <h4 className="text-lg font-semibold text-gray-300 mb-2">
                     Participants:
                   </h4>
                   <ul className="space-y-2">
@@ -134,21 +134,21 @@ const DepartmentsList: React.FC = () => {
                       department.participants.map((participant) => (
                         <li
                           key={participant.participantId}
-                          className="flex justify-between items-center p-2 bg-gray-100 border rounded-md"
+                          className="flex justify-between items-center p-2 bg-[#4a4a4a] border rounded-md"
                         >
                           <span>{participant.participantName}</span>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-gray-300">
                             {participant.participantEmail}
                           </span>
                         </li>
                       ))
                     ) : (
-                      <li className="text-gray-600">No participants</li>
+                      <li className="text-gray-500">No participants</li>
                     )}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-700 mb-2">
+                  <h4 className="text-lg font-semibold text-gray-300 mb-2">
                     Events:
                   </h4>
                   <ul className="space-y-2">
@@ -156,29 +156,29 @@ const DepartmentsList: React.FC = () => {
                       department.events.map((event) => (
                         <li
                           key={event.id}
-                          className="p-4 bg-gray-100 border rounded-md hover:bg-gray-300 transition duration-200"
+                          className="p-4 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition duration-200"
                         >
-                          <h5 className="text-xl font-semibold text-gray-800">
+                          <h5 className="text-xl font-semibold text-white">
                             {event.name}
                           </h5>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             {event.description}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             <strong>Location:</strong> {event.location}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             <strong>Date:</strong>{" "}
                             {new Date(event.eventStartDate).toLocaleString()} -{" "}
                             {new Date(event.eventEndDate).toLocaleString()}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             <strong>Organizer:</strong> {event.organizerName}
                           </p>
                         </li>
                       ))
                     ) : (
-                      <li className="text-gray-600">No events</li>
+                      <li className="text-gray-500">No events</li>
                     )}
                   </ul>
                 </div>
