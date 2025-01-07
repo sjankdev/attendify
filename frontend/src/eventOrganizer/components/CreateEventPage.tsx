@@ -106,6 +106,7 @@ const CreateEventPage: React.FC = () => {
         formData,
         setError,
         agendaItems,
+        isAgendaVisible,
         isAttendeeLimitChecked,
         attendeeLimit,
         eventStartDate,
@@ -127,11 +128,13 @@ const CreateEventPage: React.FC = () => {
           ? new Date(joinDeadline).toISOString()
           : null,
         joinApproval,
-        agendaItems: agendaItems.map((item) => ({
-          ...item,
-          startTime: new Date(item.startTime).toISOString(),
-          endTime: new Date(item.endTime).toISOString(),
-        })),
+        agendaItems: isAgendaVisible
+          ? agendaItems.map((item) => ({
+              ...item,
+              startTime: new Date(item.startTime).toISOString(),
+              endTime: new Date(item.endTime).toISOString(),
+            }))
+          : [],
       };
 
       await axios.post(
@@ -175,13 +178,6 @@ const CreateEventPage: React.FC = () => {
       [field]: value,
     };
     setAgendaItems(updatedAgendaItems);
-  };
-
-  const handleAddAgendaItem = () => {
-    setAgendaItems([
-      ...agendaItems,
-      { title: "", description: "", startTime: "", endTime: "" },
-    ]);
   };
 
   const handleRemoveAgendaItem = (index: number) => {

@@ -118,6 +118,7 @@ export const validateEventForm = (
   formData: CreateEventDto,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
   agendaItems: AgendaItemDTO[],
+  isAgendaVisible: boolean, // Pass this parameter
   isAttendeeLimitChecked: boolean,
   attendeeLimit: number | null,
   eventStartDate: string,
@@ -184,32 +185,15 @@ export const validateEventForm = (
       errors.push("Join deadline must be before the event start date.");
     }
 
-    agendaItems.forEach((item, index) => {
-      const start = new Date(item.startTime);
-      const end = new Date(item.endTime);
-
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        errors.push(`Agenda item ${index + 1}: Invalid start or end time.`);
-      } else {
-        if (start < eventStart || end > eventEnd) {
-          errors.push(
-            `Agenda item ${index + 1}: Times must be within event duration.`
-          );
-        }
-
-        if (start >= end) {
-          errors.push(
-            `Agenda item ${index + 1}: Start time must be before end time.`
-          );
-        }
-      }
-    });
-
     setError(errors.length > 0 ? errors[0] : null);
     return errors.length === 0;
   };
 
   const validateAgendaItems = (): boolean => {
+    if (!isAgendaVisible || agendaItems.length === 0) {
+      return true;
+    }
+
     const errors: string[] = [];
 
     for (let i = 0; i < agendaItems.length; i++) {
@@ -228,11 +212,8 @@ export const validateEventForm = (
       }
     }
 
-    if (errors.length > 0) {
-      setError(errors[0]);
-      return false;
-    }
-    return true;
+    const isValid = validateDates() && errors.length === 0;
+    return isValid;
   };
 
   return validateDates() && validateAgendaItems();
