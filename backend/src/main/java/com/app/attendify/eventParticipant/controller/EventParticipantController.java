@@ -41,6 +41,24 @@ public class EventParticipantController {
         }
     }
 
+    @GetMapping("/feedback/{eventId}")
+    public ResponseEntity<FeedbackDTO> getEventFeedback(@PathVariable Integer eventId) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+
+            FeedbackDTO feedback = eventParticipantService.getFeedbackForEvent(eventId, currentUserEmail);
+
+            if (feedback == null) {
+                return ResponseEntity.status(404).body(null);
+            }
+
+            return ResponseEntity.ok(feedback);
+        } catch (Exception e) {
+            logger.error("Error while fetching feedback", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     @PostMapping("/submit-feedback/{eventId}")
     public ResponseEntity<String> submitFeedback(@PathVariable Integer eventId, @Valid @RequestBody FeedbackDTO feedbackDTO) {
         try {

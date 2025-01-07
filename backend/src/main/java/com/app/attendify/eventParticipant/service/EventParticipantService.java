@@ -4,6 +4,7 @@ import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Department;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
+import com.app.attendify.event.dto.FeedbackDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
@@ -81,27 +82,12 @@ public class EventParticipantService {
 
                 boolean isFeedbackSubmitted = feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId());
 
-                return new EventForParticipantsDTO(
-                        event.getId(),
-                        event.getName(),
-                        event.getDescription(),
-                        event.getLocation(),
-                        event.getCompany() != null ? event.getCompany().getName() : "No company",
-                        event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer",
-                        availableSeats,
-                        event.getEventStartDate(),
-                        attendeeLimit,
-                        event.getJoinDeadline(),
-                        (int) acceptedParticipantsCount,
-                        event.isJoinApproval(),
-                        status,
-                        event.getEventEndDate(),
-                        agendaItems,
-                        pendingRequests,
-                        departmentNames,
-                        isFeedbackSubmitted,
-                        event.getEventEndDate().isBefore(LocalDateTime.now())
-                );
+                FeedbackDTO feedbackDTO = null;
+                if (feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId())) {
+                    feedbackDTO = getFeedbackForEvent(event.getId(), currentUserEmail);
+                }
+
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames, isFeedbackSubmitted, event.getEventEndDate().isBefore(LocalDateTime.now()), feedbackDTO);
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
@@ -214,6 +200,19 @@ public class EventParticipantService {
 
         event.setFeedbackSubmitted(true);
         eventRepository.save(event);
+    }
+
+    @Transactional
+    public FeedbackDTO getFeedbackForEvent(Integer eventId, String userEmail) {
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+
+        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId()).orElseThrow(() -> new RuntimeException("Feedback not found for this event"));
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setComments(feedback.getComments());
+        feedbackDTO.setRating(feedback.getRating());
+
+        return feedbackDTO;
     }
 
 }

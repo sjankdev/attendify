@@ -10,6 +10,10 @@ const EventParticipantPage: React.FC = () => {
   const [allEventsCount, setAllEventsCount] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");
   const [rating, setRating] = useState<number | string>("");
+  const [eventFeedbacks, setEventFeedbacks] = useState<
+    { eventId: number; feedback: string; rating: number }[]
+  >([]);
+
   const [isFeedbackFormVisible, setIsFeedbackFormVisible] =
     useState<boolean>(false);
 
@@ -75,6 +79,39 @@ const EventParticipantPage: React.FC = () => {
     }
   };
 
+  const fetchEventFeedback = async (eventId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/auth/event-participant/feedback/${eventId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        setEventFeedbacks((prevFeedbacks) => [
+          ...prevFeedbacks.filter((item) => item.eventId !== eventId),
+          {
+            eventId,
+            feedback: response.data.comments,
+            rating: response.data.rating,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch feedback:", err);
+      setError("Failed to fetch feedback.");
+    }
+  };
+
   const handleSubmitFeedback = async (
     eventId: number,
     comments: string,
@@ -111,6 +148,8 @@ const EventParticipantPage: React.FC = () => {
       console.log("Feedback submitted successfully:", response.data);
       setError(null);
       alert("Feedback submitted successfully!");
+
+      fetchEventFeedback(eventId);
       setIsFeedbackFormVisible(false);
       fetchEvents();
     } catch (err: any) {
@@ -160,7 +199,10 @@ const EventParticipantPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+    events.forEach((event) => {
+      fetchEventFeedback(event.id);
+    });
+  }, [events]);
 
   return (
     <div className="p-6">
@@ -199,6 +241,10 @@ const EventParticipantPage: React.FC = () => {
           const eventEndDate = new Date(event.eventEndDate);
           const isEventEnded = currentTime > eventEndDate;
           const isFeedbackSubmitted = event.feedbackSubmitted;
+
+          const eventFeedback = eventFeedbacks.find(
+            (feedback) => feedback.eventId === event.id
+          );
 
           return (
             <div
@@ -258,6 +304,22 @@ const EventParticipantPage: React.FC = () => {
                   </li>
                 ))}
               </ul>
+
+              <div className="mt-4">
+                <h4 className="font-semibold">Your Feedback</h4>
+                {eventFeedback ? (
+                  <div className="border-t pt-2">
+                    <p>
+                      <strong>Rating:</strong> {eventFeedback.rating}/5
+                    </p>
+                    <p>
+                      <strong>Feedback:</strong> {eventFeedback.feedback}
+                    </p>
+                  </div>
+                ) : (
+                  <p>No feedback available yet.</p>
+                )}
+              </div>
 
               {isJoinDeadlinePassed && isNotJoined && (
                 <p className="text-gray-500 italic">
