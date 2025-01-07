@@ -131,28 +131,32 @@ const ListEventsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto p-6">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-6">My Events</h2>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+      <div className="p-6 bg-[#151515] rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-white mb-6">My Events</h2>
+        {error && (
+          <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
 
-        <div className="mb-6 space-x-4">
+        <div className="mb-6 flex space-x-4">
           <button
             onClick={() => setFilter("week")}
-            className="bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700"
+            className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
           >
             This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek}{" "}
             Accepted)
           </button>
           <button
             onClick={() => setFilter("month")}
-            className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
+            className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500"
           >
             This Month ({counts.thisMonth} Events,{" "}
             {acceptedParticipants.thisMonth} Accepted)
           </button>
           <button
             onClick={() => setFilter("")}
-            className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+            className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
           >
             All Events ({counts.allEvents} Events,{" "}
             {acceptedParticipants.allEvents} Accepted)
@@ -160,16 +164,16 @@ const ListEventsPage: React.FC = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-2">
+          <label className="block text-gray-300 font-semibold mb-2">
             Filter by Department
           </label>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setDepartmentFilter(null)}
-              className={`px-4 py-2 rounded-md font-medium ${
+              className={`px-4 py-2 rounded-lg font-medium ${
                 departmentFilter === null
                   ? "bg-teal-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-[#313030] text-gray-300 hover:bg-gray-500"
               }`}
             >
               All Departments
@@ -178,10 +182,10 @@ const ListEventsPage: React.FC = () => {
               <button
                 key={department.id}
                 onClick={() => setDepartmentFilter(department.id)}
-                className={`px-4 py-2 rounded-md font-medium ${
+                className={`px-4 py-2 rounded-lg font-medium ${
                   departmentFilter === department.id
                     ? "bg-teal-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    : "bg-[#313030] text-gray-300 hover:bg-gray-500"
                 }`}
               >
                 {department.name}
@@ -189,6 +193,7 @@ const ListEventsPage: React.FC = () => {
             ))}
           </div>
         </div>
+
         {events.length === 0 ? (
           <p className="text-gray-500">No events found.</p>
         ) : (
@@ -196,14 +201,14 @@ const ListEventsPage: React.FC = () => {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden p-6"
+                className="bg-[#313030] rounded-lg shadow-lg p-6"
               >
-                <h3 className="text-2xl font-semibold text-gray-800">
+                <h3 className="text-2xl font-semibold text-white">
                   {event.name}
                 </h3>
-                <p className="text-gray-600 mt-2">{event.description}</p>
+                <p className="text-gray-400 mt-2">{event.description}</p>
 
-                <div className="mt-4 space-y-2">
+                <div className="mt-4 space-y-2 text-gray-300">
                   <p>
                     <strong>Location:</strong> {event.location}
                   </p>
@@ -222,7 +227,7 @@ const ListEventsPage: React.FC = () => {
                       : "N/A"}
                   </p>
                   <p>
-                    <strong>Available Seats: </strong>
+                    <strong>Available Seats:</strong>{" "}
                     {event.attendeeLimit === null
                       ? `${event.acceptedParticipants}/no limit`
                       : `${event.acceptedParticipants}/${event.attendeeLimit}`}
@@ -231,12 +236,12 @@ const ListEventsPage: React.FC = () => {
                     <strong>Pending Requests:</strong> {event.pendingRequests}
                   </p>
                   <p>
-                    <strong>Available for All Departments: </strong>
+                    <strong>Available for All Departments:</strong>{" "}
                     {event.availableForAllDepartments ? "Yes" : "No"}
                   </p>
                   {event.departments && event.departments.length > 0 && (
                     <p>
-                      <strong>Departments: </strong>
+                      <strong>Departments:</strong>{" "}
                       {event.departments.map((dept, index) => (
                         <span key={index}>
                           {dept.name}
@@ -248,119 +253,27 @@ const ListEventsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => navigate(`/event-stats/${event.id}`)}
-                  className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 w-full mt-2"
+                  className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 w-full mt-2"
                 >
                   View Stats
                 </button>
 
-                <div className="mt-4">
+                <div className="mt-4 flex flex-col gap-2">
                   <button
                     onClick={() =>
                       navigate(`/event-organizer/update-event/${event.id}`)
                     }
-                    className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 w-full"
+                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 w-full"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDeleteEvent(event.id)}
-                    className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 w-full mt-2"
+                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 w-full"
                   >
                     Delete
                   </button>
                 </div>
-                {event.agendaItems && event.agendaItems.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Agenda:
-                    </h4>
-                    <ul className="space-y-4">
-                      {event.agendaItems.map((agendaItem, index) => (
-                        <li key={index} className="border-b pb-4">
-                          <h5 className="font-medium text-gray-700">
-                            {agendaItem.title}
-                          </h5>
-                          <p className="text-gray-600">
-                            {agendaItem.description}
-                          </p>
-                          <p className="text-gray-500">
-                            {new Date(agendaItem.startTime).toLocaleString()} -{" "}
-                            {new Date(agendaItem.endTime).toLocaleString()}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {event.participants && event.participants.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Participants:
-                    </h4>
-                    <ul className="space-y-4">
-                      {event.participants.map((participant: Participant) => (
-                        <li
-                          key={participant.participantId}
-                          className="flex justify-between items-center"
-                        >
-                          <div>
-                            <p>{participant.participantName}</p>
-                            <p className="text-sm text-gray-600">
-                              {participant.participantEmail}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              <strong>Department:</strong>{" "}
-                              {participant.departmentName}
-                            </p>{" "}
-                          </div>
-                          <div>
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm ${
-                                participant.status === "PENDING"
-                                  ? "bg-yellow-500 text-white"
-                                  : participant.status === "ACCEPTED"
-                                  ? "bg-green-500 text-white"
-                                  : "bg-red-500 text-white"
-                              }`}
-                            >
-                              {participant.status}
-                            </span>
-                          </div>
-                          {participant.status === "PENDING" && (
-                            <div className="space-x-2 mt-2">
-                              <button
-                                disabled={loading}
-                                onClick={() =>
-                                  handleReviewJoinRequest(
-                                    event.id,
-                                    participant.participantId,
-                                    "ACCEPTED"
-                                  )
-                                }
-                                className="bg-green-600 text-white py-1 px-3 rounded-md hover:bg-green-700"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                disabled={loading}
-                                onClick={() =>
-                                  handleReviewJoinRequest(
-                                    event.id,
-                                    participant.participantId,
-                                    "REJECTED"
-                                  )
-                                }
-                                className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             ))}
           </div>
