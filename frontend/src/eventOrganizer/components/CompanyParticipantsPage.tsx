@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/Layout";
+import { useNavigate } from 'react-router-dom';
 
 const CompanyParticipantsPage: React.FC = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const loadParticipants = async () => {
@@ -51,6 +53,38 @@ const CompanyParticipantsPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-white mb-6">
           Participants from Your Company
         </h2>
+
+        <p className="text-lg text-gray-300 mb-6">
+          Welcome to the company participants dashboard. Here you can view and
+          manage participants who have joined events hosted by your company. You
+          can also track their participation and engagement levels.
+        </p>
+
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-white">Overview</h3>
+          <div className="grid grid-cols-3 gap-4 text-gray-300">
+            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
+              <h4 className="text-lg font-medium">Total Participants</h4>
+              <p className="text-2xl font-bold">{participants.length}</p>
+            </div>
+            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
+              <h4 className="text-lg font-medium">Active Participants</h4>
+              <p className="text-2xl font-bold">
+                {participants.filter((p) => p.joinedEventCount > 0).length}
+              </p>
+            </div>
+            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
+              <h4 className="text-lg font-medium">Total Events</h4>
+              <p className="text-2xl font-bold">
+                {participants.reduce(
+                  (acc, participant) => acc + participant.joinedEventCount,
+                  0
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {participants.length === 0 ? (
           <p className="text-center text-lg text-yellow-300">
             No participants found for your company.
@@ -95,6 +129,15 @@ const CompanyParticipantsPage: React.FC = () => {
             ))}
           </ul>
         )}
+
+        <div className="mt-6 text-center">
+          <button
+            className="bg-teal-500 text-white py-2 px-6 rounded-full hover:bg-teal-600 transition-all"
+            onClick={() => navigate("/event-organizer/invitations")}
+          >
+            Invite More Participants
+          </button>
+        </div>
       </div>
     </Layout>
   );
