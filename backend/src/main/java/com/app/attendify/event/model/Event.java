@@ -61,24 +61,14 @@ public class Event {
     @JoinTable(name = "event_department", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "department_id"))
     private List<Department> departments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    private boolean feedbackSubmitted;
+
     @Column(nullable = false)
     private boolean availableForAllDepartments;
 
-    public boolean isAvailableForAllDepartments() {
-        return availableForAllDepartments;
-    }
-
-    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
-        this.availableForAllDepartments = availableForAllDepartments;
-    }
-
-    public List<Department> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<Department> departments) {
-        this.departments = departments;
-    }
 
     public Integer getId() {
         return id;
@@ -200,6 +190,29 @@ public class Event {
     public Event setAgendaItems(List<AgendaItem> agendaItems) {
         this.agendaItems = agendaItems;
         return this;
+    }
+
+    public boolean isAvailableForAllDepartments() {
+        return availableForAllDepartments;
+    }
+
+    public boolean isFeedbackSubmitted() {
+        return feedbackSubmitted;
+    }
+
+    public void setFeedbackSubmitted(boolean feedbackSubmitted) {
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
     }
 
     public Integer getAvailableSlots() {
