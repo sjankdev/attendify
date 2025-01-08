@@ -6,8 +6,9 @@ import {
   fetchEventsWithParticipants,
   deleteEvent,
   reviewJoinRequest,
+  fetchEventFeedbacks,
 } from "../services/eventOrganizerService";
-import { Event, Participant } from "../../types/eventTypes";
+import { Event } from "../../types/eventTypes";
 import Layout from "../../shared/components/Layout";
 
 const ListEventsPage: React.FC = () => {
@@ -16,6 +17,7 @@ const ListEventsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
+  const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
 
   const [departments, setDepartments] = useState<any[]>([]);
   const [counts, setCounts] = useState<{
@@ -70,6 +72,18 @@ const ListEventsPage: React.FC = () => {
     fetchDepartments();
   }, []);
 
+  const loadFeedbacks = async (eventId: number) => {
+    try {
+      const feedbackResponse = await fetchEventFeedbacks(eventId);
+      setFeedbacks((prevFeedbacks) => ({
+        ...prevFeedbacks,
+        [eventId]: feedbackResponse,
+      }));
+    } catch (error) {
+      console.error(`Failed to load feedback for event ${eventId}:`, error);
+    }
+  };
+
   useEffect(() => {
     const loadEvents = async () => {
       try {
@@ -78,9 +92,14 @@ const ListEventsPage: React.FC = () => {
             filter,
             departmentFilter ? [departmentFilter] : []
           );
+
         setEvents(events);
         setCounts(counts);
         setAcceptedParticipants(acceptedParticipants);
+
+        events.forEach((event) => {
+          loadFeedbacks(event.id);
+        });
       } catch (error) {
         console.error("Failed to load events:", error);
         setError("Failed to load events.");
@@ -367,6 +386,32 @@ const ListEventsPage: React.FC = () => {
                     Delete
                   </button>
                 </div>
+                {feedbacks[event.id]?.length > 0 && (
+                  <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
+                    <h4 className="text-lg font-semibold text-white">
+                      Feedback:
+                    </h4>
+                    <ul className="space-y-4 mt-4">
+                      {feedbacks[event.id].map((feedback, index) => (
+                        <li
+                          key={index}
+                          className="border-b border-gray-600 pb-4"
+                        >
+                          <p className="text-gray-300 mt-1">
+                            {feedback.comments}
+                          </p>
+                          <p className="text-sm text-gray-400 mt-2">
+                            <strong>Rating:</strong> {feedback.rating} / 5
+                          </p>
+                          <p className="text-sm text-gray-400 mt-2">
+                            <strong>Participant:</strong>{" "}
+                            {feedback.participantName}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
           </div>

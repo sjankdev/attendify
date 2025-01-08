@@ -49,7 +49,7 @@ public class EventParticipantController {
             FeedbackDTO feedback = eventParticipantService.getFeedbackForEvent(eventId, currentUserEmail);
 
             if (feedback == null) {
-                return ResponseEntity.status(404).body(null);
+                return ResponseEntity.status(204).body(null);
             }
 
             return ResponseEntity.ok(feedback);

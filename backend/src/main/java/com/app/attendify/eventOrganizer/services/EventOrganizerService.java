@@ -291,6 +291,41 @@ public class EventOrganizerService {
     }
 
     @Transactional
+    public List<FeedbackOrganizerDTO> getFeedbacksByEvent(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+                logger.error("Event not found for ID: {}", eventId);
+                return new IllegalArgumentException("Event not found");
+            });
+
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                logger.error("User not found for email: {}", email);
+                return new IllegalArgumentException("User not found");
+            });
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+                logger.error("Event organizer not found for user: {}", email);
+                return new IllegalArgumentException("Organizer not found");
+            });
+
+            if (!event.getOrganizer().equals(organizer)) {
+                throw new IllegalArgumentException("Event does not belong to the current organizer");
+            }
+
+            return event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(
+                    feedback.getParticipant().getUser().getFullName(),
+                    feedback.getRating(),
+                    feedback.getComments()
+            )).collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error retrieving feedbacks for event", e);
+            throw new RuntimeException("Error retrieving feedbacks for event", e);
+        }
+    }
+
+    @Transactional
     public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType, List<Integer> departmentIds) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

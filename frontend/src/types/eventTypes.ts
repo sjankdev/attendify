@@ -5,6 +5,12 @@ export interface AgendaItemDTO {
   endTime: string;
 }
 
+export interface FeedbackDTO {
+  participantName: string;
+  rating: number;
+  comments: string;
+}
+
 export interface Event {
   id: number;
   name: string;
@@ -24,6 +30,7 @@ export interface Event {
   acceptedParticipants: number;
   availableForAllDepartments: boolean; 
   departments: DepartmentDTO[]; 
+  feedbacks?: FeedbackDTO[];
 }
 
 export interface DepartmentDTO {
