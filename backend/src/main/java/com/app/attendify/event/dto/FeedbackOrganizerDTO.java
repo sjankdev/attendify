@@ -4,7 +4,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class FeedbackDTO {
+public class FeedbackOrganizerDTO {
+    private String participantName;
 
     private String comments;
 
@@ -12,6 +13,23 @@ public class FeedbackDTO {
     @Min(value = 1, message = "Rating must be at least 1")
     @Max(value = 5, message = "Rating must be no greater than 5")
     private int rating;
+
+    public FeedbackOrganizerDTO() {
+    }
+
+    public FeedbackOrganizerDTO(String participantName, int rating, String comments) {
+        this.participantName = participantName;
+        this.rating = rating;
+        this.comments = comments;
+    }
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
+    }
 
     public String getComments() {
         return comments;
@@ -29,3 +47,4 @@ public class FeedbackDTO {
         this.rating = rating;
     }
 }
+

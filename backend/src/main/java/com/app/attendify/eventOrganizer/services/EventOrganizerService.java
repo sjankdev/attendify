@@ -291,7 +291,7 @@ public class EventOrganizerService {
     }
 
     @Transactional
-    public List<FeedbackDTO> getFeedbacksByEvent(int eventId) {
+    public List<FeedbackOrganizerDTO> getFeedbacksByEvent(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {
                 logger.error("Event not found for ID: {}", eventId);
@@ -314,7 +314,7 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            return event.getFeedbacks().stream().map(feedback -> new FeedbackDTO(
+            return event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(
                     feedback.getParticipant().getUser().getFullName(),
                     feedback.getRating(),
                     feedback.getComments()
