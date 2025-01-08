@@ -1,11 +1,13 @@
 package com.app.attendify.event.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class FeedbackDTO {
+
+    private String participantName;
+
     private String comments;
 
     @NotNull(message = "Rating cannot be null")
@@ -13,6 +15,22 @@ public class FeedbackDTO {
     @Max(value = 5, message = "Rating must be no greater than 5")
     private int rating;
 
+    public FeedbackDTO() {
+    }
+
+    public FeedbackDTO(String participantName, int rating, String comments) {
+        this.participantName = participantName;
+        this.rating = rating;
+        this.comments = comments;
+    }
+
+    public String getParticipantName() {
+        return participantName;
+    }
+
+    public void setParticipantName(String participantName) {
+        this.participantName = participantName;
+    }
 
     public String getComments() {
         return comments;

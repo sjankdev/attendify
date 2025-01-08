@@ -215,6 +215,14 @@ public class Event {
         this.departments = departments;
     }
 
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
+    }
+
     public Integer getAvailableSlots() {
         if (attendeeLimit == null) {
             return null;

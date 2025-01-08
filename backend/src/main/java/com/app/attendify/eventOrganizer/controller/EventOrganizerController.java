@@ -131,6 +131,18 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/my-events/{eventId}/feedbacks")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<FeedbackDTO>> getEventFeedbacks(@PathVariable int eventId) {
+        try {
+            List<FeedbackDTO> feedbacks = eventOrganizerService.getFeedbacksByEvent(eventId);
+            return ResponseEntity.ok(feedbacks);
+        } catch (Exception e) {
+            logger.error("Error retrieving feedbacks for event", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     @GetMapping("/company/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {
