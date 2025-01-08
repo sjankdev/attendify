@@ -204,9 +204,15 @@ public class EventParticipantService {
 
     @Transactional
     public FeedbackDTO getFeedbackForEvent(Integer eventId, String userEmail) {
-        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail)
+                .orElseThrow(() -> new RuntimeException("Participant not found"));
 
-        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId()).orElseThrow(() -> new RuntimeException("Feedback not found for this event"));
+        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId())
+                .orElse(null);
+
+        if (feedback == null) {
+            return null;
+        }
 
         FeedbackDTO feedbackDTO = new FeedbackDTO();
         feedbackDTO.setComments(feedback.getComments());

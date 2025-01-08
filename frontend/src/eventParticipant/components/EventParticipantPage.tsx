@@ -96,6 +96,11 @@ const EventParticipantPage: React.FC = () => {
         }
       );
 
+      if (response.status === 204) {
+        console.log("No feedback available for event:", eventId);
+        return;
+      }
+
       if (response.data) {
         setEventFeedbacks((prevFeedbacks) => [
           ...prevFeedbacks.filter((item) => item.eventId !== eventId),
@@ -317,7 +322,9 @@ const EventParticipantPage: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  <p>No feedback available yet.</p>
+                  <p className="italic text-gray-500">
+                    No feedback provided yet.
+                  </p>
                 )}
               </div>
 
