@@ -210,32 +210,36 @@ const EventParticipantPage: React.FC = () => {
   }, [events]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Your Events</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="p-6 bg-[#151515] rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold text-white mb-6">Your Events</h1>
+      {error && (
+        <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
 
-      <div className="flex space-x-4 mb-6">
+      <div className="mb-6 flex space-x-4">
         <button
           onClick={() => fetchEvents("week")}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
         >
           This Week ({thisWeekCount})
         </button>
         <button
           onClick={() => fetchEvents("month")}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500"
         >
           This Month ({thisMonthCount})
         </button>
         <button
           onClick={() => fetchEvents("all")}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
         >
           All Events ({allEventsCount})
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {events.map((event) => {
           const currentTime = new Date();
           const joinDeadline = new Date(event.joinDeadline);
@@ -254,38 +258,40 @@ const EventParticipantPage: React.FC = () => {
           return (
             <div
               key={event.id}
-              className="p-4 border rounded shadow hover:shadow-lg"
+              className="bg-[#313030] rounded-lg shadow-lg p-6"
             >
-              <h3 className="text-xl font-bold mb-2">{event.name}</h3>
-              <p className="text-gray-700 mb-2">{event.description}</p>
-              <p className="text-gray-500">
+              <h3 className="text-2xl font-semibold text-white">
+                {event.name}
+              </h3>
+              <p className="text-gray-400 mt-2">{event.description}</p>
+              <p className="text-gray-300 mt-2">
                 <strong>Location:</strong> {event.location}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Company:</strong> {event.companyName}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Departments:</strong>{" "}
                 {event.departmentNames.includes("All")
                   ? "All"
                   : event.departmentNames.join(", ")}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Date & Time:</strong>{" "}
                 {new Date(event.eventStartDate).toLocaleString()}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>End Date:</strong>{" "}
                 {new Date(event.eventEndDate).toLocaleString()}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Join Deadline:</strong>{" "}
                 {new Date(event.joinDeadline).toLocaleString()}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Status:</strong> {event.status}
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-300">
                 <strong>Available Seats:</strong>{" "}
                 {event.joinedParticipants !== null &&
                 event.attendeeLimit !== null
@@ -293,43 +299,47 @@ const EventParticipantPage: React.FC = () => {
                   : "No limit"}
               </p>
 
-              <h4 className="text-lg font-semibold mt-4">Agenda</h4>
-              <ul className="list-disc list-inside text-gray-700 mb-4">
+              <h4 className="text-lg font-semibold text-white mt-6">Agenda</h4>
+              <ul className="space-y-4 mt-4">
                 {event.agendaItems.map((item: AgendaItemDTO) => (
-                  <li key={item.title}>
-                    <strong>{item.title}</strong> - {item.description}
+                  <li
+                    key={item.title}
+                    className="border-b border-gray-600 pb-4"
+                  >
+                    <strong className="text-teal-400">{item.title}</strong> -{" "}
+                    {item.description}
                     <br />
-                    <span className="text-sm">
+                    <span className="text-sm text-gray-400">
                       Start: {new Date(item.startTime).toLocaleString()}
                     </span>
                     <br />
-                    <span className="text-sm">
+                    <span className="text-sm text-gray-400">
                       End: {new Date(item.endTime).toLocaleString()}
                     </span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-4">
-                <h4 className="font-semibold">Your Feedback</h4>
+              <div className="mt-6">
+                <h4 className="text-lg font-semibold text-white">
+                  Your Feedback
+                </h4>
                 {eventFeedback ? (
-                  <div className="border-t pt-2">
-                    <p>
+                  <div>
+                    <p className="text-gray-300">
                       <strong>Rating:</strong> {eventFeedback.rating}/5
                     </p>
-                    <p>
+                    <p className="text-gray-300">
                       <strong>Feedback:</strong> {eventFeedback.feedback}
                     </p>
                   </div>
                 ) : (
-                  <p className="italic text-gray-500">
-                    No feedback provided yet.
-                  </p>
+                  <p className="text-gray-400">No feedback provided yet.</p>
                 )}
               </div>
 
               {isJoinDeadlinePassed && isNotJoined && (
-                <p className="text-gray-500 italic">
+                <p className="text-red-500 mt-4">
                   The join deadline for this event has passed. You cannot join
                   this event.
                 </p>
@@ -338,7 +348,7 @@ const EventParticipantPage: React.FC = () => {
               {!isJoinDeadlinePassed && !isAccepted && !isPending && (
                 <button
                   onClick={() => handleJoinEvent(event.id)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                  className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 mt-4"
                 >
                   Join Event
                 </button>
@@ -346,7 +356,7 @@ const EventParticipantPage: React.FC = () => {
               {(isPending || isAccepted) && !isEventEnded && (
                 <button
                   onClick={() => handleUnjoinEvent(event.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 w-full mt-2"
+                  className="bg-yellow-600 text-black py-2 px-4 rounded-lg hover:bg-yellow-500 mt-4"
                 >
                   Unjoin Event
                 </button>
@@ -356,7 +366,7 @@ const EventParticipantPage: React.FC = () => {
                 <div className="mt-4">
                   <button
                     onClick={() => setIsFeedbackFormVisible(true)}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 w-full"
+                    className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500"
                   >
                     Leave Feedback
                   </button>
@@ -373,8 +383,8 @@ const EventParticipantPage: React.FC = () => {
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Write your feedback here..."
-                      className="w-full p-2 border rounded"
                       rows={4}
+                      className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
                     ></textarea>
                     <input
                       type="number"
@@ -383,10 +393,14 @@ const EventParticipantPage: React.FC = () => {
                       min="1"
                       max="5"
                       placeholder="Rating (1-5)"
-                      className="w-full p-2 border rounded mt-2"
+                      className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
                     />
-                    {error && <p className="text-red-500 mt-2">{error}</p>}
-                    <div className="flex space-x-4 mt-2">
+                    {error && (
+                      <p className="text-red-500 bg-red-800 p-2 rounded-lg mt-2">
+                        {error}
+                      </p>
+                    )}
+                    <div className="mt-4 flex space-x-4">
                       <button
                         onClick={() =>
                           handleSubmitFeedback(
@@ -395,13 +409,13 @@ const EventParticipantPage: React.FC = () => {
                             parseInt(rating.toString())
                           )
                         }
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+                        className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
                       >
                         Submit Feedback
                       </button>
                       <button
                         onClick={() => setIsFeedbackFormVisible(false)}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full"
+                        className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
                       >
                         Cancel
                       </button>
