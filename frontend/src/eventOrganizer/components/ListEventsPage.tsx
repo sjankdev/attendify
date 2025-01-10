@@ -9,7 +9,7 @@ import {
   fetchEventFeedbacks,
 } from "../services/eventOrganizerService";
 import { Event } from "../../types/eventTypes";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 
 const ListEventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
