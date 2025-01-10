@@ -9,6 +9,7 @@ const EventParticipantPage: React.FC = () => {
   const [thisWeekCount, setThisWeekCount] = useState<number>(0);
   const [thisMonthCount, setThisMonthCount] = useState<number>(0);
   const [allEventsCount, setAllEventsCount] = useState<number>(0);
+  const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
   const [feedback, setFeedback] = useState<string>("");
   const [rating, setRating] = useState<number | string>("");
   const [eventFeedbacks, setEventFeedbacks] = useState<
@@ -192,6 +193,7 @@ const EventParticipantPage: React.FC = () => {
         setThisWeekCount(response.data.thisWeekCount);
         setThisMonthCount(response.data.thisMonthCount);
         setAllEventsCount(response.data.allEventsCount);
+        setUpcomingEventsCount(response.data.upcomingEventsCount);
         setError(null);
       } else {
         setError("No events found.");
@@ -248,6 +250,12 @@ const EventParticipantPage: React.FC = () => {
             className="bg-[#805AD5] text-white py-2 px-4 rounded-lg hover:bg-[#9D7DE5]"
           >
             All Events ({allEventsCount})
+          </button>
+          <button
+            onClick={() => fetchEvents("upcoming")}
+            className="bg-[#4A5568] text-white py-2 px-4 rounded-lg hover:bg-[#5A6678]"
+          >
+            Your Upcoming Events ({upcomingEventsCount})
           </button>
         </div>
 

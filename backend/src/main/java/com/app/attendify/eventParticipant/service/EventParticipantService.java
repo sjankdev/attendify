@@ -93,14 +93,17 @@ public class EventParticipantService {
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS).size();
             int allEventsCount = eventForParticipantsDTOS.size();
+            int upcomingEventsCount = eventFilterUtil.filterUpcomingEventsForParticipant(eventForParticipantsDTOS).size();
 
             if ("week".equalsIgnoreCase(filterType)) {
                 eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS);
             } else if ("month".equalsIgnoreCase(filterType)) {
                 eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS);
+            } else if ("upcoming".equalsIgnoreCase(filterType)) {
+                eventForParticipantsDTOS = eventFilterUtil.filterUpcomingEventsForParticipant(eventForParticipantsDTOS);
             }
 
-            return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+            return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount, upcomingEventsCount);
 
         } catch (Exception e) {
             log.error("Error fetching events for participant", e);
@@ -204,11 +207,9 @@ public class EventParticipantService {
 
     @Transactional
     public FeedbackDTO getFeedbackForEvent(Integer eventId, String userEmail) {
-        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail)
-                .orElseThrow(() -> new RuntimeException("Participant not found"));
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
 
-        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId())
-                .orElse(null);
+        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId()).orElse(null);
 
         if (feedback == null) {
             return null;

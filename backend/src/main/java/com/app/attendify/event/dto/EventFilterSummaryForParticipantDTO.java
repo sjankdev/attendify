@@ -10,12 +10,14 @@ public class EventFilterSummaryForParticipantDTO {
     private int thisWeekCount;
     private int thisMonthCount;
     private int allEventsCount;
+    private int upcomingEventsCount;
 
-    public EventFilterSummaryForParticipantDTO(List<EventForParticipantsDTO> events, int thisWeekCount, int thisMonthCount, int allEventsCount) {
+    public EventFilterSummaryForParticipantDTO(List<EventForParticipantsDTO> events, int thisWeekCount, int thisMonthCount, int allEventsCount, int upcomingEventsCount) {
         this.events = events;
         this.thisWeekCount = thisWeekCount;
         this.thisMonthCount = thisMonthCount;
         this.allEventsCount = allEventsCount;
+        this.upcomingEventsCount = upcomingEventsCount;
     }
 
     public List<EventForParticipantsDTO> getEvents() {
@@ -48,5 +50,13 @@ public class EventFilterSummaryForParticipantDTO {
 
     public void setAllEventsCount(int allEventsCount) {
         this.allEventsCount = allEventsCount;
+    }
+
+    public int getUpcomingEventsCount() {
+        return upcomingEventsCount;
+    }
+
+    public void setUpcomingEventsCount(int upcomingEventsCount) {
+        this.upcomingEventsCount = upcomingEventsCount;
     }
 }
