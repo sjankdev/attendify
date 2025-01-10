@@ -26,6 +26,9 @@ const ListEventsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
+  const [showAccepted, setShowAccepted] = useState<{
+    [eventId: number]: boolean;
+  }>({});
   const [expandedDescriptions, setExpandedDescriptions] = useState<{
     [key: number]: boolean;
   }>({});
@@ -163,6 +166,13 @@ const ListEventsPage: React.FC = () => {
     } else {
       setError("Failed to update join request.");
     }
+  };
+
+  const toggleAcceptedParticipants = (eventId: number) => {
+    setShowAccepted((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
   };
 
   return (
@@ -360,66 +370,110 @@ const ListEventsPage: React.FC = () => {
                     <h4 className="text-lg font-semibold text-white">
                       Participants:
                     </h4>
-                    <ul className="space-y-4 mt-4">
-                      {event.participants.map((participant) => (
-                        <li
-                          key={participant.participantId}
-                          className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
-                        >
-                          <div>
-                            <p className="text-white">
-                              {participant.participantName}
-                            </p>
-                            <p className="text-sm text-gray-400">
-                              {participant.participantEmail}
-                            </p>
-                          </div>
-                          <div>
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                participant.status === "PENDING"
-                                  ? "bg-yellow-500 text-black"
-                                  : participant.status === "ACCEPTED"
-                                  ? "bg-green-500 text-white"
-                                  : "bg-red-500 text-white"
-                              }`}
-                            >
-                              {participant.status}
-                            </span>
-                          </div>
-                          {participant.status === "PENDING" && (
-                            <div className="space-x-2">
-                              <button
-                                disabled={loading}
-                                onClick={() =>
-                                  handleReviewJoinRequest(
-                                    event.id,
-                                    participant.participantId,
-                                    "ACCEPTED"
-                                  )
-                                }
-                                className="bg-teal-600 text-white py-1 px-3 rounded-md hover:bg-teal-500"
+
+                    {/* Accepted Participants Count */}
+                    <div className="mt-4">
+                      <h5 className="text-white">
+                        Joined participants:{" "}
+                        {
+                          event.participants.filter(
+                            (p) => p.status === "ACCEPTED"
+                          ).length
+                        }
+                      </h5>
+                      <button
+                        className="text-teal-600 hover:text-teal-500"
+                        onClick={() => toggleAcceptedParticipants(event.id)}
+                      >
+                        {showAccepted[event.id] ? "Hide" : "View"} accepted
+                        participants
+                      </button>
+                    </div>
+
+                    {/* List of accepted participants */}
+                    {showAccepted[event.id] &&
+                      event.participants.filter((p) => p.status === "ACCEPTED")
+                        .length > 0 && (
+                        <ul className="space-y-4 mt-4">
+                          {event.participants
+                            .filter((p) => p.status === "ACCEPTED")
+                            .map((participant) => (
+                              <li
+                                key={participant.participantId}
+                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
                               >
-                                Approve
-                              </button>
-                              <button
-                                disabled={loading}
-                                onClick={() =>
-                                  handleReviewJoinRequest(
-                                    event.id,
-                                    participant.participantId,
-                                    "REJECTED"
-                                  )
-                                }
-                                className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-500"
+                                <div>
+                                  <p className="text-white">
+                                    {participant.participantName}
+                                  </p>
+                                  <p className="text-sm text-gray-400">
+                                    {participant.participantEmail}
+                                  </p>
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+
+                    {/* Pending Participants List */}
+                    {event.participants.filter((p) => p.status === "PENDING")
+                      .length > 0 && (
+                      <div className="mt-6">
+                        <h5 className="text-white">Pending participants</h5>
+                        <ul className="space-y-4 mt-4">
+                          {event.participants
+                            .filter((p) => p.status === "PENDING")
+                            .map((participant) => (
+                              <li
+                                key={participant.participantId}
+                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
                               >
-                                Reject
-                              </button>
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                                <div>
+                                  <p className="text-white">
+                                    {participant.participantName}
+                                  </p>
+                                  <p className="text-sm text-gray-400">
+                                    {participant.participantEmail}
+                                  </p>
+                                </div>
+                                <div>
+                                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-500 text-black">
+                                    {participant.status}
+                                  </span>
+                                </div>
+                                <div className="space-x-2">
+                                  <button
+                                    disabled={loading}
+                                    onClick={() =>
+                                      handleReviewJoinRequest(
+                                        event.id,
+                                        participant.participantId,
+                                        "ACCEPTED"
+                                      )
+                                    }
+                                    className="bg-teal-600 text-white py-1 px-3 rounded-md hover:bg-teal-500"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    disabled={loading}
+                                    onClick={() =>
+                                      handleReviewJoinRequest(
+                                        event.id,
+                                        participant.participantId,
+                                        "REJECTED"
+                                      )
+                                    }
+                                    className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-500"
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
