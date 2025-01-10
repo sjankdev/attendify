@@ -8,7 +8,7 @@ import {
   BuildingLibraryIcon,
   UsersIcon,
   MapPinIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import {
   fetchEventsWithParticipants,
@@ -264,47 +264,57 @@ const ListEventsPage: React.FC = () => {
                   </button>
                 )}
 
-                <div className="mt-4 space-y-2 text-gray-300">
-                  <p className="flex items-center">
-                    <MapPinIcon className="w-5 h-5 mr-2" />
-                    <strong>Location:</strong> {event.location}
-                  </p>
-                  <p className="flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2" />
-                    <strong>Date:</strong>{" "}
-                    {new Date(event.eventStartDate).toLocaleString()}
-                  </p>
-                  <p className="flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2" />
-                    <strong>End Date:</strong>{" "}
-                    {new Date(event.eventEndDate).toLocaleString()}
-                  </p>
-                  <p className="flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2" />
-                    <strong>Join Deadline:</strong>{" "}
-                    {event.joinDeadline
-                      ? new Date(event.joinDeadline).toLocaleString()
-                      : "N/A"}
-                  </p>
-                  <p className="flex items-center">
-                    <UsersIcon className="w-5 h-5 mr-2" />
-                    <strong>Available Seats:</strong>{" "}
-                    {event.attendeeLimit === null
-                      ? `${event.acceptedParticipants}/no limit`
-                      : `${event.acceptedParticipants}/${event.attendeeLimit}`}
-                  </p>
-                  <p className="flex items-center">
-                    <UsersIcon className="w-5 h-5 mr-2" />
-                    <strong>Pending Requests:</strong> {event.pendingRequests}
-                  </p>
-                  <p className="flex items-center">
-                    <CheckCircleIcon className="w-5 h-5 mr-2" />
-                    <strong>Available for All Departments:</strong>{" "}
-                    {event.availableForAllDepartments ? "Yes" : "No"}
-                  </p>
-
-                  {event.departments && event.departments.length > 0 && (
+                <div className="mt-4 border-t border-gray-600 pt-4">
+                  <h4 className="text-lg font-semibold text-white">
+                    Event Details
+                  </h4>
+                  <div className="space-y-4 text-gray-300 mt-4">
                     <p className="flex items-center">
+                      <MapPinIcon className="w-5 h-5 mr-2" />
+                      <strong>Location:</strong> {event.location}
+                    </p>
+                    <p className="flex items-center">
+                      <CalendarIcon className="w-5 h-5 mr-2" />
+                      <strong>Date:</strong>{" "}
+                      {new Date(event.eventStartDate).toLocaleString()}
+                    </p>
+                    <p className="flex items-center">
+                      <CalendarIcon className="w-5 h-5 mr-2" />
+                      <strong>End Date:</strong>{" "}
+                      {new Date(event.eventEndDate).toLocaleString()}
+                    </p>
+                    <p className="flex items-center">
+                      <CalendarIcon className="w-5 h-5 mr-2" />
+                      <strong>Join Deadline:</strong>{" "}
+                      {event.joinDeadline
+                        ? new Date(event.joinDeadline).toLocaleString()
+                        : "N/A"}
+                    </p>
+                    <p className="flex items-center">
+                      <UsersIcon className="w-5 h-5 mr-2" />
+                      <strong>Available Seats:</strong>{" "}
+                      {event.attendeeLimit === null
+                        ? `${event.acceptedParticipants}/no limit`
+                        : `${event.acceptedParticipants}/${event.attendeeLimit}`}
+                    </p>
+                    <p className="flex items-center">
+                      <UsersIcon className="w-5 h-5 mr-2" />
+                      <strong>Pending Requests:</strong> {event.pendingRequests}
+                    </p>
+                    <p className="flex items-center">
+                      <CheckCircleIcon className="w-5 h-5 mr-2" />
+                      <strong>Available for All Departments:</strong>{" "}
+                      {event.availableForAllDepartments ? "Yes" : "No"}
+                    </p>
+                  </div>
+                </div>
+
+                {event.departments && event.departments.length > 0 && (
+                  <div className="mt-6 border-t border-gray-600 pt-4">
+                    <h4 className="text-lg font-semibold text-white">
+                      Departments
+                    </h4>
+                    <p className="text-gray-300 mt-4 flex items-center">
                       <BuildingOfficeIcon className="w-5 h-5 mr-2" />
                       <strong>Departments:</strong>{" "}
                       {event.departments.map((dept, index) => (
@@ -314,38 +324,39 @@ const ListEventsPage: React.FC = () => {
                         </span>
                       ))}
                     </p>
-                  )}
+                  </div>
+                )}
 
-                  {event.agendaItems.length > 0 && (
-                    <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
-                      <h4 className="text-lg font-semibold text-white flex items-center">
-                        <ListBulletIcon className="w-5 h-5 mr-2" />
-                        Agenda:
-                      </h4>
-                      <ul className="space-y-4 mt-4">
-                        {event.agendaItems.map((agendaItem, index) => (
-                          <li
-                            key={index}
-                            className="border-b border-gray-600 pb-4"
-                          >
-                            <h5 className="font-medium text-teal-400">
-                              {agendaItem.title}
-                            </h5>
-                            <p className="text-gray-300 mt-1">
-                              {agendaItem.description}
-                            </p>
-                            <p className="text-sm text-gray-400 mt-2">
-                              {new Date(agendaItem.startTime).toLocaleString()}{" "}
-                              - {new Date(agendaItem.endTime).toLocaleString()}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                {event.agendaItems.length > 0 && (
+                  <div className="mt-6 border-t border-gray-600 pt-4">
+                    <h4 className="text-lg font-semibold text-white flex items-center">
+                      <ListBulletIcon className="w-5 h-5 mr-2" />
+                      Agenda:
+                    </h4>
+                    <ul className="space-y-4 mt-4">
+                      {event.agendaItems.map((agendaItem, index) => (
+                        <li
+                          key={index}
+                          className="border-b border-gray-600 pb-4"
+                        >
+                          <h5 className="font-medium text-teal-400">
+                            {agendaItem.title}
+                          </h5>
+                          <p className="text-gray-300 mt-1">
+                            {agendaItem.description}
+                          </p>
+                          <p className="text-sm text-gray-400 mt-2">
+                            {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                            {new Date(agendaItem.endTime).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {event.participants?.length > 0 && (
-                  <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
+                  <div className="mt-6 border-t border-gray-600 pt-4">
                     <h4 className="text-lg font-semibold text-white">
                       Participants:
                     </h4>
@@ -411,31 +422,35 @@ const ListEventsPage: React.FC = () => {
                     </ul>
                   </div>
                 )}
-                <button
-                  onClick={() => navigate(`/event-stats/${event.id}`)}
-                  className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 w-full mt-2"
-                >
-                  View Stats
-                </button>
 
-                <div className="mt-4 flex flex-col gap-2">
+                <div className="mt-6 border-t border-gray-600 pt-4">
                   <button
-                    onClick={() =>
-                      navigate(`/event-organizer/update-event/${event.id}`)
-                    }
-                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 w-full"
+                    onClick={() => navigate(`/event-stats/${event.id}`)}
+                    className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 w-full mt-2"
                   >
-                    Edit
+                    View Stats
                   </button>
-                  <button
-                    onClick={() => handleDeleteEvent(event.id)}
-                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 w-full"
-                  >
-                    Delete
-                  </button>
+
+                  <div className="mt-4 flex flex-col gap-2">
+                    <button
+                      onClick={() =>
+                        navigate(`/event-organizer/update-event/${event.id}`)
+                      }
+                      className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 w-full"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 w-full"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
+
                 {feedbacks[event.id]?.length > 0 && (
-                  <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
+                  <div className="mt-6 border-t border-gray-600 pt-4">
                     <h4 className="text-lg font-semibold text-white">
                       Feedback:
                     </h4>
