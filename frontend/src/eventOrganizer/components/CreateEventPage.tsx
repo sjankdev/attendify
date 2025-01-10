@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AgendaItemDTO } from "../../types/eventTypes";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {

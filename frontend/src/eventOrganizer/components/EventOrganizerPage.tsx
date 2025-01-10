@@ -1,5 +1,5 @@
 import React from "react";
-import SidebarLayout from "../../shared/components/Layout";
+import SidebarLayout from "../../shared/components/EventOrganizerLayout";
 
 const EventOrganizerPage: React.FC = () => {
   return (

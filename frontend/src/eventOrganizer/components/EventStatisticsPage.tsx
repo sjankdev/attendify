@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Bar, Pie } from "react-chartjs-2";
 import { fetchEventStatistics } from "../services/eventOrganizerService";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 import {
   Chart as ChartJS,
   CategoryScale,

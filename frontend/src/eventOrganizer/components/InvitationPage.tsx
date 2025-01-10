@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 
 const InvitationPage: React.FC = () => {
   const [companyName, setCompanyName] = useState<string | null>(null);

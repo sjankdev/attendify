@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 import { useNavigate } from "react-router-dom";
 
 const CompanyParticipantsPage: React.FC = () => {

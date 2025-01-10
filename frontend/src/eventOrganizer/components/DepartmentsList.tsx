@@ -4,7 +4,7 @@ import {
   fetchDepartmentsByCompany,
 } from "../services/eventOrganizerService";
 import { DepartmentDTO } from "../../types/eventTypes";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 import axios from "axios";
 
 const DepartmentsList: React.FC = () => {
