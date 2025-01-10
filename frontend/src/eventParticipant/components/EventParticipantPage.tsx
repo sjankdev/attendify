@@ -210,35 +210,41 @@ const EventParticipantPage: React.FC = () => {
   }, [events]);
 
   return (
-    <div className="p-6 bg-[#151515] rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-white mb-6">Your Events</h1>
+    <div
+      className="min-h-screen p-6"
+      style={{
+        background: "linear-gradient(135deg, #1A202C, #2D3748)", 
+        color: "#DDEFFF",
+      }}
+    >
+      <h1 className="text-3xl font-bold mb-6">Your Events</h1>
       {error && (
-        <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
+        <div className="text-[#FF6B6B] bg-[#4E2A2A] p-4 rounded-lg mb-4">
           {error}
         </div>
       )}
-
+  
       <div className="mb-6 flex space-x-4">
         <button
           onClick={() => fetchEvents("week")}
-          className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
+          className="bg-[#2A4365] text-white py-2 px-4 rounded-lg hover:bg-[#3B567A]"
         >
           This Week ({thisWeekCount})
         </button>
         <button
           onClick={() => fetchEvents("month")}
-          className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500"
+          className="bg-[#2C7A7B] text-white py-2 px-4 rounded-lg hover:bg-[#3E9696]"
         >
           This Month ({thisMonthCount})
         </button>
         <button
           onClick={() => fetchEvents("all")}
-          className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
+          className="bg-[#805AD5] text-white py-2 px-4 rounded-lg hover:bg-[#9D7DE5]"
         >
           All Events ({allEventsCount})
         </button>
       </div>
-
+  
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {events.map((event) => {
           const currentTime = new Date();
@@ -428,6 +434,7 @@ const EventParticipantPage: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default EventParticipantPage;
