@@ -216,33 +216,24 @@ const ListEventsPage: React.FC = () => {
           <label className="block text-gray-300 font-semibold mb-2">
             Filter by Department
           </label>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setDepartmentFilter(null)}
-              className={`px-4 py-2 rounded-lg font-medium ${
-                departmentFilter === null
-                  ? "bg-teal-600 text-white"
-                  : "bg-[#313030] text-gray-300 hover:bg-gray-500"
-              }`}
-            >
-              <BuildingLibraryIcon className="w-5 h-5 mr-2 inline" />
+          <select
+            onChange={(e) => setDepartmentFilter(Number(e.target.value))}
+            value={departmentFilter ?? ""}
+            className="bg-[#313030] text-gray-300 rounded-lg py-2 px-4 w-1/6 sm:w-1/8"
+          >
+            <option value="" className="bg-[#313030] text-gray-300">
               All Departments
-            </button>
+            </option>
             {departments.map((department) => (
-              <button
+              <option
                 key={department.id}
-                onClick={() => setDepartmentFilter(department.id)}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  departmentFilter === department.id
-                    ? "bg-teal-600 text-white"
-                    : "bg-[#313030] text-gray-300 hover:bg-gray-500"
-                }`}
+                value={department.id}
+                className="bg-[#313030] text-gray-300"
               >
-                <BuildingOfficeIcon className="w-5 h-5 mr-2 inline" />
                 {department.name}
-              </button>
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         {events.length === 0 ? (
