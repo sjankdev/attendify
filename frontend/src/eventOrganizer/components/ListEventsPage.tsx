@@ -26,6 +26,9 @@ const ListEventsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
+  const [expandedFeedbacks, setExpandedFeedbacks] = useState<{
+    [eventId: number]: boolean;
+  }>({}); // Add state to manage feedback expansion
   const [showAccepted, setShowAccepted] = useState<{
     [eventId: number]: boolean;
   }>({});
@@ -57,6 +60,13 @@ const ListEventsPage: React.FC = () => {
 
   const toggleDescription = (eventId: number) => {
     setExpandedDescriptions((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
+  };
+
+  const toggleFeedback = (eventId: number) => {
+    setExpandedFeedbacks((prev) => ({
       ...prev,
       [eventId]: !prev[eventId],
     }));
@@ -362,7 +372,6 @@ const ListEventsPage: React.FC = () => {
                       Participants:
                     </h4>
 
-                    {/* Accepted Participants Count */}
                     <div className="mt-4">
                       <h5 className="text-white">
                         Joined participants:{" "}
@@ -381,7 +390,6 @@ const ListEventsPage: React.FC = () => {
                       </button>
                     </div>
 
-                    {/* List of accepted participants */}
                     {showAccepted[event.id] &&
                       event.participants.filter((p) => p.status === "ACCEPTED")
                         .length > 0 && (
@@ -406,7 +414,6 @@ const ListEventsPage: React.FC = () => {
                         </ul>
                       )}
 
-                    {/* Pending Participants List */}
                     {event.participants.filter((p) => p.status === "PENDING")
                       .length > 0 && (
                       <div className="mt-6">
@@ -494,32 +501,42 @@ const ListEventsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {feedbacks[event.id]?.length > 0 && (
-                  <div className="mt-6 border-t border-gray-600 pt-4">
-                    <h4 className="text-lg font-semibold text-white">
-                      Feedback:
-                    </h4>
-                    <ul className="space-y-4 mt-4">
-                      {feedbacks[event.id].map((feedback, index) => (
-                        <li
-                          key={index}
-                          className="border-b border-gray-600 pb-4"
-                        >
-                          <p className="text-gray-300 mt-1">
-                            {feedback.comments}
-                          </p>
-                          <p className="text-sm text-gray-400 mt-2">
-                            <strong>Rating:</strong> {feedback.rating} / 5
-                          </p>
-                          <p className="text-sm text-gray-400 mt-2">
-                            <strong>Participant:</strong>{" "}
-                            {feedback.participantName}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <div className="mt-6 border-t border-gray-600 pt-4">
+                  <h4 className="text-lg font-semibold text-white">
+                    Feedback:
+                  </h4>
+                  <button
+                    onClick={() => toggleFeedback(event.id)}
+                    className="text-teal-400 mt-2 hover:underline"
+                  >
+                    {expandedFeedbacks[event.id]
+                      ? "Hide Feedback"
+                      : "View Feedback"}
+                  </button>
+
+                  {expandedFeedbacks[event.id] &&
+                    feedbacks[event.id]?.length > 0 && (
+                      <ul className="space-y-4 mt-4">
+                        {feedbacks[event.id].map((feedback, index) => (
+                          <li
+                            key={index}
+                            className="border-b border-gray-600 pb-4"
+                          >
+                            <p className="text-gray-300 mt-1">
+                              {feedback.comments}
+                            </p>
+                            <p className="text-sm text-gray-400 mt-2">
+                              <strong>Rating:</strong> {feedback.rating} / 5
+                            </p>
+                            <p className="text-sm text-gray-400 mt-2">
+                              <strong>Participant:</strong>{" "}
+                              {feedback.participantName}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                </div>
               </div>
             ))}
           </div>
