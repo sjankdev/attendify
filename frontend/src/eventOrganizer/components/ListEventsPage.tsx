@@ -18,7 +18,9 @@ const ListEventsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
-
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{
+    [key: number]: boolean;
+  }>({});
   const [departments, setDepartments] = useState<any[]>([]);
   const [counts, setCounts] = useState<{
     thisWeek: number;
@@ -41,6 +43,13 @@ const ListEventsPage: React.FC = () => {
   });
 
   const navigate = useNavigate();
+
+  const toggleDescription = (eventId: number) => {
+    setExpandedDescriptions((prev) => ({
+      ...prev,
+      [eventId]: !prev[eventId],
+    }));
+  };
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -225,7 +234,22 @@ const ListEventsPage: React.FC = () => {
                 <h3 className="text-2xl font-semibold text-white">
                   {event.name}
                 </h3>
-                <p className="text-gray-400 mt-2">{event.description}</p>
+                <p className="text-gray-400 mt-2">
+                  {expandedDescriptions[event.id]
+                    ? event.description
+                    : event.description.length > 100
+                    ? `${event.description.slice(0, 100)}...`
+                    : event.description}
+                </p>
+
+                {event.description.length > 100 && (
+                  <button
+                    onClick={() => toggleDescription(event.id)}
+                    className="text-teal-400 mt-2 hover:underline"
+                  >
+                    {expandedDescriptions[event.id] ? "View Less" : "View More"}
+                  </button>
+                )}
 
                 <div className="mt-4 space-y-2 text-gray-300">
                   <p>
