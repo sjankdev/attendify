@@ -166,7 +166,6 @@ const EventParticipantPage: React.FC = () => {
       );
     }
   };
-
   const fetchEvents = async (filter?: string) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -205,9 +204,14 @@ const EventParticipantPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
-    events.forEach((event) => {
-      fetchEventFeedback(event.id);
-    });
+  }, []);
+
+  useEffect(() => {
+    if (events.length > 0) {
+      events.forEach((event) => {
+        fetchEventFeedback(event.id);
+      });
+    }
   }, [events]);
 
   return (
