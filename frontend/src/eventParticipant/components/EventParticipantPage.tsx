@@ -237,7 +237,9 @@ const EventParticipantPage: React.FC = () => {
           color: "#DDEFFF",
         }}
       >
-        <h1 className="text-3xl font-bold mb-6">Hello, participant</h1>
+        <h1 className="text-3xl font-bold mb-6">
+          {`We found ${allEventsCount} events for you`}
+        </h1>
         {error && (
           <div className="text-[#FF6B6B] bg-[#4E2A2A] p-4 rounded-lg mb-4">
             {error}
@@ -265,17 +267,6 @@ const EventParticipantPage: React.FC = () => {
             }`}
           >
             This Month ({thisMonthCount})
-          </button>
-
-          <button
-            onClick={() => handleFilterClick("all")}
-            className={`py-2 px-4 rounded-lg transition ease-in-out ${
-              selectedFilter === "all"
-                ? "bg-purple-500 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-          >
-            All Events ({allEventsCount})
           </button>
 
           <button
