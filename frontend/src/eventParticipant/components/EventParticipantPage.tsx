@@ -12,12 +12,24 @@ const EventParticipantPage: React.FC = () => {
   const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
   const [feedback, setFeedback] = useState<string>("");
   const [rating, setRating] = useState<number | string>("");
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+
   const [eventFeedbacks, setEventFeedbacks] = useState<
     { eventId: number; feedback: string; rating: number }[]
   >([]);
 
   const [isFeedbackFormVisible, setIsFeedbackFormVisible] =
     useState<boolean>(false);
+
+  const handleFilterClick = (filter: string) => {
+    if (selectedFilter === filter) {
+      setSelectedFilter(null);
+      fetchEvents();
+    } else {
+      setSelectedFilter(filter);
+      fetchEvents(filter);
+    }
+  };
 
   const handleJoinEvent = async (eventId: number) => {
     const token = localStorage.getItem("token");
@@ -232,28 +244,47 @@ const EventParticipantPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-6 flex space-x-4">
+        <div className="flex space-x-4">
           <button
-            onClick={() => fetchEvents("week")}
-            className="bg-[#2A4365] text-white py-2 px-4 rounded-lg hover:bg-[#3B567A]"
+            onClick={() => handleFilterClick("week")}
+            className={`py-2 px-4 rounded-lg transition ease-in-out ${
+              selectedFilter === "week"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             This Week ({thisWeekCount})
           </button>
+
           <button
-            onClick={() => fetchEvents("month")}
-            className="bg-[#2C7A7B] text-white py-2 px-4 rounded-lg hover:bg-[#3E9696]"
+            onClick={() => handleFilterClick("month")}
+            className={`py-2 px-4 rounded-lg transition ease-in-out ${
+              selectedFilter === "month"
+                ? "bg-green-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             This Month ({thisMonthCount})
           </button>
+
           <button
-            onClick={() => fetchEvents("all")}
-            className="bg-[#805AD5] text-white py-2 px-4 rounded-lg hover:bg-[#9D7DE5]"
+            onClick={() => handleFilterClick("all")}
+            className={`py-2 px-4 rounded-lg transition ease-in-out ${
+              selectedFilter === "all"
+                ? "bg-purple-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             All Events ({allEventsCount})
           </button>
+
           <button
-            onClick={() => fetchEvents("upcoming")}
-            className="bg-[#4A5568] text-white py-2 px-4 rounded-lg hover:bg-[#5A6678]"
+            onClick={() => handleFilterClick("upcoming")}
+            className={`py-2 px-4 rounded-lg transition ease-in-out ${
+              selectedFilter === "upcoming"
+                ? "bg-gray-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             Your Upcoming Events ({upcomingEventsCount})
           </button>
