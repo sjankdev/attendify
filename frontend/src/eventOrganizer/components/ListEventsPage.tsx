@@ -28,7 +28,7 @@ const ListEventsPage: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
   const [expandedFeedbacks, setExpandedFeedbacks] = useState<{
     [eventId: number]: boolean;
-  }>({}); // Add state to manage feedback expansion
+  }>({}); 
   const [showAccepted, setShowAccepted] = useState<{
     [eventId: number]: boolean;
   }>({});
