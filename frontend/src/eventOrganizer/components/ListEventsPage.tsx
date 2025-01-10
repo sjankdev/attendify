@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import {
+  CalendarIcon,
+  ListBulletIcon,
+  BuildingOfficeIcon,
+  BuildingLibraryIcon,
+  UsersIcon,
+  MapPinIcon,
+  CheckCircleIcon
+} from "@heroicons/react/24/outline";
 import {
   fetchEventsWithParticipants,
   deleteEvent,
@@ -172,6 +180,7 @@ const ListEventsPage: React.FC = () => {
             onClick={() => setFilter("week")}
             className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
           >
+            <CalendarIcon className="w-5 h-5 mr-2 inline" />
             This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek}{" "}
             Accepted)
           </button>
@@ -179,6 +188,7 @@ const ListEventsPage: React.FC = () => {
             onClick={() => setFilter("month")}
             className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500"
           >
+            <CalendarIcon className="w-5 h-5 mr-2 inline" />
             This Month ({counts.thisMonth} Events,{" "}
             {acceptedParticipants.thisMonth} Accepted)
           </button>
@@ -186,6 +196,7 @@ const ListEventsPage: React.FC = () => {
             onClick={() => setFilter("")}
             className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
           >
+            <ListBulletIcon className="w-5 h-5 mr-2 inline" />
             All Events ({counts.allEvents} Events,{" "}
             {acceptedParticipants.allEvents} Accepted)
           </button>
@@ -204,6 +215,7 @@ const ListEventsPage: React.FC = () => {
                   : "bg-[#313030] text-gray-300 hover:bg-gray-500"
               }`}
             >
+              <BuildingLibraryIcon className="w-5 h-5 mr-2 inline" />
               All Departments
             </button>
             {departments.map((department) => (
@@ -216,6 +228,7 @@ const ListEventsPage: React.FC = () => {
                     : "bg-[#313030] text-gray-300 hover:bg-gray-500"
                 }`}
               >
+                <BuildingOfficeIcon className="w-5 h-5 mr-2 inline" />
                 {department.name}
               </button>
             ))}
@@ -252,38 +265,47 @@ const ListEventsPage: React.FC = () => {
                 )}
 
                 <div className="mt-4 space-y-2 text-gray-300">
-                  <p>
+                  <p className="flex items-center">
+                    <MapPinIcon className="w-5 h-5 mr-2" />
                     <strong>Location:</strong> {event.location}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-2" />
                     <strong>Date:</strong>{" "}
                     {new Date(event.eventStartDate).toLocaleString()}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-2" />
                     <strong>End Date:</strong>{" "}
                     {new Date(event.eventEndDate).toLocaleString()}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-2" />
                     <strong>Join Deadline:</strong>{" "}
                     {event.joinDeadline
                       ? new Date(event.joinDeadline).toLocaleString()
                       : "N/A"}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <UsersIcon className="w-5 h-5 mr-2" />
                     <strong>Available Seats:</strong>{" "}
                     {event.attendeeLimit === null
                       ? `${event.acceptedParticipants}/no limit`
                       : `${event.acceptedParticipants}/${event.attendeeLimit}`}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <UsersIcon className="w-5 h-5 mr-2" />
                     <strong>Pending Requests:</strong> {event.pendingRequests}
                   </p>
-                  <p>
+                  <p className="flex items-center">
+                    <CheckCircleIcon className="w-5 h-5 mr-2" />
                     <strong>Available for All Departments:</strong>{" "}
                     {event.availableForAllDepartments ? "Yes" : "No"}
                   </p>
+
                   {event.departments && event.departments.length > 0 && (
-                    <p>
+                    <p className="flex items-center">
+                      <BuildingOfficeIcon className="w-5 h-5 mr-2" />
                       <strong>Departments:</strong>{" "}
                       {event.departments.map((dept, index) => (
                         <span key={index}>
@@ -293,9 +315,11 @@ const ListEventsPage: React.FC = () => {
                       ))}
                     </p>
                   )}
+
                   {event.agendaItems.length > 0 && (
                     <div className="mt-6 bg-[#313030] p-4 rounded-lg shadow-lg">
-                      <h4 className="text-lg font-semibold text-white">
+                      <h4 className="text-lg font-semibold text-white flex items-center">
+                        <ListBulletIcon className="w-5 h-5 mr-2" />
                         Agenda:
                       </h4>
                       <ul className="space-y-4 mt-4">
