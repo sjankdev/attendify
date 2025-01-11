@@ -3,7 +3,7 @@ import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
 import { useNavigate } from "react-router-dom";
-
+import { FaUsers, FaUserCheck, FaCalendarAlt } from "react-icons/fa";
 const CompanyParticipantsPage: React.FC = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,38 +49,54 @@ const CompanyParticipantsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#151515] rounded-lg shadow-lg max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Participants from Your Company
+      <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto">
+        <h2 className="text-3xl font-semibold text-white mb-6">
+          Company Participants Dashboard
         </h2>
 
         <p className="text-lg text-gray-300 mb-6">
-          Welcome to the company participants dashboard. Here you can view and
-          manage participants who have joined events hosted by your company. You
-          can also track their participation and engagement levels.
+          Here you can view and manage participants, track their engagement, and
+          see the events they have joined.
         </p>
 
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-white">Overview</h3>
-          <div className="grid grid-cols-3 gap-4 text-gray-300">
-            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
-              <h4 className="text-lg font-medium">Total Participants</h4>
-              <p className="text-2xl font-bold">{participants.length}</p>
+        <div className="mb-8">
+          <h3 className="text-2xl font-semibold text-white mb-4">Overview</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white">
+            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center space-x-4">
+                <FaUsers className="text-teal-500 text-3xl" />
+                <div>
+                  <h4 className="text-xl font-medium">Total Participants</h4>
+                  <p className="text-2xl font-semibold">
+                    {participants.length}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
-              <h4 className="text-lg font-medium">Active Participants</h4>
-              <p className="text-2xl font-bold">
-                {participants.filter((p) => p.joinedEventCount > 0).length}
-              </p>
+            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center space-x-4">
+                <FaUserCheck className="text-teal-500 text-3xl" />
+                <div>
+                  <h4 className="text-xl font-medium">Active Participants</h4>
+                  <p className="text-2xl font-semibold">
+                    {participants.filter((p) => p.joinedEventCount > 0).length}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="p-4 bg-[#313030] rounded-lg shadow-sm">
-              <h4 className="text-lg font-medium">Total Events</h4>
-              <p className="text-2xl font-bold">
-                {participants.reduce(
-                  (acc, participant) => acc + participant.joinedEventCount,
-                  0
-                )}
-              </p>
+            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center space-x-4">
+                <FaCalendarAlt className="text-teal-500 text-3xl" />
+                <div>
+                  <h4 className="text-xl font-medium">Total Events</h4>
+                  <p className="text-2xl font-semibold">
+                    {participants.reduce(
+                      (acc, participant) => acc + participant.joinedEventCount,
+                      0
+                    )}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -90,49 +106,50 @@ const CompanyParticipantsPage: React.FC = () => {
             No participants found for your company.
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {participants.map((participant) => (
-              <div
-                key={participant.participantId}
-                className="bg-[#313030] p-4 rounded-lg shadow-sm hover:bg-[#3a3a3a] transition-colors"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xl font-medium text-white">
-                      {participant.participantName}
-                    </h3>
-                    <p className="text-gray-300">
-                      {participant.participantEmail}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Department: {participant.departmentName}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Events Joined: {participant.joinedEventCount}
-                    </p>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {participants.map((participant) => (
+                <div
+                  key={participant.participantId}
+                  className="bg-[#2A2A2A] p-6 rounded-lg shadow-md hover:bg-[#333333] hover:shadow-xl transition-all"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xl font-semibold text-white">
+                        {participant.participantName}
+                      </h3>
+                      <p className="text-gray-300">
+                        {participant.participantEmail}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Department: {participant.departmentName}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Events Joined: {participant.joinedEventCount}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <ul className="mt-4 space-y-2">
-                  {participant.eventLinks.map((link, index) => (
-                    <li key={index}>
-                      <a
-                        href={`/event-details/${link.split("/").pop()}`}
-                        className="text-teal-500 hover:underline"
-                      >
-                        Event {index + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                  <ul className="mt-4 space-y-2">
+                    {participant.eventLinks.map((link, index) => (
+                      <li key={index}>
+                        <a
+                          href={`/event-details/${link.split("/").pop()}`}
+                          className="text-teal-500 hover:underline"
+                        >
+                          Event {index + 1}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         )}
-
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
-            className="bg-teal-500 text-white py-2 px-6 rounded-full hover:bg-teal-600 transition-all"
+            className="bg-teal-500 text-white py-3 px-8 rounded-full hover:bg-teal-600 transition-all"
             onClick={() => navigate("/event-organizer/invitations")}
           >
             Invite More Participants
