@@ -6,20 +6,20 @@
 ---
 
 ## Features 🚀  
+
 ### For Organizers:  
-- **Event Management**: Create, update, delete, and manage events.  
-- **Participant Insights**: View participants who joined your events.  
-- **Account Setup**:  
-  - Register through a form and verify your email upon registration.  
-  - Add company information during registration.  
+- **Company Management**: Register a company, add company details, and create departments within the company.  
+- **Event Management**: Create, update, or delete events with details like agenda items, participant limits, and department-specific access.  
+- **Join Approval**: Approve or reject participant requests for events.  
+- **Event Statistics**: View detailed statistics on events, including participant counts, feedback ratings, and graphs with demographic data such as age, occupation, gender, education level, and years of experience.  
+- **Invite Employees**: Send email invitations to employees to join the platform, and assign them to specific departments. Bulk invitations are supported.  
+- **Participant Dashboard**: View all participants within the company, their details, and the events they are attending.  
+- **Department Overview**: See all departments, manage employees within them, and create new departments.
 
 ### For Participants:  
-- **Invitation-Only Access**:  
-  - Join the platform via an email invite sent by the organizer.  
-  - Complete registration through the provided invite link.  
-- **Event Interaction**:  
-  - View events from your associated company.  
-  - Join events, track deadlines, check available seats, and more.  
+- **Receive Invitations**: Get invited via email by an organizer to join events.  
+- **Event Participation**: View and join company events, track deadlines, and available seats.  
+- **Feedback**: Leave ratings and feedback for events you attended.
 
 ---
 
