@@ -49,7 +49,7 @@ const CreateEventPage: React.FC = () => {
     const fetchOrganizerDetails = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,7 +68,7 @@ const CreateEventPage: React.FC = () => {
     const fetchDepartments = async (companyId: number) => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/companies/${companyId}/departments`,
+          `https://attendify-backend-el2r.onrender.com/api/companies/${companyId}/departments`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -138,7 +138,7 @@ const CreateEventPage: React.FC = () => {
       };
 
       await axios.post(
-        "http://localhost:8080/api/auth/event-organizer/create-event",
+        "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/create-event",
         eventData,
         {
           headers: {
