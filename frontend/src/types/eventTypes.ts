@@ -5,6 +5,17 @@ export interface AgendaItemDTO {
   endTime: string;
 }
 
+export interface FeedbackDTO {
+  participantName: string;
+  rating: number;
+  comments: string;
+}
+
+export interface FeedbackSummaryDTO {
+  feedbacks: FeedbackDTO[];
+  averageRating: number;
+}
+
 export interface Event {
   id: number;
   name: string;
@@ -22,16 +33,26 @@ export interface Event {
   agendaItems: AgendaItemDTO[];
   pendingRequests: number;
   acceptedParticipants: number;
+  availableForAllDepartments: boolean; 
+  departments: DepartmentDTO[]; 
+  feedbacks?: FeedbackDTO[];
 }
 
+export interface DepartmentDTO {
+  id: number;
+  name: string;
+  participants: Participant[];
+  events: Event[]; 
+}
 
 export interface Participant {
   participantId: number;
   participantName: string;
   participantEmail: string;
   status: string;
-  joinedEventCount: number; 
-  eventLinks: string[];    
+  joinedEventCount: number;
+  eventLinks: string[];
+  departmentName: string; 
 }
 
 export interface OccupationStatsDTO {
@@ -51,6 +72,7 @@ export interface EventStatistics {
   lowestExperience: number;
   educationLevelStats: Record<string, OccupationStatsDTO>;
   occupationStats: Record<string, OccupationStatsDTO>; 
+  departmentStats: Record<string, number>; 
 }
 
 export interface CreateEventDto {

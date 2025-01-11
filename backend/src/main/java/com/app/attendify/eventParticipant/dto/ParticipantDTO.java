@@ -5,11 +5,13 @@ public class ParticipantDTO {
     private int id;
     private String participantName;
     private String participantEmail;
+    private String departmentName;
 
-    public ParticipantDTO(int id, String participantName, String participantEmail) {
+    public ParticipantDTO(int id, String participantName, String participantEmail, String departmentName) {
         this.id = id;
         this.participantName = participantName;
         this.participantEmail = participantEmail;
+        this.departmentName = departmentName;
     }
 
     public int getId() {
@@ -34,5 +36,13 @@ public class ParticipantDTO {
 
     public void setParticipantEmail(String participantEmail) {
         this.participantEmail = participantEmail;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 }

@@ -7,9 +7,7 @@ import {
 } from "react-router-dom";
 
 import Login from "./security/components/Login";
-import EventOrganizerRegister from "./security/components/EventOrganizerRegister";
 import EventOrganizerPage from "./eventOrganizer/components/EventOrganizerPage";
-import Homepage from "./public/Homepage";
 import EventParticipantPage from "./eventParticipant/components/EventParticipantPage";
 import EventParticipantRegister from "./security/components/EventParticipantRegister";
 import InvitationPage from "./eventOrganizer/components/InvitationPage";
@@ -19,19 +17,15 @@ import UpdateEventPage from "./eventOrganizer/components/UpdateEventPage";
 import CompanyParticipantsPage from "./eventOrganizer/components/CompanyParticipantsPage";
 import EventDetailsPage from "./eventOrganizer/components/EventDetailsPage";
 import EventStatisticsPage from "./eventOrganizer/components/EventStatisticsPage";
+import DepartmentsList from "./eventOrganizer/components/DepartmentsList";
 
 function App() {
   return (
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<Homepage />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/register-eventOrganizer"
-            element={<EventOrganizerRegister />}
-          />
           <Route path="/event-organizer" element={<EventOrganizerPage />} />
           <Route path="/event-participant" element={<EventParticipantPage />} />
           <Route
@@ -62,6 +56,10 @@ function App() {
           <Route
             path="/event-details/:eventId"
             element={<EventDetailsPage />}
+          />
+          <Route
+            path="/event-organizer/company-departments"
+            element={<DepartmentsList />}
           />
         </Routes>
       </div>

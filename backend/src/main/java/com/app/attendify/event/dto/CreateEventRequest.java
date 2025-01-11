@@ -43,6 +43,16 @@ public class CreateEventRequest {
 
     private List<AgendaItemRequest> agendaItems;
 
+    private List<Integer> departmentIds;
+
+    public List<Integer> getDepartmentIds() {
+        return departmentIds;
+    }
+
+    public void setDepartmentIds(List<Integer> departmentIds) {
+        this.departmentIds = departmentIds;
+    }
+
     public String getName() {
         return name;
     }

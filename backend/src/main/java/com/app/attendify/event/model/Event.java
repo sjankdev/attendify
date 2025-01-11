@@ -1,6 +1,7 @@
 package com.app.attendify.event.model;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,6 +56,19 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<AgendaItem> agendaItems = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "event_department", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "department_id"))
+    private List<Department> departments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks = new ArrayList<>();
+
+    private boolean feedbackSubmitted;
+
+    @Column(nullable = false)
+    private boolean availableForAllDepartments;
+
 
     public Integer getId() {
         return id;
@@ -176,6 +190,37 @@ public class Event {
     public Event setAgendaItems(List<AgendaItem> agendaItems) {
         this.agendaItems = agendaItems;
         return this;
+    }
+
+    public boolean isAvailableForAllDepartments() {
+        return availableForAllDepartments;
+    }
+
+    public boolean isFeedbackSubmitted() {
+        return feedbackSubmitted;
+    }
+
+    public void setFeedbackSubmitted(boolean feedbackSubmitted) {
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
+    }
+
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
     }
 
     public Integer getAvailableSlots() {

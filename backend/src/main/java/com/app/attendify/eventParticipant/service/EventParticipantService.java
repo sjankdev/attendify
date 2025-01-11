@@ -1,13 +1,17 @@
 package com.app.attendify.eventParticipant.service;
 
 import com.app.attendify.company.model.Company;
+import com.app.attendify.company.model.Department;
 import com.app.attendify.event.dto.AgendaItemDTO;
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
+import com.app.attendify.event.dto.FeedbackDTO;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
 import com.app.attendify.event.model.EventAttendance;
+import com.app.attendify.event.model.Feedback;
 import com.app.attendify.event.repository.EventRepository;
 import com.app.attendify.event.repository.EventAttendanceRepository;
+import com.app.attendify.event.repository.FeedbackRepository;
 import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
@@ -31,12 +35,14 @@ public class EventParticipantService {
     private final EventRepository eventRepository;
     private final EventAttendanceRepository eventAttendanceRepository;
     private final EventFilterUtil eventFilterUtil;
+    private final FeedbackRepository feedbackRepository;
 
-    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil) {
+    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil, FeedbackRepository feedbackRepository) {
         this.eventParticipantRepository = eventParticipantRepository;
         this.eventRepository = eventRepository;
         this.eventAttendanceRepository = eventAttendanceRepository;
         this.eventFilterUtil = eventFilterUtil;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @Transactional
@@ -49,7 +55,10 @@ public class EventParticipantService {
                 throw new RuntimeException("The participant does not belong to any company.");
             }
 
+            Department participantDepartment = eventParticipant.getDepartment();
             List<Event> events = eventRepository.findByCompany(participantCompany);
+
+            events = events.stream().filter(event -> event.isAvailableForAllDepartments() || event.getDepartments().contains(participantDepartment)).collect(Collectors.toList());
 
             List<EventForParticipantsDTO> eventForParticipantsDTOS = events.stream().map(event -> {
                 EventAttendance attendance = eventAttendanceRepository.findByParticipantIdAndEventId(eventParticipant.getId(), event.getId()).orElse(null);
@@ -62,22 +71,39 @@ public class EventParticipantService {
 
                 Integer pendingRequests = event.getPendingRequests();
 
+                List<String> departmentNames;
+                if (event.isAvailableForAllDepartments()) {
+                    departmentNames = List.of("All");
+                } else {
+                    departmentNames = event.getDepartments().stream().map(Department::getName).collect(Collectors.toList());
+                }
+
                 List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
 
-                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests);
+                boolean isFeedbackSubmitted = feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId());
+
+                FeedbackDTO feedbackDTO = null;
+                if (feedbackRepository.existsByEventIdAndParticipantId(event.getId(), eventParticipant.getId())) {
+                    feedbackDTO = getFeedbackForEvent(event.getId(), currentUserEmail);
+                }
+
+                return new EventForParticipantsDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getCompany() != null ? event.getCompany().getName() : "No company", event.getOrganizer() != null && event.getOrganizer().getUser() != null ? event.getOrganizer().getUser().getFullName() : "No organizer", availableSeats, event.getEventStartDate(), attendeeLimit, event.getJoinDeadline(), (int) acceptedParticipantsCount, event.isJoinApproval(), status, event.getEventEndDate(), agendaItems, pendingRequests, departmentNames, isFeedbackSubmitted, event.getEventEndDate().isBefore(LocalDateTime.now()), feedbackDTO);
             }).collect(Collectors.toList());
 
             int thisWeekCount = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS).size();
             int thisMonthCount = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS).size();
             int allEventsCount = eventForParticipantsDTOS.size();
+            int upcomingEventsCount = eventFilterUtil.filterUpcomingEventsForParticipant(eventForParticipantsDTOS).size();
 
             if ("week".equalsIgnoreCase(filterType)) {
                 eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentWeekForParticipant(eventForParticipantsDTOS);
             } else if ("month".equalsIgnoreCase(filterType)) {
                 eventForParticipantsDTOS = eventFilterUtil.filterEventsByCurrentMonthForParticipant(eventForParticipantsDTOS);
+            } else if ("upcoming".equalsIgnoreCase(filterType)) {
+                eventForParticipantsDTOS = eventFilterUtil.filterUpcomingEventsForParticipant(eventForParticipantsDTOS);
             }
 
-            return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount);
+            return new EventFilterSummaryForParticipantDTO(eventForParticipantsDTOS, thisWeekCount, thisMonthCount, allEventsCount, upcomingEventsCount);
 
         } catch (Exception e) {
             log.error("Error fetching events for participant", e);
@@ -130,6 +156,16 @@ public class EventParticipantService {
             throw new RuntimeException("You are not joined to this event.");
         }
 
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+            log.error("No event found with ID: {}", eventId);
+            return new RuntimeException("Event not found.");
+        });
+
+        if (event.getEventEndDate().isBefore(LocalDateTime.now())) {
+            log.warn("Event end date has passed. Cannot unjoin.");
+            throw new RuntimeException("You cannot unjoin this event as the end date has passed.");
+        }
+
         log.info("Participant with ID {} is confirmed to be joined to event ID {}", eventParticipant.getId(), eventId);
 
         eventAttendanceRepository.deleteByParticipantIdAndEventId(eventParticipant.getId(), eventId);
@@ -141,6 +177,49 @@ public class EventParticipantService {
         }
 
         log.info("Successfully removed association between Participant ID {} and Event ID {}", eventParticipant.getId(), eventId);
+    }
+
+    @Transactional
+    public void submitFeedback(Integer eventId, String userEmail, String comments, int rating) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (LocalDateTime.now().isBefore(event.getEventEndDate())) {
+            throw new RuntimeException("Feedback can only be submitted after the event has ended.");
+        }
+
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+
+        if (eventAttendanceRepository.findByParticipantIdAndEventId(participant.getId(), eventId).isEmpty()) {
+            throw new RuntimeException("You did not attend this event.");
+        }
+
+        Feedback feedback = new Feedback();
+        feedback.setEvent(event);
+        feedback.setParticipant(participant);
+        feedback.setComments(comments);
+        feedback.setRating(rating);
+
+        feedbackRepository.save(feedback);
+
+        event.setFeedbackSubmitted(true);
+        eventRepository.save(event);
+    }
+
+    @Transactional
+    public FeedbackDTO getFeedbackForEvent(Integer eventId, String userEmail) {
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+
+        Feedback feedback = feedbackRepository.findByEventIdAndParticipantId(eventId, participant.getId()).orElse(null);
+
+        if (feedback == null) {
+            return null;
+        }
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setComments(feedback.getComments());
+        feedbackDTO.setRating(feedback.getRating());
+
+        return feedbackDTO;
     }
 
 }

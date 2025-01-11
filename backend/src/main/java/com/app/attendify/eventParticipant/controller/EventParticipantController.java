@@ -1,7 +1,9 @@
 package com.app.attendify.eventParticipant.controller;
 
 import com.app.attendify.event.dto.EventFilterSummaryForParticipantDTO;
+import com.app.attendify.event.dto.FeedbackDTO;
 import com.app.attendify.eventParticipant.service.EventParticipantService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +38,36 @@ public class EventParticipantController {
         } catch (Exception e) {
             logger.error("Failed to fetch events for the participant", e);
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/feedback/{eventId}")
+    public ResponseEntity<FeedbackDTO> getEventFeedback(@PathVariable Integer eventId) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+
+            FeedbackDTO feedback = eventParticipantService.getFeedbackForEvent(eventId, currentUserEmail);
+
+            if (feedback == null) {
+                return ResponseEntity.status(204).body(null);
+            }
+
+            return ResponseEntity.ok(feedback);
+        } catch (Exception e) {
+            logger.error("Error while fetching feedback", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @PostMapping("/submit-feedback/{eventId}")
+    public ResponseEntity<String> submitFeedback(@PathVariable Integer eventId, @Valid @RequestBody FeedbackDTO feedbackDTO) {
+        try {
+            String currentUserEmail = getCurrentUserEmail();
+            eventParticipantService.submitFeedback(eventId, currentUserEmail, feedbackDTO.getComments(), feedbackDTO.getRating());
+            return ResponseEntity.ok("Feedback submitted successfully.");
+        } catch (Exception e) {
+            logger.error("Error while submitting feedback", e);
+            return ResponseEntity.status(500).body("Error while submitting feedback: " + e.getMessage());
         }
     }
 

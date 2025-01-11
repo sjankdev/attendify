@@ -1,5 +1,6 @@
 package com.app.attendify.company.model;
 
+import com.app.attendify.event.model.Event;
 import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import jakarta.persistence.*;
@@ -19,6 +20,28 @@ public class Department {
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
+
+    @OneToMany(mappedBy = "department")
+    private List<EventParticipant> participants;
+
+    @ManyToMany(mappedBy = "departments")
+    private List<Event> events;
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    public List<EventParticipant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<EventParticipant> participants) {
+        this.participants = participants;
+    }
 
     public Integer getId() {
         return id;

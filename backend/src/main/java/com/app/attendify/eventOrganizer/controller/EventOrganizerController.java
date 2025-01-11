@@ -1,5 +1,7 @@
 package com.app.attendify.eventOrganizer.controller;
 
+import com.app.attendify.company.dto.DepartmentDto;
+import com.app.attendify.company.services.CompanyService;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
@@ -8,6 +10,7 @@ import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.enums.Gender;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +28,11 @@ public class EventOrganizerController {
     private static final Logger logger = LoggerFactory.getLogger(EventOrganizerController.class);
 
     private final EventOrganizerService eventOrganizerService;
+    private final CompanyService companyService;
 
-    public EventOrganizerController(EventOrganizerService eventOrganizerService) {
+    public EventOrganizerController(EventOrganizerService eventOrganizerService, CompanyService companyService) {
         this.eventOrganizerService = eventOrganizerService;
+        this.companyService = companyService;
     }
 
     @GetMapping("/home")
@@ -39,7 +44,9 @@ public class EventOrganizerController {
     @PostMapping("/create-event")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody CreateEventRequest request) {
+        logger.info("Creating event with request: {}", request);
         Event event = eventOrganizerService.createEvent(request);
+        logger.info("Event created successfully: {}", event);
         return ResponseEntity.ok(event);
     }
 
@@ -57,9 +64,11 @@ public class EventOrganizerController {
 
     @GetMapping("/my-events")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(@RequestParam(required = false) String filter) {
+    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) List<Integer> departmentIds) {
         try {
-            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter);
+            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter, departmentIds);
             return ResponseEntity.ok(summary);
         } catch (Exception e) {
             logger.error("Error retrieving events", e);
@@ -122,6 +131,31 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/my-events/{eventId}/feedbacks")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<FeedbackOrganizerDTO>> getEventFeedbacks(@PathVariable int eventId) {
+        try {
+            List<FeedbackOrganizerDTO> feedbacks = eventOrganizerService.getFeedbacksByEvent(eventId);
+            return ResponseEntity.ok(feedbacks);
+        } catch (Exception e) {
+            logger.error("Error retrieving feedbacks for event", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/my-events/{eventId}/feedback-summary")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<FeedbackSummaryDTO> getEventFeedbackSummary(@PathVariable int eventId) {
+        try {
+            FeedbackSummaryDTO feedbackSummary = eventOrganizerService.getFeedbackSummaryByEvent(eventId);
+            return ResponseEntity.ok(feedbackSummary);
+        } catch (Exception e) {
+            logger.error("Error retrieving feedback summary for event", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+
     @GetMapping("/company/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {
@@ -143,6 +177,30 @@ public class EventOrganizerController {
         } catch (Exception e) {
             logger.error("Error retrieving event statistics for eventId: {}", eventId, e);
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/company/departments")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<List<DepartmentDto>> getDepartmentsByCompany() {
+        try {
+            List<DepartmentDto> departments = eventOrganizerService.getDepartmentsByCompany();
+            return ResponseEntity.ok(departments);
+        } catch (Exception e) {
+            logger.error("Error retrieving departments for organizer's company", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @PostMapping("/{companyId}/add-departments")
+    public ResponseEntity<Void> addDepartments(
+            @PathVariable Integer companyId,
+            @RequestBody List<String> departmentNames) {
+        try {
+            companyService.addDepartmentsToCompany(companyId, departmentNames);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

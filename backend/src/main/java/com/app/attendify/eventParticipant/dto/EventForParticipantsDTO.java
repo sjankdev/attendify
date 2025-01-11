@@ -1,6 +1,7 @@
 package com.app.attendify.eventParticipant.dto;
 
 import com.app.attendify.event.dto.AgendaItemDTO;
+import com.app.attendify.event.dto.FeedbackDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,14 @@ public class EventForParticipantsDTO {
 
     private Integer pendingRequests;
 
-    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests) {
+    private List<String> departmentNames;
+    private Boolean isFeedbackSubmitted;
+
+    private Boolean isEventOver;
+
+    private FeedbackDTO feedbackDTO;
+
+    public EventForParticipantsDTO(Integer id, String name, String description, String location, String companyName, String organizerName, Integer availableSeats, LocalDateTime eventStartDate, Integer attendeeLimit, LocalDateTime joinDeadline, Integer joinedParticipants, boolean joinApproval, String status, LocalDateTime eventEndDate, List<AgendaItemDTO> agendaItems, Integer pendingRequests, List<String> departmentNames, Boolean isFeedbackSubmitted, Boolean isEventOver, FeedbackDTO feedbackDTO) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,7 +54,10 @@ public class EventForParticipantsDTO {
         this.eventEndDate = eventEndDate;
         this.agendaItems = agendaItems;
         this.pendingRequests = pendingRequests;
-
+        this.departmentNames = departmentNames;
+        this.isFeedbackSubmitted = isFeedbackSubmitted;
+        this.isEventOver = isEventOver;
+        this.feedbackDTO = feedbackDTO;
     }
 
     public Integer getId() {
@@ -183,5 +194,37 @@ public class EventForParticipantsDTO {
 
     public void setPendingRequests(Integer pendingRequests) {
         this.pendingRequests = pendingRequests;
+    }
+
+    public List<String> getDepartmentNames() {
+        return departmentNames;
+    }
+
+    public void setDepartmentNames(List<String> departmentNames) {
+        this.departmentNames = departmentNames;
+    }
+
+    public Boolean getFeedbackSubmitted() {
+        return isFeedbackSubmitted;
+    }
+
+    public void setFeedbackSubmitted(Boolean feedbackSubmitted) {
+        isFeedbackSubmitted = feedbackSubmitted;
+    }
+
+    public Boolean getEventOver() {
+        return isEventOver;
+    }
+
+    public void setEventOver(Boolean eventOver) {
+        isEventOver = eventOver;
+    }
+
+    public FeedbackDTO getFeedbackDTO() {
+        return feedbackDTO;
+    }
+
+    public void setFeedbackDTO(FeedbackDTO feedbackDTO) {
+        this.feedbackDTO = feedbackDTO;
     }
 }

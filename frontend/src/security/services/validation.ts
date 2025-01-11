@@ -118,48 +118,61 @@ export const validateEventForm = (
   formData: CreateEventDto,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
   agendaItems: AgendaItemDTO[],
+  isAgendaVisible: boolean,
   isAttendeeLimitChecked: boolean,
   attendeeLimit: number | null,
   eventStartDate: string,
   eventEndDate: string,
   joinDeadline: string | null
 ): boolean => {
+  console.log("Validating event form...");
+  console.log("Agenda items:", agendaItems);
+  console.log("Is agenda visible:", isAgendaVisible);
+
   if (!formData.name || formData.name.length < 10) {
+    console.log("Event name is too short:", formData.name);
     setError("Event name must be at least 10 characters long.");
     return false;
   }
 
   if (!formData.description || formData.description.length < 50) {
+    console.log("Description is too short:", formData.description);
     setError("Description must be at least 50 characters long.");
     return false;
   }
 
   if (!formData.location || formData.location.length < 5) {
+    console.log("Location is too short:", formData.location);
     setError("Location must be at least 5 characters long.");
     return false;
   }
 
   if (formData.attendeeLimit !== null && formData.attendeeLimit < 1) {
+    console.log("Attendee limit is invalid:", formData.attendeeLimit);
     setError("Attendee limit must be at least 1.");
     return false;
   }
 
   if (!formData.organizerId) {
+    console.log("Organizer ID is missing.");
     setError("Organizer ID is required.");
     return false;
   }
 
   if (!eventStartDate || !eventEndDate) {
+    console.log("Event start or end date is missing.");
     setError("Event start and end dates are required.");
     return false;
   }
 
   if (joinDeadline === null || joinDeadline.trim() === "") {
+    console.log("Join deadline is missing or empty.");
     setError("Join deadline is required.");
     return false;
   }
 
   const validateDates = (): boolean => {
+    console.log("Validating event dates...");
     const errors: string[] = [];
     const eventStart = new Date(eventStartDate);
     const eventEnd = new Date(eventEndDate);
@@ -184,56 +197,57 @@ export const validateEventForm = (
       errors.push("Join deadline must be before the event start date.");
     }
 
-    agendaItems.forEach((item, index) => {
-      const start = new Date(item.startTime);
-      const end = new Date(item.endTime);
-
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        errors.push(`Agenda item ${index + 1}: Invalid start or end time.`);
-      } else {
-        if (start < eventStart || end > eventEnd) {
-          errors.push(
-            `Agenda item ${index + 1}: Times must be within event duration.`
-          );
-        }
-
-        if (start >= end) {
-          errors.push(
-            `Agenda item ${index + 1}: Start time must be before end time.`
-          );
-        }
-      }
-    });
+    console.log("Date validation errors:", errors);
 
     setError(errors.length > 0 ? errors[0] : null);
     return errors.length === 0;
   };
 
   const validateAgendaItems = (): boolean => {
+    if (!isAgendaVisible || agendaItems.length === 0) {
+      console.log("No agenda items to validate or agenda not visible.");
+      return true;
+    }
+  
+    console.log("Validating agenda items...");
     const errors: string[] = [];
-
+    
+    const eventStartDateTime = new Date(eventStartDate).getTime();
+    const eventEndDateTime = new Date(eventEndDate).getTime();
+  
     for (let i = 0; i < agendaItems.length; i++) {
       const item = agendaItems[i];
+      
       if (!item.title || item.title.trim().length < 10) {
-        errors.push(
-          `Agenda item ${i + 1}: Title must be at least 10 characters long.`
-        );
+        errors.push(`Agenda item ${i + 1}: Title must be at least 10 characters long.`);
       }
+  
       if (!item.description || item.description.trim().length < 50) {
-        errors.push(
-          `Agenda item ${
-            i + 1
-          }: Description must be at least 50 characters long.`
-        );
+        errors.push(`Agenda item ${i + 1}: Description must be at least 50 characters long.`);
+      }
+  
+      const agendaStartTime = new Date(item.startTime).getTime();
+      const agendaEndTime = new Date(item.endTime).getTime();
+  
+      if (agendaStartTime >= agendaEndTime) {
+        errors.push(`Agenda item ${i + 1}: Start time must be before end time.`);
+      }
+  
+      if (agendaStartTime < eventStartDateTime || agendaEndTime > eventEndDateTime) {
+        errors.push(`Agenda item ${i + 1}: Agenda start and end time must be within the event duration.`);
       }
     }
-
+  
+    console.log("Agenda validation errors:", errors);
+  
     if (errors.length > 0) {
-      setError(errors[0]);
+      setError(errors[0]); 
       return false;
     }
-    return true;
+  
+    return validateDates();
   };
+  
 
   return validateDates() && validateAgendaItems();
 };

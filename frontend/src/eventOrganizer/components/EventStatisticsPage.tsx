@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Bar, Pie } from "react-chartjs-2";
 import { fetchEventStatistics } from "../services/eventOrganizerService";
-import Layout from "../../shared/components/Layout";
+import Layout from "../../shared/components/EventOrganizerLayout";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -132,6 +132,33 @@ const EventStatisticsPage: React.FC = () => {
         borderWidth: 1,
       },
     ],
+  };
+
+  const departmentData = {
+    labels: Object.keys(stats.departmentStats || {}),
+    datasets: [
+      {
+        label: "Participants per Department",
+        data: Object.values(stats.departmentStats || {}),
+        backgroundColor: "#34d399",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const departmentChartOptions = {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem: any) => {
+            const department = tooltipItem.label || "";
+            const participants = tooltipItem.raw || 0;
+            return `${department}: ${participants}`;
+          },
+        },
+      },
+    },
   };
 
   const formatLabel = (label: string) => {
@@ -307,6 +334,22 @@ const EventStatisticsPage: React.FC = () => {
                 options={occupationChartOptions}
               />
             </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              Participants per Department
+            </h3>
+
+            {Object.keys(stats.departmentStats || {}).length > 1 ? (
+              <div className="w-3/4 mx-auto">
+                <Bar data={departmentData} options={departmentChartOptions} />
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">
+                Stats are not available since only one department is
+                participating in this event.
+              </p>
+            )}
           </div>
         </div>
       </div>
