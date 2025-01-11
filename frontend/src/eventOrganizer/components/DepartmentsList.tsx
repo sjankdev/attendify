@@ -6,6 +6,7 @@ import {
 import { DepartmentDTO } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
 import axios from "axios";
+import { FaUsers, FaCalendarAlt, FaPlusCircle } from "react-icons/fa";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<DepartmentDTO[]>([]);
@@ -77,8 +78,8 @@ const DepartmentsList: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto p-6 bg-[#151515] rounded-lg shadow-lg space-y-6">
-        <h2 className="text-3xl font-semibold text-center text-white">
+      <div className="max-w-6xl mx-auto p-8 bg-[#101010] rounded-lg shadow-xl space-y-6">
+        <h2 className="text-3xl font-semibold text-center text-white mb-4">
           Departments
         </h2>
 
@@ -91,14 +92,15 @@ const DepartmentsList: React.FC = () => {
         <div className="flex justify-center gap-4">
           <button
             onClick={() => setIsAddingDepartments(!isAddingDepartments)}
-            className="w-40 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500"
+            className="w-44 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500 transition-all"
           >
-            {isAddingDepartments ? "Cancel" : "Add New Departments"}
+            <FaPlusCircle className="inline mr-2" />
+            {isAddingDepartments ? "Cancel" : "Add New Department"}
           </button>
         </div>
 
         {isAddingDepartments && (
-          <div className="space-y-4">
+          <div className="space-y-4 mt-6">
             <input
               type="text"
               value={newDepartmentNames.join(",")}
@@ -108,18 +110,18 @@ const DepartmentsList: React.FC = () => {
             />
             <button
               onClick={handleAddDepartments}
-              className="w-full px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500"
+              className="w-full px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500 transition-all"
             >
               Add Departments
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {departments.map((department) => (
             <div
               key={department.id}
-              className="p-6 bg-[#313030] rounded-lg shadow-md space-y-4 max-w-[400px] w-full"
+              className="p-6 bg-[#313030] rounded-lg shadow-md space-y-4 max-w-[400px] w-full hover:shadow-xl hover:bg-[#424242] transition-all"
             >
               <h3 className="text-2xl font-semibold text-white">
                 {department.name}
@@ -127,6 +129,7 @@ const DepartmentsList: React.FC = () => {
 
               <div>
                 <h4 className="text-lg font-semibold text-gray-300 mb-2">
+                  <FaUsers className="inline mr-2" />
                   Participants:
                 </h4>
                 {department.participants &&
@@ -135,7 +138,7 @@ const DepartmentsList: React.FC = () => {
                     {department.participants.map((participant) => (
                       <li
                         key={participant.participantId}
-                        className="p-2 bg-[#4a4a4a] border rounded-md"
+                        className="p-2 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition-all"
                       >
                         <span>{participant.participantName}</span>
                         <span className="text-sm text-gray-300">
@@ -151,6 +154,7 @@ const DepartmentsList: React.FC = () => {
 
               <div>
                 <h4 className="text-lg font-semibold text-gray-300 mb-2">
+                  <FaCalendarAlt className="inline mr-2" />
                   Events:
                 </h4>
                 {department.events && department.events.length > 0 ? (
@@ -158,7 +162,7 @@ const DepartmentsList: React.FC = () => {
                     {department.events.map((event) => (
                       <li
                         key={event.id}
-                        className="p-4 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition duration-200"
+                        className="p-4 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition-all"
                       >
                         <h5 className="text-xl font-semibold text-white">
                           {event.name}
