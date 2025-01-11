@@ -352,51 +352,74 @@ const ListEventsPage: React.FC = () => {
                   </button>
                 )}
 
-                <div className="mt-4 border-t border-gray-600 pt-4">
-                  <h4 className="text-lg font-semibold text-white">
+                <div className="mt-6 border-t border-gray-600 pt-6">
+                  <h4 className="text-xl font-semibold text-white mb-4">
                     Event Details
                   </h4>
-                  <div className="space-y-4 text-gray-300 mt-4">
-                    <p className="flex items-center">
-                      <MapPinIcon className="w-5 h-5 mr-2" />
-                      <strong>Location:</strong> {event.location}
-                    </p>
-                    <p className="flex items-center">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      <strong>Date:</strong>{" "}
-                      {new Date(event.eventStartDate).toLocaleString()}
-                    </p>
-                    <p className="flex items-center">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      <strong>End Date:</strong>{" "}
-                      {new Date(event.eventEndDate).toLocaleString()}
-                    </p>
-                    <p className="flex items-center">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      <strong>Join Deadline:</strong>{" "}
-                      {event.joinDeadline
-                        ? new Date(event.joinDeadline).toLocaleString()
-                        : "N/A"}
-                    </p>
-                    <p className="flex items-center">
-                      <UsersIcon className="w-5 h-5 mr-2" />
-                      <strong>Available Seats:</strong>{" "}
-                      {event.attendeeLimit === null
-                        ? `${event.acceptedParticipants}/no limit`
-                        : `${event.acceptedParticipants}/${event.attendeeLimit}`}
-                    </p>
-                    <p className="flex items-center">
-                      <UsersIcon className="w-5 h-5 mr-2" />
-                      <strong>Pending Requests:</strong> {event.pendingRequests}
-                    </p>
-                    <p className="flex items-center">
-                      <CheckCircleIcon className="w-5 h-5 mr-2" />
-                      <strong>Available for All Departments:</strong>{" "}
-                      {event.availableForAllDepartments ? "Yes" : "No"}
-                    </p>
+                  <div className="space-y-6 text-gray-300">
+                    <div className="space-y-4">
+                      <p className="flex items-center space-x-3">
+                        <MapPinIcon className="w-6 h-6 text-blue-500" />
+                        <strong className="text-sm">Location:</strong>{" "}
+                        <span>{event.location}</span>
+                      </p>
+                    </div>
+                    <hr className="border-t border-gray-700" />
+
+                    <div className="space-y-4">
+                      <p className="flex items-center space-x-3">
+                        <CalendarIcon className="w-6 h-6 text-green-500" />
+                        <strong className="text-sm">Start Date:</strong>
+                        <span>
+                          {new Date(event.eventStartDate).toLocaleString()}
+                        </span>
+                      </p>
+                      <p className="flex items-center space-x-3">
+                        <CalendarIcon className="w-6 h-6 text-red-500" />
+                        <strong className="text-sm">End Date:</strong>
+                        <span>
+                          {new Date(event.eventEndDate).toLocaleString()}
+                        </span>
+                      </p>
+                      <p className="flex items-center space-x-3">
+                        <CalendarIcon className="w-6 h-6 text-yellow-500" />
+                        <strong className="text-sm">Join Deadline:</strong>
+                        <span>
+                          {event.joinDeadline
+                            ? new Date(event.joinDeadline).toLocaleString()
+                            : "No deadline"}
+                        </span>
+                      </p>
+                    </div>
+                    <hr className="border-t border-gray-700" />
+
+                    <div className="space-y-4">
+                      <p className="flex items-center space-x-3">
+                        <UsersIcon className="w-6 h-6 text-purple-500" />
+                        <strong className="text-sm">Available Seats:</strong>
+                        <span>
+                          {event.attendeeLimit === null
+                            ? `${event.acceptedParticipants}/no limit`
+                            : `${event.acceptedParticipants}/${event.attendeeLimit}`}
+                        </span>
+                      </p>
+                      <p className="flex items-center space-x-3">
+                        <UsersIcon className="w-6 h-6 text-orange-500" />
+                        <strong className="text-sm">Pending Requests:</strong>
+                        <span>{event.pendingRequests}</span>
+                      </p>
+                      <p className="flex items-center space-x-3">
+                        <CheckCircleIcon className="w-6 h-6 text-teal-500" />
+                        <strong className="text-sm">
+                          Available for All Departments:
+                        </strong>
+                        <span>
+                          {event.availableForAllDepartments ? "Yes" : "No"}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
-
                 {event.departments && event.departments.length > 0 && (
                   <div className="mt-6 border-t border-gray-600 pt-4">
                     <h4 className="text-lg font-semibold text-white">
