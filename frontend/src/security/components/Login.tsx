@@ -18,6 +18,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showSignUp, setShowSignUp] = useState<boolean>(false);
   const [errorFields, setErrorFields] = useState<{ [key: string]: string }>({});
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -117,7 +118,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setRegisterError(null);
     setSuccess(null);
 
     const errors = validateFormOrganizerRegistration(formData);
@@ -138,14 +139,14 @@ const Login: React.FC = () => {
       if (error.response && error.response.data) {
         const errorMessages = error.response.data;
         if (errorMessages.includes("Email already exists")) {
-          setError(
+          setRegisterError(
             "This email is already registered. Please use a different email."
           );
         } else {
-          setError(errorMessages.join(", "));
+          setRegisterError(errorMessages.join(", "));
         }
       } else {
-        setError("Registration failed");
+        setRegisterError("Registration failed");
       }
     }
   };
