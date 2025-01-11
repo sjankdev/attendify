@@ -7,18 +7,29 @@ export interface RegisterUserDto {
   role: string;
   companyName: string;
   companyDescription: string;
-  departmentNames: string[]; 
+  departmentNames: string[];
 }
 
-  export interface RegisterParticipantDto {
-    name: string;
-    email: string;
-    password: string;
-    token: string;
-    age: number | null;
-    yearsOfExperience: number | null;
-    gender: Gender | null; 
-    educationLevel: EducationLevel | null;
-    occupation: Occupation | null; 
-  }
-  
+export interface RegisterParticipantDto {
+  name: string;
+  email: string;
+  password: string;
+  token: string;
+  age: number | null;
+  yearsOfExperience: number | null;
+  gender: Gender | null;
+  educationLevel: EducationLevel | null;
+  occupation: Occupation | null;
+}
+
+export interface FieldErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  age?: string;
+  yearsOfExperience?: string;
+  token?: string;
+  gender?: string;
+  educationLevel?: string;
+  occupation?: string;
+}

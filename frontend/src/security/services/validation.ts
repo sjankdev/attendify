@@ -1,6 +1,10 @@
 import { EducationLevel, Gender, Occupation } from "../../types/Enums";
 import { AgendaItemDTO, CreateEventDto } from "../../types/eventTypes";
-import { RegisterParticipantDto, RegisterUserDto } from "../../types/userTypes";
+import {
+  FieldErrors,
+  RegisterParticipantDto,
+  RegisterUserDto,
+} from "../../types/userTypes";
 
 export const validateFormOrganizerRegistration = (
   formData: RegisterUserDto
@@ -50,8 +54,11 @@ export const validateFormOrganizerRegistration = (
 
 export const validateFormParticipantRegistration = (
   formData: RegisterParticipantDto,
-  setError: React.Dispatch<React.SetStateAction<string | null>>
+  setError: React.Dispatch<React.SetStateAction<string | null>>,
+  setFieldErrors: React.Dispatch<React.SetStateAction<FieldErrors>>
 ): boolean => {
+  setFieldErrors({});
+
   if (
     !formData.name ||
     !formData.email ||
@@ -68,48 +75,75 @@ export const validateFormParticipantRegistration = (
   }
 
   if (formData.name.length < 8) {
-    setError("Full Name must be at least 8 characters long");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      name: "Full Name must be at least 8 characters long",
+    }));
     return false;
   }
 
   if (formData.password.length < 8) {
-    setError("Password must be at least 8 characters long");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      password: "Password must be at least 8 characters long",
+    }));
     return false;
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(formData.email)) {
-    setError("Invalid email format");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      email: "Invalid email format",
+    }));
     return false;
   }
 
   if (formData.age <= 0 || formData.age < 16) {
-    setError("Age must be 16 or above and a positive number");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      age: "Age must be 16 or above and a positive number",
+    }));
     return false;
   }
 
   if (formData.yearsOfExperience == null || formData.yearsOfExperience < 0) {
-    setError("Years of Experience cannot be negative or null");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      yearsOfExperience: "Years of Experience cannot be negative or null",
+    }));
     return false;
   }
 
   if (!formData.token) {
-    setError("Token cannot be empty");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      token: "Token cannot be empty",
+    }));
     return false;
   }
 
   if (!Object.values(Gender).includes(formData.gender)) {
-    setError("Invalid gender selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      gender: "Invalid gender selection",
+    }));
     return false;
   }
 
   if (!Object.values(EducationLevel).includes(formData.educationLevel)) {
-    setError("Invalid education level selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      educationLevel: "Invalid education level selection",
+    }));
     return false;
   }
 
   if (!Object.values(Occupation).includes(formData.occupation)) {
-    setError("Invalid occupation selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      occupation: "Invalid occupation selection",
+    }));
     return false;
   }
 
