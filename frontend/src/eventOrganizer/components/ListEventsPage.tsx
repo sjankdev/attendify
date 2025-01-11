@@ -5,11 +5,13 @@ import {
   CalendarIcon,
   ListBulletIcon,
   BuildingOfficeIcon,
-  BuildingLibraryIcon,
   UsersIcon,
   MapPinIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
+
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+
 import {
   fetchEventsWithParticipants,
   deleteEvent,
@@ -209,6 +211,27 @@ const ListEventsPage: React.FC = () => {
       ...prev,
       [eventId]: !prev[eventId],
     }));
+  };
+
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <>
+        {[...Array(fullStars)].map((_, i) => (
+          <FaStar key={`full-${i}`} className="text-yellow-400 inline-block" />
+        ))}
+        {halfStar && <FaStarHalfAlt className="text-yellow-400 inline-block" />}
+        {[...Array(emptyStars)].map((_, i) => (
+          <FaRegStar
+            key={`empty-${i}`}
+            className="text-yellow-400 inline-block"
+          />
+        ))}
+      </>
+    );
   };
 
   return (
@@ -529,11 +552,11 @@ const ListEventsPage: React.FC = () => {
 
                 <div className="mt-6 border-t border-gray-600 pt-4">
                   <h4 className="text-lg font-semibold text-white">
-                    Feedback:
+                    Feedbacks:
                   </h4>
                   <p className="text-gray-300 mt-1">
                     <strong>Average Rating:</strong>{" "}
-                    {averageRatings[event.id]?.toFixed(2)} / 5
+                    {renderStars(averageRatings[event.id] || 0)}
                   </p>
                   <button
                     onClick={() => toggleFeedback(event.id)}
@@ -556,7 +579,8 @@ const ListEventsPage: React.FC = () => {
                               {feedback.comments}
                             </p>
                             <p className="text-sm text-gray-400 mt-2">
-                              <strong>Rating:</strong> {feedback.rating} / 5
+                              <strong>Rating:</strong>{" "}
+                              {renderStars(feedback.rating)}
                             </p>
                             <p className="text-sm text-gray-400 mt-2">
                               <strong>Participant:</strong>{" "}
