@@ -15,6 +15,7 @@ import {
   deleteEvent,
   reviewJoinRequest,
   fetchEventFeedbacks,
+  fetchEventFeedbackSummary,
 } from "../services/eventOrganizerService";
 import { Event } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
@@ -26,9 +27,13 @@ const ListEventsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [departmentFilter, setDepartmentFilter] = useState<number | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
+  const [averageRatings, setAverageRatings] = useState<Record<number, number>>(
+    {}
+  );
+
   const [expandedFeedbacks, setExpandedFeedbacks] = useState<{
     [eventId: number]: boolean;
-  }>({}); 
+  }>({});
   const [showAccepted, setShowAccepted] = useState<{
     [eventId: number]: boolean;
   }>({});
@@ -128,6 +133,7 @@ const ListEventsPage: React.FC = () => {
         setAcceptedParticipants(acceptedParticipants);
 
         events.forEach((event) => {
+          loadFeedbackSummary(event.id);
           loadFeedbacks(event.id);
         });
       } catch (error) {
@@ -137,6 +143,26 @@ const ListEventsPage: React.FC = () => {
     };
     loadEvents();
   }, [filter, departmentFilter]);
+
+  const loadFeedbackSummary = async (eventId: number) => {
+    try {
+      const feedbackSummary = await fetchEventFeedbackSummary(eventId);
+      console.log("Feedback Summary:", feedbackSummary);
+      setFeedbacks((prevFeedbacks) => ({
+        ...prevFeedbacks,
+        [eventId]: feedbackSummary.feedbacks,
+      }));
+      setAverageRatings((prevRatings) => ({
+        ...prevRatings,
+        [eventId]: feedbackSummary.averageRating,
+      }));
+    } catch (error) {
+      console.error(
+        `Failed to load feedback summary for event ${eventId}:`,
+        error
+      );
+    }
+  };
 
   const handleDeleteEvent = async (eventId: number) => {
     const success = await deleteEvent(eventId);
@@ -505,6 +531,10 @@ const ListEventsPage: React.FC = () => {
                   <h4 className="text-lg font-semibold text-white">
                     Feedback:
                   </h4>
+                  <p className="text-gray-300 mt-1">
+                    <strong>Average Rating:</strong>{" "}
+                    {averageRatings[event.id]?.toFixed(2)} / 5
+                  </p>
                   <button
                     onClick={() => toggleFeedback(event.id)}
                     className="text-teal-400 mt-2 hover:underline"

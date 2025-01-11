@@ -326,6 +326,49 @@ public class EventOrganizerService {
     }
 
     @Transactional
+    public FeedbackSummaryDTO getFeedbackSummaryByEvent(int eventId) {
+        try {
+            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
+                logger.error("Event not found for ID: {}", eventId);
+                return new IllegalArgumentException("Event not found");
+            });
+
+            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String email = currentUser.getUsername();
+            User user = userRepository.findByEmail(email).orElseThrow(() -> {
+                logger.error("User not found for email: {}", email);
+                return new IllegalArgumentException("User not found");
+            });
+
+            EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+                logger.error("Event organizer not found for user: {}", email);
+                return new IllegalArgumentException("Organizer not found");
+            });
+
+            if (!event.getOrganizer().equals(organizer)) {
+                throw new IllegalArgumentException("Event does not belong to the current organizer");
+            }
+
+            List<FeedbackOrganizerDTO> feedbacks = event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(
+                    feedback.getParticipant().getUser().getFullName(),
+                    feedback.getRating(),
+                    feedback.getComments()
+            )).collect(Collectors.toList());
+
+            double averageRating = feedbacks.stream()
+                    .mapToDouble(FeedbackOrganizerDTO::getRating)
+                    .average()
+                    .orElse(0.0);
+
+
+            return new FeedbackSummaryDTO(feedbacks, averageRating);
+        } catch (Exception e) {
+            logger.error("Error retrieving feedbacks for event", e);
+            throw new RuntimeException("Error retrieving feedbacks for event", e);
+        }
+    }
+
+    @Transactional
     public EventFilterSummaryForOrganizerDTO getEventsByOrganizer(String filterType, List<Integer> departmentIds) {
         try {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

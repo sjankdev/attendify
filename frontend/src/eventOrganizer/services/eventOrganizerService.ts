@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DepartmentDTO, Event, FeedbackDTO, Participant } from "../../types/eventTypes";
+import { DepartmentDTO, Event, FeedbackDTO, FeedbackSummaryDTO, Participant } from "../../types/eventTypes";
 
 export const fetchEventStatistics = async (eventId: string) => {
   const token = localStorage.getItem("token");
@@ -173,6 +173,29 @@ export const fetchEventFeedbacks = async (eventId: number): Promise<FeedbackDTO[
     return response.json();
   } catch (error) {
     console.error(`Error fetching feedbacks for event ID ${eventId}:`, error);
+    throw error;
+  }
+};
+
+export const fetchEventFeedbackSummary = async (eventId: number): Promise<FeedbackSummaryDTO> => {
+  try {
+    const url = `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/feedback-summary`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch feedback summary for event ID ${eventId}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Error fetching feedback summary for event ID ${eventId}:`, error);
     throw error;
   }
 };

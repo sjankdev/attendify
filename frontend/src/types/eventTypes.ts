@@ -11,6 +11,11 @@ export interface FeedbackDTO {
   comments: string;
 }
 
+export interface FeedbackSummaryDTO {
+  feedbacks: FeedbackDTO[];
+  averageRating: number;
+}
+
 export interface Event {
   id: number;
   name: string;
