@@ -580,46 +580,55 @@ const ListEventsPage: React.FC = () => {
                     Feedbacks:
                   </h4>
 
-                  <p className="text-gray-300 mt-2">
-                    <strong className="font-medium">Average Rating:</strong>{" "}
-                    {renderStars(averageRatings[event.id] || 0)}
-                  </p>
+                  {feedbacks[event.id]?.length > 0 ? (
+                    <>
+                      <p className="text-gray-300 mt-2">
+                        <strong className="font-medium">Average Rating:</strong>{" "}
+                        {renderStars(averageRatings[event.id] || 0)}
+                      </p>
 
-                  <button
-                    onClick={() => toggleFeedback(event.id)}
-                    className="mt-2 text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  >
-                    {expandedFeedbacks[event.id]
-                      ? "Hide Feedbacks"
-                      : "View Feedbacks"}
-                  </button>
+                      <button
+                        onClick={() => toggleFeedback(event.id)}
+                        className="mt-2 text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      >
+                        {expandedFeedbacks[event.id]
+                          ? "Hide Feedbacks"
+                          : "View Feedbacks"}
+                      </button>
 
-                  {expandedFeedbacks[event.id] &&
-                    feedbacks[event.id]?.length > 0 && (
-                      <ul className="space-y-4 mt-4 bg-gray-800 rounded-lg p-4">
-                        {feedbacks[event.id].map((feedback, index) => (
-                          <li
-                            key={index}
-                            className="border-b border-gray-600 pb-4 last:border-none"
-                          >
-                            <p className="text-gray-300">{feedback.comments}</p>
-
-                            <div className="mt-2 text-sm text-gray-400">
-                              <p>
-                                <strong className="font-medium">Rating:</strong>{" "}
-                                {renderStars(feedback.rating)}
+                      {expandedFeedbacks[event.id] && (
+                        <ul className="space-y-4 mt-4 bg-gray-800 rounded-lg p-4">
+                          {feedbacks[event.id].map((feedback, index) => (
+                            <li
+                              key={index}
+                              className="border-b border-gray-600 pb-4 last:border-none"
+                            >
+                              <p className="text-gray-300">
+                                {feedback.comments}
                               </p>
-                              <p>
-                                <strong className="font-medium">
-                                  Participant:
-                                </strong>{" "}
-                                {feedback.participantName}
-                              </p>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+
+                              <div className="mt-2 text-sm text-gray-400">
+                                <p>
+                                  <strong className="font-medium">
+                                    Rating:
+                                  </strong>{" "}
+                                  {renderStars(feedback.rating)}
+                                </p>
+                                <p>
+                                  <strong className="font-medium">
+                                    Participant:
+                                  </strong>{" "}
+                                  {feedback.participantName}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-300 mt-4">No feedbacks</p>
+                  )}
                 </div>
               </div>
             ))}
