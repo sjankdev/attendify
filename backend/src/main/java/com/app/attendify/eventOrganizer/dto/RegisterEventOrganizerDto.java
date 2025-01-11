@@ -8,7 +8,7 @@ import java.util.List;
 
 public class RegisterEventOrganizerDto {
     @NotEmpty(message = "Full Name cannot be empty")
-    @Size(min = 10, message = "Full Name must be at least 8 characters long")
+    @Size(min = 10, message = "Full Name must be at least 10 characters long")
     private String fullName;
 
     @NotEmpty(message = "Email cannot be empty")
