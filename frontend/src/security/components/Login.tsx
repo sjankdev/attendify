@@ -380,8 +380,11 @@ const Login: React.FC = () => {
                   Sign In
                 </button>
               </div>
+
               {error && (
-                <p className="mt-4 text-lg text-red-600 text-center">{error}</p>
+                <div className="mt-4 p-4 bg-[#F8D7DA] text-[#721C24] rounded-lg">
+                  <p className="text-lg text-center">{error}</p>
+                </div>
               )}
             </form>
           )}
