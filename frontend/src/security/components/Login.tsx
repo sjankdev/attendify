@@ -385,6 +385,12 @@ const Login: React.FC = () => {
               )}
             </form>
           )}
+          <div className="absolute bottom-4 w-full text-center text-white text-sm">
+            <p>
+              Note: Response times may be slower due to our free hosting plan.
+              We appreciate your patience!
+            </p>
+          </div>
         </div>
       </div>
     </div>
