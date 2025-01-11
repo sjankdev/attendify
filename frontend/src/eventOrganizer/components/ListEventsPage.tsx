@@ -8,6 +8,9 @@ import {
   UsersIcon,
   MapPinIcon,
   CheckCircleIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -302,8 +305,34 @@ const ListEventsPage: React.FC = () => {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="bg-[#313030] rounded-lg shadow-lg p-6"
+                className="relative bg-[#313030] rounded-lg shadow-lg p-6"
               >
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button
+                    onClick={() => navigate(`/event-stats/${event.id}`)}
+                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
+                    title="View Stats"
+                  >
+                    <ChartBarIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigate(`/event-organizer/update-event/${event.id}`)
+                    }
+                    className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
+                    title="Edit Event"
+                  >
+                    <PencilSquareIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
+                    title="Delete Event"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
                 <h3 className="text-2xl font-semibold text-white">
                   {event.name}
                 </h3>
@@ -314,7 +343,6 @@ const ListEventsPage: React.FC = () => {
                     ? `${event.description.slice(0, 100)}...`
                     : event.description}
                 </p>
-
                 {event.description.length > 100 && (
                   <button
                     onClick={() => toggleDescription(event.id)}
@@ -523,32 +551,6 @@ const ListEventsPage: React.FC = () => {
                     )}
                   </div>
                 )}
-
-                <div className="mt-6 border-t border-gray-600 pt-4">
-                  <button
-                    onClick={() => navigate(`/event-stats/${event.id}`)}
-                    className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 w-full mt-2"
-                  >
-                    View Stats
-                  </button>
-
-                  <div className="mt-4 flex flex-col gap-2">
-                    <button
-                      onClick={() =>
-                        navigate(`/event-organizer/update-event/${event.id}`)
-                      }
-                      className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 w-full"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteEvent(event.id)}
-                      className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 w-full"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
 
                 <div className="mt-6 border-t border-gray-600 pt-4">
                   <h4 className="text-lg font-semibold text-white">
