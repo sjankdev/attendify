@@ -482,7 +482,7 @@ const ListEventsPage: React.FC = () => {
                         }
                       </h5>
                       <button
-                        className="text-teal-600 hover:text-teal-500"
+                        className="mt-2 text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                         onClick={() => toggleAcceptedParticipants(event.id)}
                       >
                         {showAccepted[event.id] ? "Hide" : "View"} accepted
@@ -499,7 +499,7 @@ const ListEventsPage: React.FC = () => {
                             .map((participant) => (
                               <li
                                 key={participant.participantId}
-                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
+                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                               >
                                 <div>
                                   <p className="text-white">
@@ -524,7 +524,7 @@ const ListEventsPage: React.FC = () => {
                             .map((participant) => (
                               <li
                                 key={participant.participantId}
-                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow"
+                                className="flex justify-between items-center bg-[#252525] p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                               >
                                 <div>
                                   <p className="text-white">
@@ -549,7 +549,7 @@ const ListEventsPage: React.FC = () => {
                                         "ACCEPTED"
                                       )
                                     }
-                                    className="bg-teal-600 text-white py-1 px-3 rounded-md hover:bg-teal-500"
+                                    className="bg-teal-600 text-white py-1 px-3 rounded-md hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                                   >
                                     Approve
                                   </button>
@@ -562,7 +562,7 @@ const ListEventsPage: React.FC = () => {
                                         "REJECTED"
                                       )
                                     }
-                                    className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-500"
+                                    className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                                   >
                                     Reject
                                   </button>
@@ -579,38 +579,43 @@ const ListEventsPage: React.FC = () => {
                   <h4 className="text-lg font-semibold text-white">
                     Feedbacks:
                   </h4>
-                  <p className="text-gray-300 mt-1">
-                    <strong>Average Rating:</strong>{" "}
+
+                  <p className="text-gray-300 mt-2">
+                    <strong className="font-medium">Average Rating:</strong>{" "}
                     {renderStars(averageRatings[event.id] || 0)}
                   </p>
+
                   <button
                     onClick={() => toggleFeedback(event.id)}
-                    className="text-teal-400 mt-2 hover:underline"
+                    className="mt-2 text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
                     {expandedFeedbacks[event.id]
-                      ? "Hide Feedback"
-                      : "View Feedback"}
+                      ? "Hide Feedbacks"
+                      : "View Feedbacks"}
                   </button>
 
                   {expandedFeedbacks[event.id] &&
                     feedbacks[event.id]?.length > 0 && (
-                      <ul className="space-y-4 mt-4">
+                      <ul className="space-y-4 mt-4 bg-gray-800 rounded-lg p-4">
                         {feedbacks[event.id].map((feedback, index) => (
                           <li
                             key={index}
-                            className="border-b border-gray-600 pb-4"
+                            className="border-b border-gray-600 pb-4 last:border-none"
                           >
-                            <p className="text-gray-300 mt-1">
-                              {feedback.comments}
-                            </p>
-                            <p className="text-sm text-gray-400 mt-2">
-                              <strong>Rating:</strong>{" "}
-                              {renderStars(feedback.rating)}
-                            </p>
-                            <p className="text-sm text-gray-400 mt-2">
-                              <strong>Participant:</strong>{" "}
-                              {feedback.participantName}
-                            </p>
+                            <p className="text-gray-300">{feedback.comments}</p>
+
+                            <div className="mt-2 text-sm text-gray-400">
+                              <p>
+                                <strong className="font-medium">Rating:</strong>{" "}
+                                {renderStars(feedback.rating)}
+                              </p>
+                              <p>
+                                <strong className="font-medium">
+                                  Participant:
+                                </strong>{" "}
+                                {feedback.participantName}
+                              </p>
+                            </div>
                           </li>
                         ))}
                       </ul>
