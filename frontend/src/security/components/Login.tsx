@@ -319,6 +319,11 @@ const Login: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+                {errorFields.departmentNames && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {errorFields.departmentNames}
+                  </p>
+                )}
               </div>
 
               <button

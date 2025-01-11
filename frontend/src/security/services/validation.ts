@@ -41,6 +41,10 @@ export const validateFormOrganizerRegistration = (
       "Company Description must be at least 10 characters long";
   }
 
+  if (formData.departmentNames.length === 0) {
+    errors.departmentNames = "At least one department is required";
+  }
+
   return errors;
 };
 
