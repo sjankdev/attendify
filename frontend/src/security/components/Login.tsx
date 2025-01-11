@@ -152,8 +152,8 @@ const Login: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#2A3439]">
-      <div className="flex w-full max-w-[1200px] min-h-[80vh] mx-auto">
-        <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col p-6">
+      <div className="flex flex-col md:flex-row w-full max-w-[1200px] min-h-[80vh] mx-auto">
+        <div className="w-full md:w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col p-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-semibold text-white mb-4">
               Simplify Event Planning
@@ -165,10 +165,11 @@ const Login: React.FC = () => {
           <img
             src="/assets/logos/login-logo.png"
             alt="Event Logo"
-            className="w-[400px] mt-12"
+            className="w-[80%] md:w-[400px] mt-12"
           />
         </div>
-        <div className="w-[600px] bg-[#0F213E] flex items-center justify-center relative p-6">
+
+        <div className="w-full md:w-[600px] bg-[#0F213E] flex items-center justify-center relative p-6">
           <div className="absolute top-4 right-6 flex space-x-4 z-10">
             <div className="flex rounded-lg overflow-hidden">
               <button
