@@ -17,6 +17,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [showSignUp, setShowSignUp] = useState<boolean>(false);
+  const [errorFields, setErrorFields] = useState<{ [key: string]: string }>({});
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -91,7 +94,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "https://attendify-backend-el2r.onrender.com/api/auth/login",
+        "http://localhost:8080/api/auth/login",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
@@ -115,16 +118,18 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setRegisterError(null);
     setSuccess(null);
 
-    if (!validateFormOrganizerRegistration(formData, setError)) {
+    const errors = validateFormOrganizerRegistration(formData);
+    if (Object.keys(errors).length > 0) {
+      setErrorFields(errors);
       return;
     }
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
+        "http://localhost:8080/api/auth/register-organizer",
         formData
       );
       setSuccess(
@@ -134,14 +139,14 @@ const Login: React.FC = () => {
       if (error.response && error.response.data) {
         const errorMessages = error.response.data;
         if (errorMessages.includes("Email already exists")) {
-          setError(
+          setRegisterError(
             "This email is already registered. Please use a different email."
           );
         } else {
-          setError(errorMessages.join(", "));
+          setRegisterError(errorMessages.join(", "));
         }
       } else {
-        setError("Registration failed");
+        setRegisterError("Registration failed");
       }
     }
   };
@@ -151,58 +156,38 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#2A3439]">
-      <div className="flex w-full max-w-[1200px] min-h-[80vh] mx-auto">
-        <div className="w-[600px] bg-[#DD3F43] flex items-center justify-center flex-col p-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-semibold text-white mb-4">
-              Simplify Event Planning
-            </h1>
-            <h2 className="text-3xl font-medium text-white">
-              and Connect with Your Audience
-            </h2>
-          </div>
-          <img
-            src="/assets/logos/login-logo.png"
-            alt="Event Logo"
-            className="w-[400px] mt-12"
-          />
+    <div className="flex justify-center items-center min-h-screen bg-gray-800 p-6">
+      <div className="w-full max-w-md bg-gray-900 shadow-lg rounded-lg p-8">
+        <div className="flex justify-between mb-6">
+          <button
+            onClick={handleToggleForm}
+            className={`w-1/2 py-2 text-lg font-semibold rounded-md ${
+              showSignUp
+                ? "bg-gray-700 text-gray-400"
+                : "bg-blue-700 text-white"
+            } transition-colors`}
+          >
+            Sign In
+          </button>
+          <button
+            onClick={handleToggleForm}
+            className={`w-1/2 py-2 text-lg font-semibold rounded-md ${
+              !showSignUp
+                ? "bg-gray-700 text-gray-400"
+                : "bg-blue-700 text-white"
+            } transition-colors`}
+          >
+            Sign Up
+          </button>
         </div>
-        <div className="w-[600px] bg-[#0F213E] flex items-center justify-center relative p-6">
-          <div className="absolute top-4 right-6 flex space-x-4 z-10">
-            <div className="flex rounded-lg overflow-hidden">
-              <button
-                onClick={handleToggleForm}
-                className={`w-[100px] py-1 font-semibold rounded-l-lg ${
-                  showSignUp
-                    ? "bg-[#7A7A7A] hover:bg-[#626262]"
-                    : "bg-[#DD3F43] text-white hover:bg-[#D03A3E]"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                onClick={handleToggleForm}
-                className={`w-[100px] py-1 font-semibold rounded-r-lg ${
-                  showSignUp
-                    ? "bg-[#DD3F43] text-white hover:bg-[#D03A3E]"
-                    : "bg-[#7A7A7A] hover:bg-[#626262]"
-                }`}
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
 
-          {showSignUp ? (
-            <form
-              onSubmit={handleSubmit}
-              className="w-full max-w-[500px] p-8 rounded-lg grid grid-cols-1 gap-6 mt-12"
-            >
-              <div className="mb-6">
+        {showSignUp ? (
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
                 <label
                   htmlFor="email"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Email
                 </label>
@@ -211,14 +196,18 @@ const Login: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
+                <p className="text-red-500 text-sm">
+                  {errorFields.email || ""}
+                </p>
               </div>
-              <div className="mb-6">
+
+              <div>
                 <label
                   htmlFor="password"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Password
                 </label>
@@ -227,14 +216,18 @@ const Login: React.FC = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
+                <p className="text-red-500 text-sm">
+                  {errorFields.password || ""}
+                </p>
               </div>
-              <div className="mb-6">
+
+              <div>
                 <label
                   htmlFor="fullName"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Full Name
                 </label>
@@ -243,14 +236,18 @@ const Login: React.FC = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
+                <p className="text-red-500 text-sm">
+                  {errorFields.fullName || ""}
+                </p>
               </div>
-              <div className="mb-6">
+
+              <div>
                 <label
                   htmlFor="companyName"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Company Name
                 </label>
@@ -259,14 +256,18 @@ const Login: React.FC = () => {
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
+                <p className="text-red-500 text-sm">
+                  {errorFields.companyName || ""}
+                </p>
               </div>
-              <div className="mb-6 col-span-2">
+
+              <div>
                 <label
                   htmlFor="companyDescription"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Company Description
                 </label>
@@ -274,71 +275,77 @@ const Login: React.FC = () => {
                   name="companyDescription"
                   value={formData.companyDescription}
                   onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
+                <p className="text-red-500 text-sm">
+                  {errorFields.companyDescription || ""}
+                </p>
               </div>
 
-              <div className="mb-6 col-span-2 max-h-48 overflow-y-auto">
-                <label className="block text-lg font-medium text-[#CFD0C6]">
+              <div>
+                <label className="block text-sm font-medium text-gray-300">
                   Departments
                 </label>
-                <div className="mt-2 flex items-center">
+                <div className="flex space-x-2">
                   <input
                     type="text"
                     value={currentDepartment}
                     onChange={handleDepartmentInputChange}
                     placeholder="Add a department"
-                    className="p-3 mt-2 w-full bg-transparent border border-[#BCB6AE] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#DD3F43] focus:border-[#DD3F43]"
+                    className="p-2 w-full border border-gray-600 rounded-md"
                   />
                   <button
                     type="button"
                     onClick={handleSaveDepartment}
-                    className="ml-4 bg-[#DD3F43] text-white px-6 py-3 rounded-lg transition-colors duration-300 hover:bg-[#b83333]"
+                    className="bg-green-700 text-white py-2 px-4 rounded-md"
                   >
                     Save
                   </button>
                 </div>
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-2">
                   {formData.departmentNames.map((department, index) => (
                     <li
                       key={index}
-                      className="flex justify-between items-center bg-[#1F1F1F] p-3 rounded-lg hover:bg-[#333333] transition-colors"
+                      className="flex justify-between items-center mt-1"
                     >
-                      <span className="text-white">{department}</span>
+                      <span className="text-gray-200">{department}</span>{" "}
                       <button
                         type="button"
                         onClick={() => handleRemoveDepartment(department)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="text-red-500 text-sm"
                       >
                         Remove
                       </button>
                     </li>
                   ))}
                 </ul>
+                {errorFields.departmentNames && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {errorFields.departmentNames}
+                  </p>
+                )}
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-[#DD3F43] text-white py-3 rounded-lg col-span-2"
+                className="w-full py-3 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-colors"
               >
                 Register
               </button>
+
               {success && (
-                <div className="mt-4 p-4 bg-green-600 text-white rounded-lg shadow-lg transition-all duration-300 ease-in-out transform scale-105 w-full">
-                  <p className="text-lg text-center">{success}</p>
-                </div>
+                <div className="text-green-500 text-center mt-4">{success}</div>
               )}
-            </form>
-          ) : (
-            <form
-              onSubmit={handleLogin}
-              className="w-full max-w-[500px] p-8 rounded-lg mt-12"
-            >
-              <div className="mb-6">
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleLogin}>
+            <div className="space-y-4">
+              <div>
                 <label
                   htmlFor="email"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Email
                 </label>
@@ -347,14 +354,15 @@ const Login: React.FC = () => {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
               </div>
-              <div className="mb-6">
+
+              <div>
                 <label
                   htmlFor="password"
-                  className="block text-lg font-medium text-[#CFD0C6]"
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Password
                 </label>
@@ -363,34 +371,32 @@ const Login: React.FC = () => {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  className="w-full mt-2 border-b border-[#BCB6AE] bg-transparent focus:outline-none focus:ring-0 p-3 text-white"
                 />
               </div>
-              <div className="mb-6 flex justify-start mt-16">
+
+              <div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-[140px] py-1.5 px-5 text-white font-semibold rounded-xl text-lg text-center ${
-                    loading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#DD3F43] hover:bg-[#D03A3E]"
-                  }`}
+                  className="w-full py-3 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition-colors"
                 >
                   Sign In
                 </button>
               </div>
+
               {error && (
-                <p className="mt-4 text-lg text-red-600 text-center">{error}</p>
+                <div className="text-red-500 text-center mt-4">{error}</div>
               )}
-            </form>
-          )}
-          <div className="absolute bottom-4 w-full text-center text-white text-sm">
-            <p>
-              Note: Response times may be slower due to our free hosting plan.
-              We appreciate your patience!
-            </p>
-          </div>
+            </div>
+          </form>
+        )}
+        <div className="text-center mt-4 text-gray-400 text-sm">
+          <p>
+            Note: Response times may be slower due to our free hosting plan. We
+            appreciate your patience!
+          </p>
         </div>
       </div>
     </div>

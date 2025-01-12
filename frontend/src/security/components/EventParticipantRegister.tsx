@@ -19,6 +19,7 @@ const EventParticipantRegister = () => {
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [token, setToken] = useState(searchParams.get("token") || "");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<any>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .get(`https://attendify-backend-el2r.onrender.com/api/auth/accept?token=${token}`)
+      .get(`http://localhost:8080/api/auth/accept?token=${token}`)
       .then((response) => {
         setEmail(response.data.email);
         setDepartmentId(response.data.departmentId);
@@ -41,28 +42,27 @@ const EventParticipantRegister = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const formData = {
+      name,
+      email,
+      password,
+      token,
+      age,
+      yearsOfExperience,
+      gender: gender as Gender,
+      educationLevel: educationLevel as EducationLevel,
+      occupation: occupation as Occupation,
+    };
+
     if (
-      !validateFormParticipantRegistration(
-        {
-          name,
-          email,
-          password,
-          token,
-          age,
-          yearsOfExperience,
-          gender: gender as Gender,
-          educationLevel: educationLevel as EducationLevel,
-          occupation: occupation as Occupation,
-        },
-        setError
-      )
+      !validateFormParticipantRegistration(formData, setError, setFieldErrors)
     ) {
       return;
     }
 
     axios
       .post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-participant",
+        "http://localhost:8080/api/auth/register-participant",
         {
           name,
           email,
@@ -113,6 +113,9 @@ const EventParticipantRegister = () => {
               required
               className="px-4 py-3 border rounded-lg"
             />
+            {fieldErrors.name && (
+              <p className="text-red-500 text-sm mt-1">{fieldErrors.name}</p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -127,6 +130,11 @@ const EventParticipantRegister = () => {
               required
               className="px-4 py-3 border rounded-lg"
             />
+            {fieldErrors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -143,6 +151,9 @@ const EventParticipantRegister = () => {
               required
               className="px-4 py-3 border rounded-lg"
             />
+            {fieldErrors.age && (
+              <p className="text-red-500 text-sm mt-1">{fieldErrors.age}</p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -161,6 +172,11 @@ const EventParticipantRegister = () => {
               required
               className="px-4 py-3 border rounded-lg"
             />
+            {fieldErrors.yearsOfExperience && (
+              <p className="text-red-500 text-sm mt-1">
+                {fieldErrors.yearsOfExperience}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -179,6 +195,9 @@ const EventParticipantRegister = () => {
               <option value="FEMALE">Female</option>
               <option value="OTHER">Other</option>
             </select>
+            {fieldErrors.gender && (
+              <p className="text-red-500 text-sm mt-1">{fieldErrors.gender}</p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -199,6 +218,11 @@ const EventParticipantRegister = () => {
               <option value="DATA_SCIENTIST">Data Scientist</option>
               <option value="OTHER">Other</option>
             </select>
+            {fieldErrors.occupation && (
+              <p className="text-red-500 text-sm mt-1">
+                {fieldErrors.occupation}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col">
@@ -219,6 +243,11 @@ const EventParticipantRegister = () => {
               <option value="PHD">PhD</option>
               <option value="OTHER">Other</option>
             </select>
+            {fieldErrors.educationLevel && (
+              <p className="text-red-500 text-sm mt-1">
+                {fieldErrors.educationLevel}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col">

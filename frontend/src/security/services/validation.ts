@@ -1,55 +1,64 @@
 import { EducationLevel, Gender, Occupation } from "../../types/Enums";
 import { AgendaItemDTO, CreateEventDto } from "../../types/eventTypes";
-import { RegisterParticipantDto, RegisterUserDto } from "../../types/userTypes";
+import {
+  FieldErrors,
+  RegisterParticipantDto,
+  RegisterUserDto,
+} from "../../types/userTypes";
 
 export const validateFormOrganizerRegistration = (
-  formData: RegisterUserDto,
-  setError: React.Dispatch<React.SetStateAction<string | null>>
-): boolean => {
-  if (
-    !formData.email ||
-    !formData.password ||
-    !formData.fullName ||
-    !formData.companyName ||
-    !formData.companyDescription
-  ) {
-    setError("All fields are required");
-    return false;
+  formData: RegisterUserDto
+): { [key: string]: string } => {
+  const errors: { [key: string]: string } = {};
+
+  if (!formData.email) {
+    errors.email = "Email is required";
+  } else {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      errors.email = "Invalid email format";
+    }
   }
 
-  if (formData.fullName.length < 8) {
-    setError("Full name must be at least 8 characters long");
-    return false;
+  if (!formData.password) {
+    errors.password = "Password is required";
+  } else if (formData.password.length < 8) {
+    errors.password = "Password must be at least 8 characters long";
   }
 
-  if (formData.password.length < 8) {
-    setError("Password must be at least 8 characters long");
-    return false;
+  if (!formData.fullName) {
+    errors.fullName = "Full Name is required";
+  } else if (formData.fullName.length < 8) {
+    errors.fullName = "Full name must be at least 8 characters long";
   }
 
-  if (formData.companyName.length < 3) {
-    setError("Company Name must be at least 3 characters long");
-    return false;
+  if (!formData.companyName) {
+    errors.companyName = "Company Name is required";
+  } else if (formData.companyName.length < 3) {
+    errors.companyName = "Company Name must be at least 3 characters long";
   }
 
-  if (formData.companyDescription.length < 10) {
-    setError("Company Description must be at least 10 characters long");
-    return false;
+  if (!formData.companyDescription) {
+    errors.companyDescription = "Company Description is required";
+  } else if (formData.companyDescription.length < 10) {
+    errors.companyDescription =
+      "Company Description must be at least 10 characters long";
   }
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(formData.email)) {
-    setError("Invalid email format");
-    return false;
+  if (formData.departmentNames.length === 0) {
+    errors.departmentNames = "At least one department is required";
   }
 
-  return true;
+  return errors;
 };
 
 export const validateFormParticipantRegistration = (
   formData: RegisterParticipantDto,
-  setError: React.Dispatch<React.SetStateAction<string | null>>
+  setError: React.Dispatch<React.SetStateAction<string | null>>,
+  setFieldErrors: React.Dispatch<React.SetStateAction<FieldErrors>>
 ): boolean => {
+  setFieldErrors({});
+
   if (
     !formData.name ||
     !formData.email ||
@@ -66,48 +75,75 @@ export const validateFormParticipantRegistration = (
   }
 
   if (formData.name.length < 8) {
-    setError("Full Name must be at least 8 characters long");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      name: "Full Name must be at least 8 characters long",
+    }));
     return false;
   }
 
   if (formData.password.length < 8) {
-    setError("Password must be at least 8 characters long");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      password: "Password must be at least 8 characters long",
+    }));
     return false;
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(formData.email)) {
-    setError("Invalid email format");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      email: "Invalid email format",
+    }));
     return false;
   }
 
   if (formData.age <= 0 || formData.age < 16) {
-    setError("Age must be 16 or above and a positive number");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      age: "Age must be 16 or above and a positive number",
+    }));
     return false;
   }
 
   if (formData.yearsOfExperience == null || formData.yearsOfExperience < 0) {
-    setError("Years of Experience cannot be negative or null");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      yearsOfExperience: "Years of Experience cannot be negative or null",
+    }));
     return false;
   }
 
   if (!formData.token) {
-    setError("Token cannot be empty");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      token: "Token cannot be empty",
+    }));
     return false;
   }
 
   if (!Object.values(Gender).includes(formData.gender)) {
-    setError("Invalid gender selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      gender: "Invalid gender selection",
+    }));
     return false;
   }
 
   if (!Object.values(EducationLevel).includes(formData.educationLevel)) {
-    setError("Invalid education level selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      educationLevel: "Invalid education level selection",
+    }));
     return false;
   }
 
   if (!Object.values(Occupation).includes(formData.occupation)) {
-    setError("Invalid occupation selection");
+    setFieldErrors((prev: FieldErrors) => ({
+      ...prev,
+      occupation: "Invalid occupation selection",
+    }));
     return false;
   }
 
@@ -208,46 +244,60 @@ export const validateEventForm = (
       console.log("No agenda items to validate or agenda not visible.");
       return true;
     }
-  
+
     console.log("Validating agenda items...");
     const errors: string[] = [];
-    
+
     const eventStartDateTime = new Date(eventStartDate).getTime();
     const eventEndDateTime = new Date(eventEndDate).getTime();
-  
+
     for (let i = 0; i < agendaItems.length; i++) {
       const item = agendaItems[i];
-      
+
       if (!item.title || item.title.trim().length < 10) {
-        errors.push(`Agenda item ${i + 1}: Title must be at least 10 characters long.`);
+        errors.push(
+          `Agenda item ${i + 1}: Title must be at least 10 characters long.`
+        );
       }
-  
+
       if (!item.description || item.description.trim().length < 50) {
-        errors.push(`Agenda item ${i + 1}: Description must be at least 50 characters long.`);
+        errors.push(
+          `Agenda item ${
+            i + 1
+          }: Description must be at least 50 characters long.`
+        );
       }
-  
+
       const agendaStartTime = new Date(item.startTime).getTime();
       const agendaEndTime = new Date(item.endTime).getTime();
-  
+
       if (agendaStartTime >= agendaEndTime) {
-        errors.push(`Agenda item ${i + 1}: Start time must be before end time.`);
+        errors.push(
+          `Agenda item ${i + 1}: Start time must be before end time.`
+        );
       }
-  
-      if (agendaStartTime < eventStartDateTime || agendaEndTime > eventEndDateTime) {
-        errors.push(`Agenda item ${i + 1}: Agenda start and end time must be within the event duration.`);
+
+      if (
+        agendaStartTime < eventStartDateTime ||
+        agendaEndTime > eventEndDateTime
+      ) {
+        errors.push(
+          `Agenda item ${
+            i + 1
+          }: Agenda start and end time must be within the event duration.`
+        );
       }
     }
-  
+
     console.log("Agenda validation errors:", errors);
-  
+
     if (errors.length > 0) {
-      setError(errors[0]); 
+      setError(errors[0]);
       return false;
     }
-  
+
     return validateDates();
   };
-  
 
   return validateDates() && validateAgendaItems();
 };
