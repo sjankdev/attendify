@@ -35,6 +35,7 @@ public class CreateEventRequest {
     @NotNull
     private LocalDateTime eventEndDate;
 
+    @NotNull
     private LocalDateTime joinDeadline;
 
     private boolean joinApproval;
