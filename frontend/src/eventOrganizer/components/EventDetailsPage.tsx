@@ -81,12 +81,6 @@ const EventDetailsPage: React.FC = () => {
                           </strong>{" "}
                           {participant.participantName}
                         </div>
-                        <div className="mr-4">
-                          <strong className="text-sm text-gray-500">
-                            Email:
-                          </strong>{" "}
-                          {participant.participantEmail}
-                        </div>
                         <div>
                           <strong className="text-sm text-gray-500">
                             Department:
