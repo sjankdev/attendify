@@ -449,14 +449,16 @@ const CreateEventPage: React.FC = () => {
                 </div>
               )}
 
-              <button
-                onClick={() => setIsAgendaVisible(!isAgendaVisible)}
-                className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
-              >
-                {isAgendaVisible ? "Hide Agenda Items" : "Add New Agenda Item"}
-              </button>
+              {!isAgendaVisible && (
+                <button
+                  onClick={() => setIsAgendaVisible(true)}
+                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
+                >
+                  Add New Agenda Item
+                </button>
+              )}
 
-              {isAgendaVisible && (
+              {isAgendaVisible && agendaItems.length > 0 && (
                 <button
                   onClick={handleAddAgendaItem}
                   className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500 mt-4"
