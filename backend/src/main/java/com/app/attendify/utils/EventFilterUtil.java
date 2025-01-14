@@ -46,7 +46,6 @@ public class EventFilterUtil {
         return events.stream().filter(event -> event.getEventStartDate().isAfter(now) && "ACCEPTED".equals(event.getStatus())).collect(Collectors.toList());
     }
 
-
     private boolean isBetween(LocalDateTime date, LocalDateTime start, LocalDateTime end) {
         return date != null && (date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end));
     }

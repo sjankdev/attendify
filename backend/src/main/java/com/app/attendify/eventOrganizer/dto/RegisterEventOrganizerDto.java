@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public class RegisterEventOrganizerDto {
+
     @NotEmpty(message = "Full Name cannot be empty")
     @Size(min = 10, message = "Full Name must be at least 10 characters long")
     private String fullName;

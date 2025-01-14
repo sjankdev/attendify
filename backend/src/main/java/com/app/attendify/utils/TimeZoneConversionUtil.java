@@ -10,8 +10,8 @@ import java.time.ZonedDateTime;
 @Component
 public class TimeZoneConversionUtil {
 
-    private  final ZoneId BELGRADE_ZONE = ZoneId.of("Europe/Belgrade");
-    private  final ZoneId UTC_ZONE = ZoneId.of("UTC");
+    private final ZoneId BELGRADE_ZONE = ZoneId.of("Europe/Belgrade");
+    private final ZoneId UTC_ZONE = ZoneId.of("UTC");
 
     public LocalDateTime convertToBelgradeTime(LocalDateTime utcDateTime) {
         ZonedDateTime utcZonedDateTime = utcDateTime.atZone(UTC_ZONE);

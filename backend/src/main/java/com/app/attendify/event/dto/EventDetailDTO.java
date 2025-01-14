@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventDetailDTO {
+
     private int id;
     private String name;
     private String description;
@@ -16,9 +17,7 @@ public class EventDetailDTO {
     private String attendeeLimit;
     private List<ParticipantDTO> joinedParticipants;
 
-    public EventDetailDTO(int id, String name, String description, String location,
-                          LocalDateTime eventStartDate, LocalDateTime eventEndDate,
-                          String organizerName, String attendeeLimit, List<ParticipantDTO> joinedParticipants) {
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, String attendeeLimit, List<ParticipantDTO> joinedParticipants) {
         this.id = id;
         this.name = name;
         this.description = description;

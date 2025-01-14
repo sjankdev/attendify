@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 @Service
 public class CompanyService {
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Autowired
-    private DepartmentRepository departmentRepository;
+    public CompanyService(CompanyRepository companyRepository, DepartmentRepository departmentRepository) {
+        this.companyRepository = companyRepository;
+        this.departmentRepository = departmentRepository;
+    }
 
     public List<DepartmentDto> getDepartmentsByCompanyId(Integer companyId) {
         Optional<Company> companyOpt = companyRepository.findById(companyId);
@@ -30,14 +33,11 @@ public class CompanyService {
 
         Company company = companyOpt.get();
         List<Department> departments = departmentRepository.findByCompany(company);
-        return departments.stream()
-                .map(department -> new DepartmentDto(department.getId(), department.getName()))
-                .collect(Collectors.toList());
+        return departments.stream().map(department -> new DepartmentDto(department.getId(), department.getName())).collect(Collectors.toList());
     }
 
     public void addDepartmentsToCompany(Integer companyId, List<String> departmentNames) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
 
         for (String departmentName : departmentNames) {
             Department department = new Department();

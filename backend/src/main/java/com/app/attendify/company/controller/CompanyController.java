@@ -13,9 +13,14 @@ import java.util.List;
 @RequestMapping("/api/companies")
 public class CompanyController {
 
+    private final CompanyService companyService;
+    private final AuthenticationService authenticationService;
+
     @Autowired
-    private CompanyService companyService;
-    private AuthenticationService authenticationService;
+    public CompanyController(CompanyService companyService, AuthenticationService authenticationService) {
+        this.companyService = companyService;
+        this.authenticationService = authenticationService;
+    }
 
     @GetMapping("/{companyId}/departments")
     public List<DepartmentDto> getDepartments(@PathVariable Integer companyId) {

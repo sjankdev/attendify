@@ -1,10 +1,12 @@
 package com.app.attendify.event.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 public class AgendaItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

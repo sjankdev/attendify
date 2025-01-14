@@ -19,13 +19,13 @@ import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
-import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.security.model.User;
 import com.app.attendify.security.repositories.UserRepository;
 import com.app.attendify.utils.EventFilterUtil;
 import com.app.attendify.utils.TimeZoneConversionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.slf4j.Logger;
@@ -53,6 +53,7 @@ public class EventOrganizerService {
     private final StatisticsService statisticsService;
     private final DepartmentRepository departmentRepository;
 
+    @Autowired
     public EventOrganizerService(EventOrganizerRepository eventOrganizerRepository, EventRepository eventRepository, UserRepository userRepository, EventAttendanceRepository eventAttendanceRepository, EventValidation eventValidation, TimeZoneConversionUtil timeZoneConversionUtil, EventFilterUtil eventFilterUtil, StatisticsService statisticsService, DepartmentRepository departmentRepository) {
         this.eventOrganizerRepository = eventOrganizerRepository;
         this.eventRepository = eventRepository;
@@ -65,20 +66,6 @@ public class EventOrganizerService {
         this.departmentRepository = departmentRepository;
     }
 
-    public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
-        List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
-        Map<Integer, Map<Gender, Long>> statistics = new HashMap<>();
-
-        for (Object[] result : results) {
-            Integer eventId = (Integer) result[0];
-            Gender gender = (Gender) result[1];
-            Long count = (Long) result[2];
-
-            statistics.computeIfAbsent(eventId, k -> new HashMap<>()).put(gender, count);
-        }
-
-        return statistics;
-    }
 
     public Event createEvent(CreateEventRequest request) {
         try {
@@ -314,11 +301,7 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            return event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(
-                    feedback.getParticipant().getUser().getFullName(),
-                    feedback.getRating(),
-                    feedback.getComments()
-            )).collect(Collectors.toList());
+            return event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(feedback.getParticipant().getUser().getFullName(), feedback.getRating(), feedback.getComments())).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error retrieving feedbacks for event", e);
             throw new RuntimeException("Error retrieving feedbacks for event", e);
@@ -349,16 +332,9 @@ public class EventOrganizerService {
                 throw new IllegalArgumentException("Event does not belong to the current organizer");
             }
 
-            List<FeedbackOrganizerDTO> feedbacks = event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(
-                    feedback.getParticipant().getUser().getFullName(),
-                    feedback.getRating(),
-                    feedback.getComments()
-            )).collect(Collectors.toList());
+            List<FeedbackOrganizerDTO> feedbacks = event.getFeedbacks().stream().map(feedback -> new FeedbackOrganizerDTO(feedback.getParticipant().getUser().getFullName(), feedback.getRating(), feedback.getComments())).collect(Collectors.toList());
 
-            double averageRating = feedbacks.stream()
-                    .mapToDouble(FeedbackOrganizerDTO::getRating)
-                    .average()
-                    .orElse(0.0);
+            double averageRating = feedbacks.stream().mapToDouble(FeedbackOrganizerDTO::getRating).average().orElse(0.0);
 
 
             return new FeedbackSummaryDTO(feedbacks, averageRating);
@@ -557,6 +533,21 @@ public class EventOrganizerService {
             logger.error("Error retrieving event details", e);
             throw new RuntimeException("Error retrieving event details", e);
         }
+    }
+
+    public Map<Integer, Map<Gender, Long>> getGenderStatistics() {
+        List<Object[]> results = eventAttendanceRepository.countParticipantsByGender();
+        Map<Integer, Map<Gender, Long>> statistics = new HashMap<>();
+
+        for (Object[] result : results) {
+            Integer eventId = (Integer) result[0];
+            Gender gender = (Gender) result[1];
+            Long count = (Long) result[2];
+
+            statistics.computeIfAbsent(eventId, k -> new HashMap<>()).put(gender, count);
+        }
+
+        return statistics;
     }
 
     @Transactional

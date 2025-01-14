@@ -41,6 +41,18 @@ public class EventOrganizerController {
         return ResponseEntity.ok("You are authorized as an EVENT_ORGANIZER!");
     }
 
+    @GetMapping("/my-events")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(@RequestParam(required = false) String filter, @RequestParam(required = false) List<Integer> departmentIds) {
+        try {
+            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter, departmentIds);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            logger.error("Error retrieving events", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
     @PostMapping("/create-event")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<Event> createEvent(@Valid @RequestBody CreateEventRequest request) {
@@ -62,20 +74,6 @@ public class EventOrganizerController {
         return ResponseEntity.ok(eventUpdateDTO);
     }
 
-    @GetMapping("/my-events")
-    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
-    public ResponseEntity<EventFilterSummaryForOrganizerDTO> getOrganizerEvents(
-            @RequestParam(required = false) String filter,
-            @RequestParam(required = false) List<Integer> departmentIds) {
-        try {
-            EventFilterSummaryForOrganizerDTO summary = eventOrganizerService.getEventsByOrganizer(filter, departmentIds);
-            return ResponseEntity.ok(summary);
-        } catch (Exception e) {
-            logger.error("Error retrieving events", e);
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
     @DeleteMapping("/delete-event/{eventId}")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
@@ -87,25 +85,6 @@ public class EventOrganizerController {
             return ResponseEntity.status(500).body("Error deleting event");
         }
     }
-
-    @GetMapping("/statistics/gender")
-    public ResponseEntity<Map<Integer, Map<Gender, Long>>> getGenderStatistics() {
-        Map<Integer, Map<Gender, Long>> statistics = eventOrganizerService.getGenderStatistics();
-        return ResponseEntity.ok(statistics);
-    }
-
-    @PutMapping("/events/{eventId}/participants/{participantId}/status")
-    public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
-        try {
-            eventOrganizerService.reviewJoinRequest(eventId, participantId, status);
-            logger.info("Join request updated: Event ID={}, Participant ID={}, New Status={}", eventId, participantId, status);
-            return ResponseEntity.ok("Join request updated successfully");
-        } catch (RuntimeException e) {
-            logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
 
     @GetMapping("/my-events/{eventId}/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
@@ -155,6 +134,17 @@ public class EventOrganizerController {
         }
     }
 
+    @PutMapping("/events/{eventId}/participants/{participantId}/status")
+    public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
+        try {
+            eventOrganizerService.reviewJoinRequest(eventId, participantId, status);
+            logger.info("Join request updated: Event ID={}, Participant ID={}, New Status={}", eventId, participantId, status);
+            return ResponseEntity.ok("Join request updated successfully");
+        } catch (RuntimeException e) {
+            logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping("/company/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
@@ -166,6 +156,12 @@ public class EventOrganizerController {
             logger.error("Error retrieving participants for organizer's company", e);
             return ResponseEntity.status(500).body(null);
         }
+    }
+
+    @GetMapping("/statistics/gender")
+    public ResponseEntity<Map<Integer, Map<Gender, Long>>> getGenderStatistics() {
+        Map<Integer, Map<Gender, Long>> statistics = eventOrganizerService.getGenderStatistics();
+        return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/event-stats/{eventId}")
@@ -193,9 +189,7 @@ public class EventOrganizerController {
     }
 
     @PostMapping("/{companyId}/add-departments")
-    public ResponseEntity<Void> addDepartments(
-            @PathVariable Integer companyId,
-            @RequestBody List<String> departmentNames) {
+    public ResponseEntity<Void> addDepartments(@PathVariable Integer companyId, @RequestBody List<String> departmentNames) {
         try {
             companyService.addDepartmentsToCompany(companyId, departmentNames);
             return ResponseEntity.ok().build();

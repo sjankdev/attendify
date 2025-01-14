@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 public class EventOrganizer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -59,5 +60,4 @@ public class EventOrganizer {
         this.events = events;
         return this;
     }
-
 }

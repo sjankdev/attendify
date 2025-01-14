@@ -18,6 +18,7 @@ import com.app.attendify.eventOrganizer.repository.EventOrganizerRepository;
 import com.app.attendify.security.repositories.RoleRepository;
 import com.app.attendify.security.repositories.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,6 +48,7 @@ public class AuthenticationService {
     private final InvitationService invitationService;
     private final DepartmentRepository departmentRepository;
 
+    @Autowired
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, EventOrganizerRepository eventOrganizerRepository, CompanyRepository companyRepository, JavaMailSender javaMailSender, EventParticipantRepository eventParticipantRepository, InvitationService invitationService, DepartmentRepository departmentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -71,11 +73,7 @@ public class AuthenticationService {
             throw new RuntimeException("Role not found");
         }
 
-        User organizerUser = new User()
-                .setFullName(input.getFullName())
-                .setEmail(input.getEmail())
-                .setPassword(passwordEncoder.encode(input.getPassword()))
-                .setRole(optionalRole.get());
+        User organizerUser = new User().setFullName(input.getFullName()).setEmail(input.getEmail()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(optionalRole.get());
 
         User savedUser = userRepository.save(organizerUser);
 
@@ -88,10 +86,7 @@ public class AuthenticationService {
         eventOrganizer.setUser(savedUser);
         eventOrganizerRepository.save(eventOrganizer);
 
-        Company company = new Company()
-                .setName(input.getCompanyName())
-                .setDescription(input.getCompanyDescription())
-                .setOwner(eventOrganizer);
+        Company company = new Company().setName(input.getCompanyName()).setDescription(input.getCompanyDescription()).setOwner(eventOrganizer);
 
         companyRepository.save(company);
 
@@ -128,15 +123,7 @@ public class AuthenticationService {
                 throw new IllegalArgumentException("Department ID is required");
             }
 
-            EventParticipant participant = new EventParticipant()
-                    .setUser(newUser)
-                    .setCompany(invitation.getCompany())
-                    .setAge(input.getAge())
-                    .setYearsOfExperience(input.getYearsOfExperience())
-                    .setGender(input.getGender())
-                    .setEducationLevel(input.getEducationLevel())
-                    .setOccupation(input.getOccupation())
-                    .setDepartment(department);
+            EventParticipant participant = new EventParticipant().setUser(newUser).setCompany(invitation.getCompany()).setAge(input.getAge()).setYearsOfExperience(input.getYearsOfExperience()).setGender(input.getGender()).setEducationLevel(input.getEducationLevel()).setOccupation(input.getOccupation()).setDepartment(department);
 
             eventParticipantRepository.save(participant);
 
@@ -164,16 +151,9 @@ public class AuthenticationService {
     }
 
     private User createUser(EventParticipantRegisterDto input) {
-        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role participantRole = roleRepository.findByName(RoleEnum.EVENT_PARTICIPANT).orElseThrow(() -> new RuntimeException("Role not found"));
 
-        User newUser = new User()
-                .setEmail(input.getEmail())
-                .setFullName(input.getName())
-                .setPassword(passwordEncoder.encode(input.getPassword()))
-                .setRole(participantRole)
-                .setEmailVerificationToken(UUID.randomUUID().toString())
-                .setEmailVerified(true);
+        User newUser = new User().setEmail(input.getEmail()).setFullName(input.getName()).setPassword(passwordEncoder.encode(input.getPassword())).setRole(participantRole).setEmailVerificationToken(UUID.randomUUID().toString()).setEmailVerified(true);
 
         return userRepository.save(newUser);
     }
@@ -220,5 +200,4 @@ public class AuthenticationService {
 
         return company;
     }
-
 }

@@ -18,12 +18,12 @@ import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.utils.EventFilterUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +37,7 @@ public class EventParticipantService {
     private final EventFilterUtil eventFilterUtil;
     private final FeedbackRepository feedbackRepository;
 
+    @Autowired
     public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil, FeedbackRepository feedbackRepository) {
         this.eventParticipantRepository = eventParticipantRepository;
         this.eventRepository = eventRepository;
@@ -221,5 +222,4 @@ public class EventParticipantService {
 
         return feedbackDTO;
     }
-
 }

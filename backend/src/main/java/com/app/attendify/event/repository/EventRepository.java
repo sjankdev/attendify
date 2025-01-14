@@ -12,5 +12,4 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE e.availableForAllDepartments = true")
     List<Event> findByAvailableForAllDepartmentsTrue();
-
 }

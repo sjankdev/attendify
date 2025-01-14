@@ -3,6 +3,7 @@ package com.app.attendify.event.dto;
 import java.util.List;
 
 public class FeedbackSummaryDTO {
+
     private List<FeedbackOrganizerDTO> feedbacks;
     private double averageRating;
 

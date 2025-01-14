@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class FeedbackOrganizerDTO {
+
     private String participantName;
 
     private String comments;

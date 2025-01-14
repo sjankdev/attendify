@@ -16,5 +16,4 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 
     @Query("SELECT d FROM Department d WHERE d.id IN :ids AND d.company = :company")
     List<Department> findByIdInAndCompany(@Param("ids") List<Integer> ids, @Param("company") Company company);
-
 }

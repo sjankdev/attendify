@@ -1,7 +1,5 @@
 package com.app.attendify.event.dto;
 
-
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -30,13 +28,12 @@ public class CreateEventRequest {
     private Integer attendeeLimit;
 
     @NotNull
-    @FutureOrPresent(message = "Event start date must be in the future.")
     private LocalDateTime eventStartDate;
 
     @NotNull
-    @FutureOrPresent(message = "Event end date must be in the future.")
     private LocalDateTime eventEndDate;
 
+    @NotNull
     private LocalDateTime joinDeadline;
 
     private boolean joinApproval;
@@ -141,6 +138,5 @@ public class CreateEventRequest {
         this.joinApproval = joinApproval;
         return this;
     }
-
 }
 
