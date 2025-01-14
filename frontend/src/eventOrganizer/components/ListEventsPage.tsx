@@ -505,9 +505,6 @@ const ListEventsPage: React.FC = () => {
                                   <p className="text-white">
                                     {participant.participantName}
                                   </p>
-                                  <p className="text-sm text-gray-400">
-                                    {participant.participantEmail}
-                                  </p>
                                 </div>
                               </li>
                             ))}
@@ -529,9 +526,6 @@ const ListEventsPage: React.FC = () => {
                                 <div>
                                   <p className="text-white">
                                     {participant.participantName}
-                                  </p>
-                                  <p className="text-sm text-gray-400">
-                                    {participant.participantEmail}
                                   </p>
                                 </div>
                                 <div>

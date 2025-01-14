@@ -118,9 +118,6 @@ const CompanyParticipantsPage: React.FC = () => {
                       <h3 className="text-xl font-semibold text-white">
                         {participant.participantName}
                       </h3>
-                      <p className="text-gray-300">
-                        {participant.participantEmail}
-                      </p>
                       <p className="text-sm text-gray-400">
                         Department: {participant.departmentName}
                       </p>
