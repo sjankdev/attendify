@@ -13,13 +13,18 @@ const EventParticipantPage: React.FC = () => {
   const [feedback, setFeedback] = useState<string>("");
   const [rating, setRating] = useState<number | string>("");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [feedbacks, setFeedbacks] = useState<{ [key: number]: string }>({});
+  const [ratings, setRatings] = useState<{ [key: number]: number | string }>(
+    {}
+  );
 
   const [eventFeedbacks, setEventFeedbacks] = useState<
     { eventId: number; feedback: string; rating: number }[]
   >([]);
 
-  const [isFeedbackFormVisible, setIsFeedbackFormVisible] =
-    useState<boolean>(false);
+  const [feedbackFormVisibleFor, setFeedbackFormVisibleFor] = useState<
+    number | null
+  >(null);
 
   const handleFilterClick = (filter: string) => {
     if (selectedFilter === filter) {
@@ -41,7 +46,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/event-participant/join-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/join-event/${eventId}`,
         {},
         {
           headers: {
@@ -73,7 +78,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/auth/event-participant/unjoin-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/unjoin-event/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,7 +107,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/auth/event-participant/feedback/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/feedback/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -138,24 +143,23 @@ const EventParticipantPage: React.FC = () => {
   ) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found");
       setError("No token found. Please log in.");
       return;
     }
 
     if (rating < 1 || rating > 5) {
-      setError("Rating must be between 1 and 5");
+      setError("Rating must be between 1 and 5.");
       return;
     }
 
     if (comments.trim() === "") {
-      setError("Feedback cannot be empty");
+      setError("Feedback cannot be empty.");
       return;
     }
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/event-participant/submit-feedback/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/submit-feedback/${eventId}`,
         { comments, rating },
         {
           headers: {
@@ -164,12 +168,13 @@ const EventParticipantPage: React.FC = () => {
           },
         }
       );
+
       console.log("Feedback submitted successfully:", response.data);
       setError(null);
       alert("Feedback submitted successfully!");
 
-      fetchEventFeedback(eventId);
-      setIsFeedbackFormVisible(false);
+      fetchEventFeedback(eventId); 
+      setFeedbackFormVisibleFor(null);
       fetchEvents();
     } catch (err: any) {
       console.error("Error submitting feedback:", err);
@@ -179,6 +184,7 @@ const EventParticipantPage: React.FC = () => {
       );
     }
   };
+
   const fetchEvents = async (filter?: string) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -188,7 +194,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/auth/event-participant/my-events",
+        "https://attendify-backend-el2r.onrender.com/api/auth/event-participant/my-events",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -409,7 +415,7 @@ const EventParticipantPage: React.FC = () => {
                 {!isNotJoined && isEventEnded && !isFeedbackSubmitted && (
                   <div className="mt-4">
                     <button
-                      onClick={() => setIsFeedbackFormVisible(true)}
+                      onClick={() => setFeedbackFormVisibleFor(event.id)}
                       className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500"
                     >
                       Leave Feedback
@@ -417,55 +423,64 @@ const EventParticipantPage: React.FC = () => {
                   </div>
                 )}
 
-                {isFeedbackFormVisible &&
-                  isAccepted &&
-                  !isFeedbackSubmitted &&
-                  isEventEnded &&
-                  !isNotJoined && (
-                    <div className="mt-4">
-                      <textarea
-                        value={feedback}
-                        onChange={(e) => setFeedback(e.target.value)}
-                        placeholder="Write your feedback here..."
-                        rows={4}
-                        className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
-                      ></textarea>
-                      <input
-                        type="number"
-                        value={rating}
-                        onChange={(e) => setRating(e.target.value)}
-                        min="1"
-                        max="5"
-                        placeholder="Rating (1-5)"
-                        className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
-                      />
-                      {error && (
-                        <p className="text-red-500 bg-red-800 p-2 rounded-lg mt-2">
-                          {error}
-                        </p>
-                      )}
-                      <div className="mt-4 flex space-x-4">
-                        <button
-                          onClick={() =>
-                            handleSubmitFeedback(
-                              event.id,
-                              feedback,
-                              parseInt(rating.toString())
-                            )
-                          }
-                          className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
-                        >
-                          Submit Feedback
-                        </button>
-                        <button
-                          onClick={() => setIsFeedbackFormVisible(false)}
-                          className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
-                        >
-                          Cancel
-                        </button>
-                      </div>
+                {feedbackFormVisibleFor === event.id && (
+                  <div className="mt-4">
+                    <textarea
+                      value={feedbacks[event.id] || ""}
+                      onChange={(e) =>
+                        setFeedbacks((prev) => ({
+                          ...prev,
+                          [event.id]: e.target.value,
+                        }))
+                      }
+                      placeholder="Write your feedback here..."
+                      rows={4}
+                      className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
+                    />
+
+                    <input
+                      type="number"
+                      value={ratings[event.id] || ""}
+                      onChange={(e) =>
+                        setRatings((prev) => ({
+                          ...prev,
+                          [event.id]: e.target.value,
+                        }))
+                      }
+                      min="1"
+                      max="5"
+                      placeholder="Rating (1-5)"
+                      className="w-full p-3 bg-[#252525] text-white rounded-lg mt-2"
+                    />
+
+                    {error && (
+                      <p className="text-red-500 bg-red-800 p-2 rounded-lg mt-2">
+                        {error}
+                      </p>
+                    )}
+
+                    <div className="mt-4 flex space-x-4">
+                      <button
+                        onClick={() =>
+                          handleSubmitFeedback(
+                            event.id,
+                            feedbacks[event.id] || "",
+                            parseInt(ratings[event.id]?.toString() || "0") 
+                          )
+                        }
+                        className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
+                      >
+                        Submit Feedback
+                      </button>
+                      <button
+                        onClick={() => setFeedbackFormVisibleFor(null)}
+                        className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
                     </div>
-                  )}
+                  </div>
+                )}
               </div>
             );
           })}
