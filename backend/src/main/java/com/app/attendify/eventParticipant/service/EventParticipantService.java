@@ -16,6 +16,7 @@ import com.app.attendify.eventParticipant.dto.EventForParticipantsDTO;
 import com.app.attendify.eventParticipant.model.EventParticipant;
 import com.app.attendify.eventParticipant.repository.EventParticipantRepository;
 import com.app.attendify.utils.EventFilterUtil;
+import com.app.attendify.utils.TimeZoneConversionUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,16 @@ public class EventParticipantService {
     private final EventAttendanceRepository eventAttendanceRepository;
     private final EventFilterUtil eventFilterUtil;
     private final FeedbackRepository feedbackRepository;
+    private final TimeZoneConversionUtil timeZoneConversionUtil;
 
     @Autowired
-    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil, FeedbackRepository feedbackRepository) {
+    public EventParticipantService(EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventAttendanceRepository eventAttendanceRepository, EventFilterUtil eventFilterUtil, FeedbackRepository feedbackRepository, TimeZoneConversionUtil timeZoneConversionUtil) {
         this.eventParticipantRepository = eventParticipantRepository;
         this.eventRepository = eventRepository;
         this.eventAttendanceRepository = eventAttendanceRepository;
         this.eventFilterUtil = eventFilterUtil;
         this.feedbackRepository = feedbackRepository;
+        this.timeZoneConversionUtil = timeZoneConversionUtil;
     }
 
     @Transactional
@@ -182,15 +185,28 @@ public class EventParticipantService {
 
     @Transactional
     public void submitFeedback(Integer eventId, String userEmail, String comments, int rating) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        Logger logger = LoggerFactory.getLogger(this.getClass());
 
-        if (LocalDateTime.now().isBefore(event.getEventEndDate())) {
+        logger.info("Starting feedback submission for eventId: {}, userEmail: {}", eventId, userEmail);
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        logger.info("Event retrieved: {}, Event end date: {}", event.getName(), event.getEventEndDate());
+
+        LocalDateTime currentBelgradeTime = timeZoneConversionUtil.convertToBelgradeTime(LocalDateTime.now());
+        logger.info("Current time in Belgrade: {}", currentBelgradeTime);
+
+        if (currentBelgradeTime.isBefore(event.getEventEndDate())) {
+            logger.error("Attempt to submit feedback before event end date. Event end date: {}", event.getEventEndDate());
             throw new RuntimeException("Feedback can only be submitted after the event has ended.");
         }
 
-        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail).orElseThrow(() -> new RuntimeException("Participant not found"));
+        EventParticipant participant = eventParticipantRepository.findByUser_Email(userEmail)
+                .orElseThrow(() -> new RuntimeException("Participant not found"));
+        logger.info("Participant retrieved: {}", participant.getId());
 
         if (eventAttendanceRepository.findByParticipantIdAndEventId(participant.getId(), eventId).isEmpty()) {
+            logger.error("Participant {} did not attend the event {}", userEmail, eventId);
             throw new RuntimeException("You did not attend this event.");
         }
 
@@ -199,11 +215,14 @@ public class EventParticipantService {
         feedback.setParticipant(participant);
         feedback.setComments(comments);
         feedback.setRating(rating);
+        logger.info("Feedback created: [Event: {}, Participant: {}, Rating: {}]", event.getName(), participant.getId(), rating);
 
         feedbackRepository.save(feedback);
+        logger.info("Feedback saved successfully for eventId: {} and userEmail: {}", eventId, userEmail);
 
         event.setFeedbackSubmitted(true);
         eventRepository.save(event);
+        logger.info("Event feedbackSubmitted status updated for eventId: {}", eventId);
     }
 
     @Transactional
