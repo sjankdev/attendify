@@ -32,7 +32,7 @@ const DepartmentsList: React.FC = () => {
     const fetchCompanyId = async () => {
       try {
         const companyResponse = await axios.get(
-          "http://localhost:8080/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -129,9 +129,6 @@ const DepartmentsList: React.FC = () => {
                       >
                         <div className="text-white">
                           {participant.participantName}
-                        </div>
-                        <div className="text-sm text-gray-400">
-                          {participant.participantEmail}
                         </div>
                       </li>
                     ))}

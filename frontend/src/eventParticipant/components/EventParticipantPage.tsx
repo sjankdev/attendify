@@ -41,7 +41,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/event-participant/join-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/join-event/${eventId}`,
         {},
         {
           headers: {
@@ -73,7 +73,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/auth/event-participant/unjoin-event/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/unjoin-event/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/auth/event-participant/feedback/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/feedback/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -155,7 +155,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/event-participant/submit-feedback/${eventId}`,
+        `https://attendify-backend-el2r.onrender.com/api/auth/event-participant/submit-feedback/${eventId}`,
         { comments, rating },
         {
           headers: {
@@ -188,7 +188,7 @@ const EventParticipantPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/auth/event-participant/my-events",
+        "https://attendify-backend-el2r.onrender.com/api/auth/event-participant/my-events",
         {
           headers: {
             Authorization: `Bearer ${token}`,
