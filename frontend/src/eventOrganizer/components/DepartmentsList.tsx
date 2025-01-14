@@ -12,7 +12,6 @@ const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<DepartmentDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [companyId, setCompanyId] = useState<number | null>(null);
-  const [companyName, setCompanyName] = useState<string>("");
   const [newDepartmentNames, setNewDepartmentNames] = useState<string[]>([]);
   const [isAddingDepartments, setIsAddingDepartments] = useState(false);
 
@@ -30,7 +29,7 @@ const DepartmentsList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCompanyData = async () => {
+    const fetchCompanyId = async () => {
       try {
         const companyResponse = await axios.get(
           "http://localhost:8080/api/auth/company",
@@ -41,35 +40,26 @@ const DepartmentsList: React.FC = () => {
           }
         );
         setCompanyId(companyResponse.data.id);
-        setCompanyName(companyResponse.data.name);
-
-        const departmentResponse = await axios.get(
-          `http://localhost:8080/api/companies/${companyResponse.data.id}/departments`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        setDepartments(departmentResponse.data);
+        console.log("Company ID:", companyResponse.data.id);
       } catch (err: any) {
-        console.error(
-          "Error fetching company or department information: ",
-          err
-        );
-        setError("Failed to fetch company or department information.");
+        console.error("Error fetching company information: ", err);
+        setError("Failed to fetch company information.");
       }
     };
 
-    fetchCompanyData();
+    fetchCompanyId();
   }, []);
 
   const handleAddDepartments = async () => {
     if (companyId && newDepartmentNames.length > 0) {
       try {
         await addDepartments(newDepartmentNames, companyId);
+
         setNewDepartmentNames([]);
         setIsAddingDepartments(false);
+
+        const updatedDepartments = await fetchDepartmentsByCompany();
+        setDepartments(updatedDepartments);
       } catch (error) {
         setError("Failed to add departments.");
       }
