@@ -2,7 +2,6 @@ package com.app.attendify.event.services;
 
 import com.app.attendify.company.model.Department;
 import com.app.attendify.event.model.EventAttendance;
-import com.app.attendify.eventParticipant.enums.EducationLevel;
 import com.app.attendify.eventParticipant.enums.Gender;
 import org.springframework.stereotype.Service;
 
@@ -23,25 +22,15 @@ public class StatisticsService {
         Integer highestAge = ages.stream().max(Integer::compareTo).orElse(null);
         Integer lowestAge = ages.stream().min(Integer::compareTo).orElse(null);
 
-        return Map.of(
-                "averageAge", averageAge,
-                "highestAge", highestAge != null ? highestAge : 0,
-                "lowestAge", lowestAge != null ? lowestAge : 0
-        );
+        return Map.of("averageAge", averageAge, "highestAge", highestAge != null ? highestAge : 0, "lowestAge", lowestAge != null ? lowestAge : 0);
     }
 
     public Map<String, Long> calculateGenderCounts(List<EventAttendance> attendances) {
-        long maleCount = attendances.stream()
-                .filter(attendance -> attendance.getParticipant().getGender() == Gender.MALE)
-                .count();
+        long maleCount = attendances.stream().filter(attendance -> attendance.getParticipant().getGender() == Gender.MALE).count();
 
-        long femaleCount = attendances.stream()
-                .filter(attendance -> attendance.getParticipant().getGender() == Gender.FEMALE)
-                .count();
+        long femaleCount = attendances.stream().filter(attendance -> attendance.getParticipant().getGender() == Gender.FEMALE).count();
 
-        long otherCount = attendances.stream()
-                .filter(attendance -> attendance.getParticipant().getGender() == Gender.OTHER)
-                .count();
+        long otherCount = attendances.stream().filter(attendance -> attendance.getParticipant().getGender() == Gender.OTHER).count();
 
         return Map.of("maleCount", maleCount, "femaleCount", femaleCount, "otherCount", otherCount);
     }
@@ -55,51 +44,27 @@ public class StatisticsService {
         Integer highestExperience = experienceList.stream().max(Integer::compareTo).orElse(0);
         Integer lowestExperience = experienceList.stream().min(Integer::compareTo).orElse(0);
 
-        return Map.of(
-                "averageExperience", averageExperience,
-                "highestExperience", highestExperience,
-                "lowestExperience", lowestExperience
-        );
+        return Map.of("averageExperience", averageExperience, "highestExperience", highestExperience, "lowestExperience", lowestExperience);
     }
 
     public Map<String, Map<String, Object>> calculateEducationLevelStats(List<EventAttendance> attendances) {
         long total = attendances.size();
-        return attendances.stream()
-                .collect(Collectors.groupingBy(
-                        attendance -> attendance.getParticipant().getEducationLevel().name(),
-                        Collectors.counting()
-                ))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> {
-                            Map<String, Object> stats = new HashMap<>();
-                            stats.put("count", entry.getValue());
-                            stats.put("percentage", (entry.getValue() * 100.0) / total);
-                            return stats;
-                        }
-                ));
+        return attendances.stream().collect(Collectors.groupingBy(attendance -> attendance.getParticipant().getEducationLevel().name(), Collectors.counting())).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("count", entry.getValue());
+            stats.put("percentage", (entry.getValue() * 100.0) / total);
+            return stats;
+        }));
     }
 
     public Map<String, Map<String, Object>> calculateOccupationStats(List<EventAttendance> attendances) {
         long total = attendances.size();
-        return attendances.stream()
-                .collect(Collectors.groupingBy(
-                        attendance -> attendance.getParticipant().getOccupation().name(),
-                        Collectors.counting()
-                ))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> {
-                            Map<String, Object> stats = new HashMap<>();
-                            stats.put("count", entry.getValue());
-                            stats.put("percentage", (entry.getValue() * 100.0) / total);
-                            return stats;
-                        }
-                ));
+        return attendances.stream().collect(Collectors.groupingBy(attendance -> attendance.getParticipant().getOccupation().name(), Collectors.counting())).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("count", entry.getValue());
+            stats.put("percentage", (entry.getValue() * 100.0) / total);
+            return stats;
+        }));
     }
 
     public Map<String, Long> calculateDepartmentStats(List<EventAttendance> attendances, List<Department> departments) {

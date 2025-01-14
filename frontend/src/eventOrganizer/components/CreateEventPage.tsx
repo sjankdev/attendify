@@ -6,10 +6,11 @@ import Layout from "../../shared/components/EventOrganizerLayout";
 import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {
-  const getBelgradeTime = () => {
+  const getBelgradeTime = (date: string | Date): string => {
     const options = { timeZone: "Europe/Belgrade", hour12: false };
-    const now = new Date().toLocaleString("sv-SE", options);
-    return now.replace(" ", "T");
+    return new Date(
+      new Date(date).toLocaleString("sv-SE", options)
+    ).toISOString();
   };
 
   const [name, setName] = useState<string>("");
@@ -20,17 +21,22 @@ const CreateEventPage: React.FC = () => {
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
   const [eventStartDate, setEventStartDate] = useState<string>(
-    getBelgradeTime()
+    getBelgradeTime(new Date())
   );
-  const [eventEndDate, setEventEndDate] = useState<string>(getBelgradeTime());
-  const [joinDeadline, setJoinDeadline] = useState<string>(getBelgradeTime());
+  const [eventEndDate, setEventEndDate] = useState<string>(
+    getBelgradeTime(new Date())
+  );
+  const [joinDeadline, setJoinDeadline] = useState<string>(
+    getBelgradeTime(new Date())
+  );
+
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
-  const [agendaItems, setAgendaItems] = useState<AgendaItemDTO[]>([
+  const [agendaItems, setAgendaItems] = useState([
     {
       title: "",
       description: "",
-      startTime: getBelgradeTime(),
-      endTime: getBelgradeTime(),
+      startTime: "",
+      endTime: "",
     },
   ]);
 
@@ -120,21 +126,21 @@ const CreateEventPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      const updatedAgendaItems = isAgendaVisible
+        ? agendaItems.map((item) => ({
+            ...item,
+            startTime: getBelgradeTime(item.startTime),
+            endTime: getBelgradeTime(item.endTime),
+          }))
+        : [];
+
       const eventData = {
         ...formData,
-        eventStartDate: new Date(eventStartDate).toISOString(),
-        eventEndDate: new Date(eventEndDate).toISOString(),
-        joinDeadline: joinDeadline
-          ? new Date(joinDeadline).toISOString()
-          : null,
+        eventStartDate: getBelgradeTime(eventStartDate),
+        eventEndDate: getBelgradeTime(eventEndDate),
+        joinDeadline: joinDeadline ? getBelgradeTime(joinDeadline) : null,
         joinApproval,
-        agendaItems: isAgendaVisible
-          ? agendaItems.map((item) => ({
-              ...item,
-              startTime: new Date(item.startTime).toISOString(),
-              endTime: new Date(item.endTime).toISOString(),
-            }))
-          : [],
+        agendaItems: updatedAgendaItems,
       };
 
       await axios.post(
@@ -183,6 +189,18 @@ const CreateEventPage: React.FC = () => {
   const handleRemoveAgendaItem = (index: number) => {
     const updatedAgendaItems = agendaItems.filter((_, i) => i !== index);
     setAgendaItems(updatedAgendaItems);
+  };
+
+  const handleAddAgendaItem = () => {
+    setAgendaItems([
+      ...agendaItems,
+      {
+        title: "",
+        description: "",
+        startTime: "",
+        endTime: "",
+      },
+    ]);
   };
 
   return (
@@ -368,11 +386,9 @@ const CreateEventPage: React.FC = () => {
               <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Agenda Items for the Event
               </label>
+
               {isAgendaVisible && (
                 <div className="p-5 rounded-lg">
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    Agenda Items for the Event
-                  </label>
                   {agendaItems.map((item, index) => (
                     <div key={index} className="space-y-4 mb-4">
                       <div>
@@ -438,13 +454,26 @@ const CreateEventPage: React.FC = () => {
                   ))}
                 </div>
               )}
-              <button
-                onClick={() => setIsAgendaVisible(!isAgendaVisible)}
-                className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
-              >
-                Add New Agenda Item
-              </button>
+
+              {!isAgendaVisible && (
+                <button
+                  onClick={() => setIsAgendaVisible(true)}
+                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
+                >
+                  Add New Agenda Item
+                </button>
+              )}
+
+              {isAgendaVisible && agendaItems.length > 0 && (
+                <button
+                  onClick={handleAddAgendaItem}
+                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500 mt-4"
+                >
+                  Add New Agenda Item
+                </button>
+              )}
             </div>
+            );
           </div>
 
           <div className="flex justify-start space-x-4 col-span-1 sm:col-span-2 md:col-span-3">

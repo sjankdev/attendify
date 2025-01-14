@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Invitation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

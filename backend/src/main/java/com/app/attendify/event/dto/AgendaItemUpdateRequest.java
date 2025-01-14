@@ -3,6 +3,7 @@ package com.app.attendify.event.dto;
 import java.time.LocalDateTime;
 
 public class AgendaItemUpdateRequest {
+
     private Integer id;
     private String title;
     private String description;
@@ -56,5 +57,4 @@ public class AgendaItemUpdateRequest {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
-
 }

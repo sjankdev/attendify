@@ -3,6 +3,7 @@ package com.app.attendify.eventParticipant.dto;
 import java.util.List;
 
 public class EventParticipantDTO {
+
     private Integer participantId;
     private String participantName;
     private String participantEmail;

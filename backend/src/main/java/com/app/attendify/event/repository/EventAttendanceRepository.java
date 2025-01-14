@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface EventAttendanceRepository extends JpaRepository<EventAttendance, Integer> {
+
     boolean existsByParticipantIdAndEventId(Integer participantId, Integer eventId);
 
     @Transactional
@@ -22,13 +23,7 @@ public interface EventAttendanceRepository extends JpaRepository<EventAttendance
 
     Optional<EventAttendance> findByParticipantIdAndEventId(Integer participantId, Integer eventId);
 
-    @Query("SELECT ea.participant.age FROM EventAttendance ea WHERE ea.event.id = :eventId AND ea.status = 'ACCEPTED'")
-    List<Integer> findAcceptedParticipantAgesByEventId(@Param("eventId") Integer eventId);
-
-    @Query("SELECT e.event.id, p.gender, COUNT(p.id) " +
-            "FROM EventAttendance e " +
-            "JOIN e.participant p " +
-            "GROUP BY e.event.id, p.gender")
+    @Query("SELECT e.event.id, p.gender, COUNT(p.id) " + "FROM EventAttendance e " + "JOIN e.participant p " + "GROUP BY e.event.id, p.gender")
     List<Object[]> countParticipantsByGender();
 
 }

@@ -213,12 +213,10 @@ export const validateEventForm = (
     const eventStart = new Date(eventStartDate);
     const eventEnd = new Date(eventEndDate);
     const join = new Date(joinDeadline);
+    const currentDate = new Date();
 
-    if (
-      isAttendeeLimitChecked &&
-      (attendeeLimit === null || attendeeLimit < 1)
-    ) {
-      errors.push("Attendee limit must be at least 1.");
+    if (eventStart <= currentDate) {
+      errors.push("Event start date must be in the future.");
     }
 
     if (isNaN(eventStart.getTime()) || isNaN(eventEnd.getTime())) {
@@ -229,7 +227,11 @@ export const validateEventForm = (
 
     if (isNaN(join.getTime())) {
       errors.push("Invalid join deadline.");
-    } else if (join >= eventStart) {
+    } else if (join <= currentDate) {
+      errors.push("Join deadline must be in the future.");
+    }
+
+    if (join >= eventStart) {
       errors.push("Join deadline must be before the event start date.");
     }
 
@@ -250,6 +252,7 @@ export const validateEventForm = (
 
     const eventStartDateTime = new Date(eventStartDate).getTime();
     const eventEndDateTime = new Date(eventEndDate).getTime();
+    const currentDate = new Date().getTime();
 
     for (let i = 0; i < agendaItems.length; i++) {
       const item = agendaItems[i];
@@ -270,6 +273,10 @@ export const validateEventForm = (
 
       const agendaStartTime = new Date(item.startTime).getTime();
       const agendaEndTime = new Date(item.endTime).getTime();
+
+      if (agendaStartTime < currentDate) {
+        errors.push(`Agenda item ${i + 1}: Start time must be in the future.`);
+      }
 
       if (agendaStartTime >= agendaEndTime) {
         errors.push(

@@ -13,5 +13,4 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
     EventParticipant findByUser(User user);
 
     Optional<EventParticipant> findByUser_Email(String email);
-
 }

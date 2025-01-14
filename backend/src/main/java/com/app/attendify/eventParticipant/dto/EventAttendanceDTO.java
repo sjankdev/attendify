@@ -3,6 +3,7 @@ package com.app.attendify.eventParticipant.dto;
 import com.app.attendify.event.enums.AttendanceStatus;
 
 public class EventAttendanceDTO {
+
     private String participantName;
     private String participantEmail;
     private int participantId;

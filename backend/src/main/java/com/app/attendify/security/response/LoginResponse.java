@@ -1,6 +1,7 @@
 package com.app.attendify.security.response;
 
 public class LoginResponse {
+
     private String token;
     private long expiresIn;
     private String message;
