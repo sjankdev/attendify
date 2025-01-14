@@ -1,7 +1,5 @@
 package com.app.attendify.event.dto;
 
-
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -140,6 +138,5 @@ public class CreateEventRequest {
         this.joinApproval = joinApproval;
         return this;
     }
-
 }
 

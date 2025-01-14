@@ -13,6 +13,7 @@ import java.util.List;
 
 @Entity
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -236,5 +237,4 @@ public class Event {
     public Integer getPendingRequests() {
         return (int) eventAttendances.stream().filter(attendance -> attendance.getStatus() == AttendanceStatus.PENDING).count();
     }
-
 }

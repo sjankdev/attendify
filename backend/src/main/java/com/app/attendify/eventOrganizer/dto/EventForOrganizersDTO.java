@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 public class EventForOrganizersDTO {
+
     private Integer id;
     private String name;
     private String description;
@@ -197,5 +197,4 @@ public class EventForOrganizersDTO {
     public void setPendingRequests(Integer pendingRequests) {
         this.pendingRequests = pendingRequests;
     }
-
 }

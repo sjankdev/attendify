@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventUpdateDTO {
+
     private Integer id;
     private String name;
     private String description;
@@ -40,7 +41,6 @@ public class EventUpdateDTO {
         this.joinApproval = joinApproval;
         this.agendaItems = agendaItems;
     }
-
 
     public Integer getId() {
         return id;
@@ -153,5 +153,4 @@ public class EventUpdateDTO {
     public void setAgendaItems(List<AgendaItemDTO> agendaItems) {
         this.agendaItems = agendaItems;
     }
-
 }

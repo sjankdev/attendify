@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class UpdateEventRequest {
+
     private String name;
     private String description;
     private String location;

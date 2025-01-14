@@ -4,7 +4,6 @@ import com.app.attendify.company.dto.InvitationRequestDto;
 import com.app.attendify.company.model.Company;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.CompanyRepository;
-import com.app.attendify.eventParticipant.service.EventParticipantService;
 import com.app.attendify.eventParticipant.dto.EventParticipantRegisterDto;
 import com.app.attendify.exceptions.EmailAlreadyExistsException;
 import com.app.attendify.security.dto.LoginUserDto;
@@ -16,6 +15,7 @@ import com.app.attendify.security.services.AuthenticationService;
 import com.app.attendify.company.services.InvitationService;
 import com.app.attendify.security.services.JwtService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -33,28 +33,23 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
-    private final EventParticipantService eventParticipantService;
     private final InvitationService invitationService;
     private final CompanyRepository companyRepository;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserRepository userRepository, EventParticipantService eventParticipantService, InvitationService invitationService, CompanyRepository companyRepository) {
+    @Autowired
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserRepository userRepository, InvitationService invitationService, CompanyRepository companyRepository) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.userRepository = userRepository;
-        this.eventParticipantService = eventParticipantService;
         this.invitationService = invitationService;
         this.companyRepository = companyRepository;
     }
 
     @PostMapping("/register-organizer")
-    public ResponseEntity<Object> registerEventOrganizer(
-            @Valid @RequestBody RegisterEventOrganizerDto registerEventOrganizerDto,
-            BindingResult bindingResult) {
+    public ResponseEntity<Object> registerEventOrganizer(@Valid @RequestBody RegisterEventOrganizerDto registerEventOrganizerDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
+            List<String> errorMessages = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errorMessages);
         }
 
@@ -69,14 +64,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register-participant")
-    public ResponseEntity<Object> registerEventParticipant(
-            @Valid @RequestBody EventParticipantRegisterDto registerDto,
-            BindingResult bindingResult) {
+    public ResponseEntity<Object> registerEventParticipant(@Valid @RequestBody EventParticipantRegisterDto registerDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getAllErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
+            List<String> errorMessages = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errorMessages);
         }
 
@@ -128,8 +119,7 @@ public class AuthenticationController {
             Integer companyId = invitationRequestDto.getCompanyId();
             List<InvitationRequestDto.EmailDepartment> emails = invitationRequestDto.getEmails();
 
-            Company company = companyRepository.findById(companyId)
-                    .orElseThrow(() -> new RuntimeException("Company not found"));
+            Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
 
             invitationService.sendBulkInvitations(emails, company);
 
@@ -159,5 +149,4 @@ public class AuthenticationController {
         Company company = authenticationService.getLoggedInOrganizerCompany();
         return ResponseEntity.ok(company);
     }
-
 }

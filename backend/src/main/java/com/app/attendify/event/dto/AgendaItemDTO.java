@@ -3,6 +3,7 @@ package com.app.attendify.event.dto;
 import java.time.LocalDateTime;
 
 public class AgendaItemDTO {
+
     private Integer id;
     private String title;
     private String description;

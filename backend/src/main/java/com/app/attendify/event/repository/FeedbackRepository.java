@@ -12,5 +12,4 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     boolean existsByEventIdAndParticipantId(Integer eventId, Integer participantId);
 
     Optional<Feedback> findByEventIdAndParticipantId(Integer eventId, Integer participantId);
-
 }

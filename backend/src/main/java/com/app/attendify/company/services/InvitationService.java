@@ -6,6 +6,7 @@ import com.app.attendify.company.model.Department;
 import com.app.attendify.company.model.Invitation;
 import com.app.attendify.company.repository.DepartmentRepository;
 import com.app.attendify.company.repository.InvitationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,15 @@ public class InvitationService {
     private final JavaMailSender mailSender;
     private final DepartmentRepository departmentRepository;
 
+    @Autowired
     public InvitationService(InvitationRepository invitationRepository, JavaMailSender mailSender, DepartmentRepository departmentRepository) {
         this.invitationRepository = invitationRepository;
         this.mailSender = mailSender;
         this.departmentRepository = departmentRepository;
+    }
+
+    public Invitation getInvitation(String token) {
+        return invitationRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Invalid or expired invitation token"));
     }
 
     public void sendInvitationEmail(String toEmail, String token) {
@@ -56,8 +62,7 @@ public class InvitationService {
     }
 
     public Invitation createInvitation(String email, Company company, Integer departmentId) {
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid department"));
+        Department department = departmentRepository.findById(departmentId).orElseThrow(() -> new IllegalArgumentException("Invalid department"));
 
         Invitation invitation = new Invitation();
         invitation.setEmail(email);
@@ -81,10 +86,6 @@ public class InvitationService {
 
             sendInvitationEmail(email, invitation.getToken());
         }
-    }
-
-    public Invitation getInvitation(String token) {
-        return invitationRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Invalid or expired invitation token"));
     }
 
     public void markAsAccepted(Invitation invitation) {
