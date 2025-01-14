@@ -6,10 +6,11 @@ import Layout from "../../shared/components/EventOrganizerLayout";
 import { validateEventForm } from "../../security/services/validation";
 
 const CreateEventPage: React.FC = () => {
-  const getBelgradeTime = () => {
+  const getBelgradeTime = (date: string | Date): string => {
     const options = { timeZone: "Europe/Belgrade", hour12: false };
-    const now = new Date().toLocaleString("sv-SE", options);
-    return now.replace(" ", "T");
+    return new Date(
+      new Date(date).toLocaleString("sv-SE", options)
+    ).toISOString();
   };
 
   const [name, setName] = useState<string>("");
@@ -20,10 +21,15 @@ const CreateEventPage: React.FC = () => {
   const [isAttendeeLimitChecked, setIsAttendeeLimitChecked] =
     useState<boolean>(false);
   const [eventStartDate, setEventStartDate] = useState<string>(
-    getBelgradeTime()
+    getBelgradeTime(new Date())
   );
-  const [eventEndDate, setEventEndDate] = useState<string>(getBelgradeTime());
-  const [joinDeadline, setJoinDeadline] = useState<string>(getBelgradeTime());
+  const [eventEndDate, setEventEndDate] = useState<string>(
+    getBelgradeTime(new Date())
+  );
+  const [joinDeadline, setJoinDeadline] = useState<string>(
+    getBelgradeTime(new Date())
+  );
+
   const [joinApproval, setJoinApproval] = useState<boolean>(false);
   const [agendaItems, setAgendaItems] = useState([
     {
@@ -120,21 +126,21 @@ const CreateEventPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      const updatedAgendaItems = isAgendaVisible
+        ? agendaItems.map((item) => ({
+            ...item,
+            startTime: getBelgradeTime(item.startTime),
+            endTime: getBelgradeTime(item.endTime),
+          }))
+        : [];
+
       const eventData = {
         ...formData,
-        eventStartDate: new Date(eventStartDate).toISOString(),
-        eventEndDate: new Date(eventEndDate).toISOString(),
-        joinDeadline: joinDeadline
-          ? new Date(joinDeadline).toISOString()
-          : null,
+        eventStartDate: getBelgradeTime(eventStartDate),
+        eventEndDate: getBelgradeTime(eventEndDate),
+        joinDeadline: joinDeadline ? getBelgradeTime(joinDeadline) : null,
         joinApproval,
-        agendaItems: isAgendaVisible
-          ? agendaItems.map((item) => ({
-              ...item,
-              startTime: new Date(item.startTime).toISOString(),
-              endTime: new Date(item.endTime).toISOString(),
-            }))
-          : [],
+        agendaItems: updatedAgendaItems,
       };
 
       await axios.post(

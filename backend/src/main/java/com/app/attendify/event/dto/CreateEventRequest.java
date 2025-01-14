@@ -30,11 +30,9 @@ public class CreateEventRequest {
     private Integer attendeeLimit;
 
     @NotNull
-    @FutureOrPresent(message = "Event start date must be in the future.")
     private LocalDateTime eventStartDate;
 
     @NotNull
-    @FutureOrPresent(message = "Event end date must be in the future.")
     private LocalDateTime eventEndDate;
 
     private LocalDateTime joinDeadline;
