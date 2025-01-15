@@ -397,6 +397,10 @@ const Login: React.FC = () => {
             Note: Response times may be slower due to our free hosting plan. We
             appreciate your patience!
           </p>
+          <p className="text-gray-300 mt-2">
+            Credentials: <strong>attendifytestdev@gmail.com</strong> /{" "}
+            <strong>attendifytestdev</strong>
+          </p>
         </div>
       </div>
     </div>
