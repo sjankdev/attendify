@@ -5,14 +5,18 @@ import com.app.attendify.company.services.CompanyService;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.enums.Gender;
+import com.app.attendify.security.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +136,13 @@ public class EventOrganizerController {
             logger.error("Error retrieving feedback summary for event", e);
             return ResponseEntity.status(500).body(null);
         }
+    }
+
+    @GetMapping("/upcoming")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public List<UpcomingEventDTO> getUpcomingEventsForOrganizer() {
+        logger.info("Fetching upcoming events for event organizer...");
+        return eventOrganizerService.getUpcomingEventsForCurrentUser();
     }
 
     @PutMapping("/events/{eventId}/participants/{participantId}/status")
