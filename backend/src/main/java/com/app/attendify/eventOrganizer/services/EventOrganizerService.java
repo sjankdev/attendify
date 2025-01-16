@@ -311,6 +311,26 @@ public class EventOrganizerService {
     }
 
     @Transactional
+    public Long getUniqueParticipantsCountForCurrentUser() {
+        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = currentUser.getUsername();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            return new IllegalArgumentException("User not found for email: " + email);
+        });
+
+        EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+            return new IllegalArgumentException("Event organizer not found for user: " + email);
+        });
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toLocalDate().atTime(23, 59, 59);
+
+        return eventOrganizerRepository.findUniqueParticipantsCountForWeek(organizer, startOfWeek, endOfWeek);
+    }
+
+    @Transactional
     public List<FeedbackOrganizerDTO> getFeedbacksByEvent(int eventId) {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> {

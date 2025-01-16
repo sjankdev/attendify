@@ -331,6 +331,33 @@ export const reviewJoinRequest = async (
   }
 };
 
+export const fetchUniqueParticipantsCountForThisWeek =
+  async (): Promise<number> => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:8080/api/auth/event-organizer/participant-counts",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch participant counts.");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching participant counts:", error);
+      throw error;
+    }
+  };
+
 export const fetchUpcomingEvents = async (): Promise<UpcomingEvent[]> => {
   try {
     const response = await fetch(

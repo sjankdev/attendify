@@ -157,6 +157,13 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/participant-counts")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public Long getUniqueParticipantsCountForOrganizer() {
+        logger.info("Fetching unique participant count for event organizer...");
+        return eventOrganizerService.getUniqueParticipantsCountForCurrentUser();
+    }
+
     @GetMapping("/company/participants")
     @PreAuthorize("hasRole('EVENT_ORGANIZER')")
     public ResponseEntity<List<EventParticipantDTO>> getParticipantsByCompany() {

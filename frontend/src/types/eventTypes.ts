@@ -62,6 +62,13 @@ export interface Participant {
   departmentName: string; 
 }
 
+export interface EventParticipantCount {
+  eventId: number;
+  eventName: string;
+  uniqueParticipantsCount: number;
+}
+
+
 export interface OccupationStatsDTO {
   count: number;
   percentage: number;

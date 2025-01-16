@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import SidebarLayout from "../../shared/components/EventOrganizerLayout";
-import { UpcomingEvent } from "../../types/eventTypes";
+import { UpcomingEvent, EventParticipantCount } from "../../types/eventTypes";
 import { fetchUpcomingEvents } from "../services/eventOrganizerService";
+import { fetchUniqueParticipantsCountForThisWeek } from "../services/eventOrganizerService";
 
 const EventOrganizerPage: React.FC = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [uniqueParticipantsCount, setUniqueParticipantsCount] =
+    useState<number>(0);
   const [showAllEvents, setShowAllEvents] = useState(false);
 
   useEffect(() => {
@@ -17,7 +20,18 @@ const EventOrganizerPage: React.FC = () => {
       }
     };
 
+    const getUniqueParticipantsCount = async () => {
+      try {
+        const uniqueParticipants =
+          await fetchUniqueParticipantsCountForThisWeek();
+        setUniqueParticipantsCount(uniqueParticipants);
+      } catch (error) {
+        console.error("Error fetching unique participants count:", error);
+      }
+    };
+
     getUpcomingEvents();
+    getUniqueParticipantsCount();
   }, []);
 
   const upcomingThisWeek = upcomingEvents.filter((event) => {
@@ -32,7 +46,9 @@ const EventOrganizerPage: React.FC = () => {
     return eventDate >= startOfWeekDate && eventDate <= endOfWeekDate;
   });
 
-  const visibleEvents = showAllEvents ? upcomingThisWeek : upcomingThisWeek.slice(0, 5);
+  const visibleEvents = showAllEvents
+    ? upcomingThisWeek
+    : upcomingThisWeek.slice(0, 5);
 
   return (
     <SidebarLayout className="bg-[#1f1f1f] text-white">
@@ -41,10 +57,23 @@ const EventOrganizerPage: React.FC = () => {
           Event Organizer Dashboard
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-gradient-to-r from-green-600 via-teal-600 to-blue-700 p-6 rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            Expected Participants This Week
+          </h2>
+          <p className="text-3xl font-bold text-white">
+            {uniqueParticipantsCount} Participants
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
-            <h2 className="text-2xl font-semibold mb-4 text-white">Upcoming Events This Week</h2>
-            <p className="text-3xl font-bold text-white mb-4">{upcomingThisWeek.length} Events</p>
+            <h2 className="text-2xl font-semibold mb-4 text-white">
+              Upcoming Events This Week
+            </h2>
+            <p className="text-3xl font-bold text-white mb-4">
+              {upcomingThisWeek.length} Events
+            </p>
 
             <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto">
               {visibleEvents.map((event) => (
@@ -59,6 +88,7 @@ const EventOrganizerPage: React.FC = () => {
                     minute: "2-digit",
                     hour12: false,
                   })}
+                  <br />
                 </li>
               ))}
             </ul>
