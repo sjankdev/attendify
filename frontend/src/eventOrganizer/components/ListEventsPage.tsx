@@ -404,8 +404,8 @@ const ListEventsPage: React.FC = () => {
                         <strong className="text-sm">Available Seats:</strong>
                         <span>
                           {event.attendeeLimit === null
-                            ? `${event.acceptedParticipants}/no limit`
-                            : `${event.acceptedParticipants}/${event.attendeeLimit}`}
+                            ? `${event.acceptedParticipants} / No Limit`
+                            : `${event.acceptedParticipants} / ${event.attendeeLimit}`}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
