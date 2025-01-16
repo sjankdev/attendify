@@ -307,32 +307,6 @@ const ListEventsPage: React.FC = () => {
                 key={event.id}
                 className="relative bg-[#313030] rounded-lg shadow-lg p-6"
               >
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <button
-                    onClick={() => navigate(`/event-stats/${event.id}`)}
-                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
-                    title="View Stats"
-                  >
-                    <ChartBarIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigate(`/event-organizer/update-event/${event.id}`)
-                    }
-                    className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
-                    title="Edit Event"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteEvent(event.id)}
-                    className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
-                    title="Delete Event"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
-
                 <h3 className="text-2xl font-semibold text-white">
                   {event.name}
                 </h3>
@@ -623,6 +597,31 @@ const ListEventsPage: React.FC = () => {
                   ) : (
                     <p className="text-gray-300 mt-4">No feedbacks</p>
                   )}
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button
+                      onClick={() => navigate(`/event-stats/${event.id}`)}
+                      className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
+                      title="View Stats"
+                    >
+                      <ChartBarIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        navigate(`/event-organizer/update-event/${event.id}`)
+                      }
+                      className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
+                      title="Edit Event"
+                    >
+                      <PencilSquareIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
+                      title="Delete Event"
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
