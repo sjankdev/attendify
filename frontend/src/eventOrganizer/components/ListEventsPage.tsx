@@ -345,14 +345,34 @@ const ListEventsPage: React.FC = () => {
                         <CalendarIcon className="w-6 h-6 text-green-500" />
                         <strong className="text-sm">Start Date:</strong>
                         <span>
-                          {new Date(event.eventStartDate).toLocaleString()}
+                          {new Intl.DateTimeFormat("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }).format(new Date(event.eventStartDate))}{" "}
+                          at{" "}
+                          {new Intl.DateTimeFormat("en-US", {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: false,
+                          }).format(new Date(event.eventStartDate))}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
                         <CalendarIcon className="w-6 h-6 text-red-500" />
                         <strong className="text-sm">End Date:</strong>
                         <span>
-                          {new Date(event.eventEndDate).toLocaleString()}
+                          {new Intl.DateTimeFormat("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }).format(new Date(event.eventEndDate))}{" "}
+                          at{" "}
+                          {new Intl.DateTimeFormat("en-US", {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: false,
+                          }).format(new Date(event.eventEndDate))}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
@@ -360,11 +380,22 @@ const ListEventsPage: React.FC = () => {
                         <strong className="text-sm">Join Deadline:</strong>
                         <span>
                           {event.joinDeadline
-                            ? new Date(event.joinDeadline).toLocaleString()
+                            ? `${new Intl.DateTimeFormat("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }).format(
+                                new Date(event.joinDeadline)
+                              )} at ${new Intl.DateTimeFormat("en-US", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: false,
+                              }).format(new Date(event.joinDeadline))}`
                             : "No deadline"}
                         </span>
                       </p>
                     </div>
+
                     <hr className="border-t border-gray-700" />
 
                     <div className="space-y-4">
