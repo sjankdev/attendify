@@ -1,5 +1,12 @@
 import axios from "axios";
-import { DepartmentDTO, Event, FeedbackDTO, FeedbackSummaryDTO, Participant } from "../../types/eventTypes";
+import {
+  DepartmentDTO,
+  Event,
+  FeedbackDTO,
+  FeedbackSummaryDTO,
+  Participant,
+  UpcomingEvent,
+} from "../../types/eventTypes";
 
 export const fetchEventStatistics = async (eventId: string) => {
   const token = localStorage.getItem("token");
@@ -18,9 +25,9 @@ export const fetchEventStatistics = async (eventId: string) => {
 
     return {
       ...data,
-      departmentStats: data.departmentStats || {}, 
-      educationLevelStats: data.educationLevelStats || {}, 
-      occupationStats: data.occupationStats || {}, 
+      departmentStats: data.departmentStats || {},
+      educationLevelStats: data.educationLevelStats || {},
+      occupationStats: data.occupationStats || {},
       maleCount: data.maleCount || 0,
       femaleCount: data.femaleCount || 0,
       otherCount: data.otherCount || 0,
@@ -53,7 +60,9 @@ export const fetchEventsWithParticipants = async (
     const queryParams = new URLSearchParams();
     if (filter) queryParams.append("filter", filter);
     if (departmentIds && departmentIds.length > 0) {
-      departmentIds.forEach((id) => queryParams.append("departmentIds", id.toString()));
+      departmentIds.forEach((id) =>
+        queryParams.append("departmentIds", id.toString())
+      );
     }
 
     const url = `http://localhost:8080/api/auth/event-organizer/my-events?${queryParams.toString()}`;
@@ -87,7 +96,8 @@ export const fetchEventsWithParticipants = async (
           );
 
           if (participantsResponse.ok) {
-            const participants: Participant[] = await participantsResponse.json();
+            const participants: Participant[] =
+              await participantsResponse.json();
             return {
               ...event,
               participants,
@@ -98,7 +108,10 @@ export const fetchEventsWithParticipants = async (
           }
           return event;
         } catch (error) {
-          console.error(`Failed to fetch participants for event ID ${event.id}:`, error);
+          console.error(
+            `Failed to fetch participants for event ID ${event.id}:`,
+            error
+          );
           return event;
         }
       })
@@ -154,7 +167,9 @@ export const fetchEventsWithParticipants = async (
   }
 };
 
-export const fetchEventFeedbacks = async (eventId: number): Promise<FeedbackDTO[]> => {
+export const fetchEventFeedbacks = async (
+  eventId: number
+): Promise<FeedbackDTO[]> => {
   try {
     const url = `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/feedbacks`;
 
@@ -177,7 +192,9 @@ export const fetchEventFeedbacks = async (eventId: number): Promise<FeedbackDTO[
   }
 };
 
-export const fetchEventFeedbackSummary = async (eventId: number): Promise<FeedbackSummaryDTO> => {
+export const fetchEventFeedbackSummary = async (
+  eventId: number
+): Promise<FeedbackSummaryDTO> => {
   try {
     const url = `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/feedback-summary`;
 
@@ -190,16 +207,20 @@ export const fetchEventFeedbackSummary = async (eventId: number): Promise<Feedba
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch feedback summary for event ID ${eventId}`);
+      throw new Error(
+        `Failed to fetch feedback summary for event ID ${eventId}`
+      );
     }
 
     return response.json();
   } catch (error) {
-    console.error(`Error fetching feedback summary for event ID ${eventId}:`, error);
+    console.error(
+      `Error fetching feedback summary for event ID ${eventId}:`,
+      error
+    );
     throw error;
   }
 };
-
 
 export const deleteEvent = async (eventId: number): Promise<boolean> => {
   try {
@@ -310,6 +331,83 @@ export const reviewJoinRequest = async (
   }
 };
 
+export const fetchUniqueParticipantsCountForThisWeek =
+  async (): Promise<number> => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:8080/api/auth/event-organizer/participant-counts",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch participant counts.");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching participant counts:", error);
+      throw error;
+    }
+  };
+
+export const fetchUpcomingEvents = async (): Promise<UpcomingEvent[]> => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/auth/event-organizer/upcoming",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch upcoming events");
+    }
+
+    const events: UpcomingEvent[] = await response.json();
+    return events;
+  } catch (error) {
+    console.error("Error fetching upcoming events:", error);
+    throw error;
+  }
+};
+
+export const fetchPastMonthEvents = async (): Promise<UpcomingEvent[]> => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/auth/event-organizer/past-month",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch upcoming events");
+    }
+
+    const events: UpcomingEvent[] = await response.json();
+    return events;
+  } catch (error) {
+    console.error("Error fetching upcoming events:", error);
+    throw error;
+  }
+};
+
 export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
   try {
     const response = await fetch(
@@ -361,7 +459,6 @@ export const fetchDepartmentsByCompany = async (): Promise<DepartmentDTO[]> => {
   }
 };
 
-
 export const fetchEventDetails = async (eventId: string): Promise<any> => {
   try {
     const response = await fetch(
@@ -387,7 +484,10 @@ export const fetchEventDetails = async (eventId: string): Promise<any> => {
   }
 };
 
-export const addDepartments = async (departmentNames: string[], companyId: number): Promise<void> => {
+export const addDepartments = async (
+  departmentNames: string[],
+  companyId: number
+): Promise<void> => {
   try {
     const token = localStorage.getItem("token");
 

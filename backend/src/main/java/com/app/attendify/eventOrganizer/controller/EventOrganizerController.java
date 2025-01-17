@@ -5,14 +5,18 @@ import com.app.attendify.company.services.CompanyService;
 import com.app.attendify.event.dto.*;
 import com.app.attendify.event.enums.AttendanceStatus;
 import com.app.attendify.event.model.Event;
+import com.app.attendify.eventOrganizer.model.EventOrganizer;
 import com.app.attendify.eventOrganizer.services.EventOrganizerService;
 import com.app.attendify.eventParticipant.dto.EventAttendanceDTO;
 import com.app.attendify.eventParticipant.dto.EventParticipantDTO;
 import com.app.attendify.eventParticipant.enums.Gender;
+import com.app.attendify.security.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +138,20 @@ public class EventOrganizerController {
         }
     }
 
+    @GetMapping("/upcoming")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public List<UpcomingEventDTO> getUpcomingEventsForOrganizer() {
+        logger.info("Fetching upcoming events for event organizer...");
+        return eventOrganizerService.getUpcomingEventsForCurrentUser();
+    }
+
+    @GetMapping("/past-month")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public List<UpcomingEventDTO> getPastMonthEventsForOrganizer() {
+        logger.info("Fetching past month's events for event organizer...");
+        return eventOrganizerService.getPastMonthEventsForCurrentUser();
+    }
+
     @PutMapping("/events/{eventId}/participants/{participantId}/status")
     public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
         try {
@@ -144,6 +162,13 @@ public class EventOrganizerController {
             logger.error("Error updating join request: Event ID={}, Participant ID={}, Error={}", eventId, participantId, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/participant-counts")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public Long getUniqueParticipantsCountForOrganizer() {
+        logger.info("Fetching unique participant count for event organizer...");
+        return eventOrganizerService.getUniqueParticipantsCountForCurrentUser();
     }
 
     @GetMapping("/company/participants")
