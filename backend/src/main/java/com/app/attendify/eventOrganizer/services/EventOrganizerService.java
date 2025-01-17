@@ -297,7 +297,6 @@ public class EventOrganizerService {
         LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
         LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toLocalDate().atTime(23, 59, 59);
 
-
         List<Event> events = eventOrganizerRepository.findUpcomingEventsForOrganizer(organizer, startOfWeek, endOfWeek);
 
         return events.stream().map(event -> {
@@ -335,8 +334,7 @@ public class EventOrganizerService {
         List<Event> events = eventOrganizerRepository.findPastMonthEventsForOrganizer(organizer, startOfMonth, endOfMonth);
         logger.info("Number of events found: {}", events.size());
 
-        events.forEach(event -> logger.info("Event: {} (ID: {}, Start: {}, End: {})",
-                event.getName(), event.getId(), event.getEventStartDate(), event.getEventEndDate()));
+        events.forEach(event -> logger.info("Event: {} (ID: {}, Start: {}, End: {})", event.getName(), event.getId(), event.getEventStartDate(), event.getEventEndDate()));
 
         return events.stream().map(event -> {
             UpcomingEventDTO dto = new UpcomingEventDTO();

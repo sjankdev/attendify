@@ -20,7 +20,6 @@ public interface EventOrganizerRepository extends JpaRepository<EventOrganizer, 
     @Query("SELECT e FROM Event e WHERE e.organizer = :organizer AND e.eventStartDate BETWEEN :startOfWeek AND :endOfWeek ORDER BY e.eventStartDate ASC")
     List<Event> findUpcomingEventsForOrganizer(@Param("organizer") EventOrganizer organizer, @Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
 
-
     @Query("SELECT COUNT(DISTINCT ea.participant.user) AS uniqueParticipantsCount " + "FROM Event e " + "JOIN e.eventAttendances ea " + "WHERE e.eventStartDate BETWEEN :startOfWeek AND :endOfWeek " + "AND e.organizer = :organizer")
     Long findUniqueParticipantsCountForWeek(@Param("organizer") EventOrganizer organizer, @Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
 

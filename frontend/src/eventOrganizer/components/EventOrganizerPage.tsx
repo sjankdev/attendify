@@ -51,13 +51,19 @@ const EventOrganizerPage: React.FC = () => {
   const upcomingThisWeek = upcomingEvents.filter((event) => {
     const eventDate = new Date(event.eventStartDate);
     const today = new Date();
-    const startOfWeek = today.getDate() - today.getDay();
-    const endOfWeek = startOfWeek + 6;
+    const dayOfWeek = today.getDay();
 
-    const startOfWeekDate = new Date(today.setDate(startOfWeek));
-    const endOfWeekDate = new Date(today.setDate(endOfWeek));
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(
+      today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
+    );
+    startOfWeek.setHours(0, 0, 0, 0);
 
-    return eventDate >= startOfWeekDate && eventDate <= endOfWeekDate;
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    return eventDate >= startOfWeek && eventDate <= endOfWeek;
   });
 
   const visibleEvents = showAllEvents
