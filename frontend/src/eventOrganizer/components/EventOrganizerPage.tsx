@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import SidebarLayout from "../../shared/components/EventOrganizerLayout";
-import { UpcomingEvent, EventParticipantCount } from "../../types/eventTypes";
-import { fetchUpcomingEvents } from "../services/eventOrganizerService";
+import { UpcomingEvent } from "../../types/eventTypes";
+import {
+  fetchUpcomingEvents,
+  fetchPastMonthEvents,
+} from "../services/eventOrganizerService";
 import { fetchUniqueParticipantsCountForThisWeek } from "../services/eventOrganizerService";
 
 const EventOrganizerPage: React.FC = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [pastMonthEvents, setPastMonthEvents] = useState<UpcomingEvent[]>([]);
   const [uniqueParticipantsCount, setUniqueParticipantsCount] =
     useState<number>(0);
   const [showAllEvents, setShowAllEvents] = useState(false);
@@ -20,6 +24,15 @@ const EventOrganizerPage: React.FC = () => {
       }
     };
 
+    const getPastMonthEvents = async () => {
+      try {
+        const events = await fetchPastMonthEvents();
+        setPastMonthEvents(events);
+      } catch (error) {
+        console.error("Error fetching past month's events:", error);
+      }
+    };
+
     const getUniqueParticipantsCount = async () => {
       try {
         const uniqueParticipants =
@@ -31,6 +44,7 @@ const EventOrganizerPage: React.FC = () => {
     };
 
     getUpcomingEvents();
+    getPastMonthEvents();
     getUniqueParticipantsCount();
   }, []);
 
@@ -99,6 +113,41 @@ const EventOrganizerPage: React.FC = () => {
               </button>
             )}
           </div>
+          <div className="bg-gradient-to-r from-green-600 via-teal-600 to-cyan-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              Events in the Past Month
+            </h2>
+            <p className="text-3xl font-bold text-white mb-4">
+              {pastMonthEvents.length} Events
+            </p>
+
+            <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto">
+              {pastMonthEvents.slice(0, 5).map((event) => (
+                <li key={event.id} className="truncate">
+                  <strong>{event.name}</strong> -{" "}
+                  {new Date(event.eventStartDate).toLocaleString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                  <br />
+                </li>
+              ))}
+            </ul>
+            {pastMonthEvents.length > 5 && (
+              <button
+                onClick={() => setShowAllEvents((prev) => !prev)}
+                className="text-blue-500 mt-4 hover:underline transition duration-200"
+              >
+                {showAllEvents ? "See Less" : "See More"}
+              </button>
+            )}
+          </div>
+
           <div className="bg-gradient-to-r from-pink-600 via-red-600 to-orange-600 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Expected Participants This Week

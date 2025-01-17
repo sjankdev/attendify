@@ -311,6 +311,44 @@ public class EventOrganizerService {
     }
 
     @Transactional
+    public List<UpcomingEventDTO> getPastMonthEventsForCurrentUser() {
+        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = currentUser.getUsername();
+        logger.info("Fetching past month's events for user with email: {}", email);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new IllegalArgumentException("User not found for email: " + email);
+        });
+        logger.info("User found: {} (ID: {})", user.getEmail(), user.getId());
+
+        EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+            throw new IllegalArgumentException("Event organizer not found for user: " + email);
+        });
+        logger.info("Event organizer found: {} (ID: {})", organizer.getId(), organizer.getId());
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.minusMonths(1).withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime endOfMonth = now.withDayOfMonth(1).minusDays(1).toLocalDate().atTime(23, 59, 59);
+
+        logger.info("Fetching events between {} and {}", startOfMonth, endOfMonth);
+
+        List<Event> events = eventOrganizerRepository.findPastMonthEventsForOrganizer(organizer, startOfMonth, endOfMonth);
+        logger.info("Number of events found: {}", events.size());
+
+        events.forEach(event -> logger.info("Event: {} (ID: {}, Start: {}, End: {})",
+                event.getName(), event.getId(), event.getEventStartDate(), event.getEventEndDate()));
+
+        return events.stream().map(event -> {
+            UpcomingEventDTO dto = new UpcomingEventDTO();
+            dto.setId(event.getId());
+            dto.setName(event.getName());
+            dto.setEventStartDate(event.getEventStartDate());
+            dto.setEventEndDate(event.getEventEndDate());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
     public Long getUniqueParticipantsCountForCurrentUser() {
         UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = currentUser.getUsername();

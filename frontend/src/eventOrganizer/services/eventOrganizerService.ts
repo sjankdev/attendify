@@ -383,6 +383,31 @@ export const fetchUpcomingEvents = async (): Promise<UpcomingEvent[]> => {
   }
 };
 
+export const fetchPastMonthEvents = async (): Promise<UpcomingEvent[]> => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/auth/event-organizer/past-month",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch upcoming events");
+    }
+
+    const events: UpcomingEvent[] = await response.json();
+    return events;
+  } catch (error) {
+    console.error("Error fetching upcoming events:", error);
+    throw error;
+  }
+};
+
 export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
   try {
     const response = await fetch(

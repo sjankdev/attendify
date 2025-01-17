@@ -145,6 +145,13 @@ public class EventOrganizerController {
         return eventOrganizerService.getUpcomingEventsForCurrentUser();
     }
 
+    @GetMapping("/past-month")
+    @PreAuthorize("hasRole('EVENT_ORGANIZER')")
+    public List<UpcomingEventDTO> getPastMonthEventsForOrganizer() {
+        logger.info("Fetching past month's events for event organizer...");
+        return eventOrganizerService.getPastMonthEventsForCurrentUser();
+    }
+
     @PutMapping("/events/{eventId}/participants/{participantId}/status")
     public ResponseEntity<String> reviewJoinRequest(@PathVariable int eventId, @PathVariable int participantId, @RequestParam AttendanceStatus status) {
         try {
