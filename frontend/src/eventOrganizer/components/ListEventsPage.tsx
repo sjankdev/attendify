@@ -86,7 +86,7 @@ const ListEventsPage: React.FC = () => {
     const fetchDepartments = async () => {
       try {
         const companyResponse = await axios.get(
-          "https://attendify-backend-el2r.onrender.com/api/auth/company",
+          "http://localhost:8080/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -95,7 +95,7 @@ const ListEventsPage: React.FC = () => {
         );
 
         const departmentResponse = await axios.get(
-          `https://attendify-backend-el2r.onrender.com/api/companies/${companyResponse.data.id}/departments`,
+          `http://localhost:8080/api/companies/${companyResponse.data.id}/departments`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -307,32 +307,6 @@ const ListEventsPage: React.FC = () => {
                 key={event.id}
                 className="relative bg-[#313030] rounded-lg shadow-lg p-6"
               >
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <button
-                    onClick={() => navigate(`/event-stats/${event.id}`)}
-                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
-                    title="View Stats"
-                  >
-                    <ChartBarIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigate(`/event-organizer/update-event/${event.id}`)
-                    }
-                    className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
-                    title="Edit Event"
-                  >
-                    <PencilSquareIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteEvent(event.id)}
-                    className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
-                    title="Delete Event"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
-
                 <h3 className="text-2xl font-semibold text-white">
                   {event.name}
                 </h3>
@@ -371,14 +345,34 @@ const ListEventsPage: React.FC = () => {
                         <CalendarIcon className="w-6 h-6 text-green-500" />
                         <strong className="text-sm">Start Date:</strong>
                         <span>
-                          {new Date(event.eventStartDate).toLocaleString()}
+                          {new Intl.DateTimeFormat("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }).format(new Date(event.eventStartDate))}{" "}
+                          at{" "}
+                          {new Intl.DateTimeFormat("en-US", {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: false,
+                          }).format(new Date(event.eventStartDate))}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
                         <CalendarIcon className="w-6 h-6 text-red-500" />
                         <strong className="text-sm">End Date:</strong>
                         <span>
-                          {new Date(event.eventEndDate).toLocaleString()}
+                          {new Intl.DateTimeFormat("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          }).format(new Date(event.eventEndDate))}{" "}
+                          at{" "}
+                          {new Intl.DateTimeFormat("en-US", {
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: false,
+                          }).format(new Date(event.eventEndDate))}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
@@ -386,11 +380,22 @@ const ListEventsPage: React.FC = () => {
                         <strong className="text-sm">Join Deadline:</strong>
                         <span>
                           {event.joinDeadline
-                            ? new Date(event.joinDeadline).toLocaleString()
+                            ? `${new Intl.DateTimeFormat("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }).format(
+                                new Date(event.joinDeadline)
+                              )} at ${new Intl.DateTimeFormat("en-US", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: false,
+                              }).format(new Date(event.joinDeadline))}`
                             : "No deadline"}
                         </span>
                       </p>
                     </div>
+
                     <hr className="border-t border-gray-700" />
 
                     <div className="space-y-4">
@@ -399,8 +404,8 @@ const ListEventsPage: React.FC = () => {
                         <strong className="text-sm">Available Seats:</strong>
                         <span>
                           {event.attendeeLimit === null
-                            ? `${event.acceptedParticipants}/no limit`
-                            : `${event.acceptedParticipants}/${event.attendeeLimit}`}
+                            ? `${event.acceptedParticipants} / No Limit`
+                            : `${event.acceptedParticipants} / ${event.attendeeLimit}`}
                         </span>
                       </p>
                       <p className="flex items-center space-x-3">
@@ -623,6 +628,31 @@ const ListEventsPage: React.FC = () => {
                   ) : (
                     <p className="text-gray-300 mt-4">No feedbacks</p>
                   )}
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <button
+                      onClick={() => navigate(`/event-stats/${event.id}`)}
+                      className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
+                      title="View Stats"
+                    >
+                      <ChartBarIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        navigate(`/event-organizer/update-event/${event.id}`)
+                      }
+                      className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
+                      title="Edit Event"
+                    >
+                      <PencilSquareIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
+                      title="Delete Event"
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

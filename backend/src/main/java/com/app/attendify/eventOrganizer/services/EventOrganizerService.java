@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -275,6 +277,93 @@ public class EventOrganizerService {
             logger.error("Error retrieving participants for event", e);
             throw new RuntimeException("Error retrieving participants for event", e);
         }
+    }
+
+    @Transactional
+    public List<UpcomingEventDTO> getUpcomingEventsForCurrentUser() {
+        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = currentUser.getUsername();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            return new IllegalArgumentException("User not found for email: " + email);
+        });
+        logger.info("User found: {}", user.getId());
+
+        EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+            return new IllegalArgumentException("Event organizer not found for user: " + email);
+        });
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toLocalDate().atTime(23, 59, 59);
+
+        List<Event> events = eventOrganizerRepository.findUpcomingEventsForOrganizer(organizer, startOfWeek, endOfWeek);
+
+        return events.stream().map(event -> {
+            UpcomingEventDTO dto = new UpcomingEventDTO();
+            dto.setId(event.getId());
+            dto.setName(event.getName());
+            dto.setEventStartDate(event.getEventStartDate());
+            dto.setEventEndDate(event.getEventEndDate());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<UpcomingEventDTO> getPastMonthEventsForCurrentUser() {
+        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = currentUser.getUsername();
+        logger.info("Fetching past month's events for user with email: {}", email);
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new IllegalArgumentException("User not found for email: " + email);
+        });
+        logger.info("User found: {} (ID: {})", user.getEmail(), user.getId());
+
+        EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+            throw new IllegalArgumentException("Event organizer not found for user: " + email);
+        });
+        logger.info("Event organizer found: {} (ID: {})", organizer.getId(), organizer.getId());
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.minusMonths(1).withDayOfMonth(1).toLocalDate().atStartOfDay();
+        LocalDateTime endOfMonth = now.withDayOfMonth(1).minusDays(1).toLocalDate().atTime(23, 59, 59);
+
+        logger.info("Fetching events between {} and {}", startOfMonth, endOfMonth);
+
+        List<Event> events = eventOrganizerRepository.findPastMonthEventsForOrganizer(organizer, startOfMonth, endOfMonth);
+        logger.info("Number of events found: {}", events.size());
+
+        events.forEach(event -> logger.info("Event: {} (ID: {}, Start: {}, End: {})", event.getName(), event.getId(), event.getEventStartDate(), event.getEventEndDate()));
+
+        return events.stream().map(event -> {
+            UpcomingEventDTO dto = new UpcomingEventDTO();
+            dto.setId(event.getId());
+            dto.setName(event.getName());
+            dto.setEventStartDate(event.getEventStartDate());
+            dto.setEventEndDate(event.getEventEndDate());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Long getUniqueParticipantsCountForCurrentUser() {
+        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = currentUser.getUsername();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            return new IllegalArgumentException("User not found for email: " + email);
+        });
+
+        EventOrganizer organizer = eventOrganizerRepository.findByUser(user).orElseThrow(() -> {
+            return new IllegalArgumentException("Event organizer not found for user: " + email);
+        });
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toLocalDate().atTime(23, 59, 59);
+
+        return eventOrganizerRepository.findUniqueParticipantsCountForWeek(organizer, startOfWeek, endOfWeek);
     }
 
     @Transactional

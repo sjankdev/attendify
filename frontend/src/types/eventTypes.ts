@@ -16,6 +16,13 @@ export interface FeedbackSummaryDTO {
   averageRating: number;
 }
 
+export interface UpcomingEvent {
+  id: number;
+  name: string;
+  eventStartDate: string; 
+  eventEndDate: string;
+}
+
 export interface Event {
   id: number;
   name: string;
@@ -54,6 +61,13 @@ export interface Participant {
   eventLinks: string[];
   departmentName: string; 
 }
+
+export interface EventParticipantCount {
+  eventId: number;
+  eventName: string;
+  uniqueParticipantsCount: number;
+}
+
 
 export interface OccupationStatsDTO {
   count: number;
