@@ -85,7 +85,7 @@ const DepartmentsList: React.FC = () => {
           <h2 className="text-3xl font-semibold text-gray-100">Departments</h2>
           <button
             onClick={() => setIsAddingDepartments(!isAddingDepartments)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
           >
             <FaPlusCircle className="mr-2" />
             {isAddingDepartments ? "Add New Department" : "Add New Department"}
@@ -106,13 +106,13 @@ const DepartmentsList: React.FC = () => {
             <div className="flex space-x-4">
               <button
                 onClick={handleAddDepartments}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors focus:ring-2 focus:ring-green-500"
               >
                 Add Departments
               </button>
               <button
                 onClick={() => setIsAddingDepartments(false)}
-                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors focus:ring-2 focus:ring-gray-400"
               >
                 Cancel
               </button>
