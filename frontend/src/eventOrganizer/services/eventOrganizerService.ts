@@ -13,7 +13,7 @@ export const fetchEventStatistics = async (eventId: string) => {
 
   try {
     const response = await axios.get(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/event-stats/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/event-stats/${eventId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ export const fetchEventsWithParticipants = async (
       );
     }
 
-    const url = `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events?${queryParams.toString()}`;
+    const url = `http://localhost:8080/api/auth/event-organizer/my-events?${queryParams.toString()}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -85,7 +85,7 @@ export const fetchEventsWithParticipants = async (
       (data.events as Event[]).map(async (event: Event): Promise<Event> => {
         try {
           const participantsResponse = await fetch(
-            `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${event.id}/participants`,
+            `http://localhost:8080/api/auth/event-organizer/my-events/${event.id}/participants`,
             {
               method: "GET",
               headers: {
@@ -171,7 +171,7 @@ export const fetchEventFeedbacks = async (
   eventId: number
 ): Promise<FeedbackDTO[]> => {
   try {
-    const url = `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${eventId}/feedbacks`;
+    const url = `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/feedbacks`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -196,7 +196,7 @@ export const fetchEventFeedbackSummary = async (
   eventId: number
 ): Promise<FeedbackSummaryDTO> => {
   try {
-    const url = `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/my-events/${eventId}/feedback-summary`;
+    const url = `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/feedback-summary`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -225,7 +225,7 @@ export const fetchEventFeedbackSummary = async (
 export const deleteEvent = async (eventId: number): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/delete-event/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/delete-event/${eventId}`,
       {
         method: "DELETE",
         headers: {
@@ -264,7 +264,7 @@ export const updateEvent = async (
       : null;
 
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/update-event/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/update-event/${eventId}`,
       {
         method: "PUT",
         headers: {
@@ -300,7 +300,7 @@ export const reviewJoinRequest = async (
 ): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/events/${eventId}/participants/${participantId}/status?status=${status}`,
+      `http://localhost:8080/api/auth/event-organizer/events/${eventId}/participants/${participantId}/status?status=${status}`,
       {
         method: "PUT",
         headers: {
@@ -337,7 +337,7 @@ export const fetchUniqueParticipantsCountForThisWeek =
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/participant-counts",
+        "http://localhost:8080/api/auth/event-organizer/participant-counts",
         {
           method: "GET",
           headers: {
@@ -361,7 +361,7 @@ export const fetchUniqueParticipantsCountForThisWeek =
 export const fetchUpcomingEvents = async (): Promise<UpcomingEvent[]> => {
   try {
     const response = await fetch(
-      "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/upcoming",
+      "http://localhost:8080/api/auth/event-organizer/upcoming",
       {
         method: "GET",
         headers: {
@@ -386,7 +386,7 @@ export const fetchUpcomingEvents = async (): Promise<UpcomingEvent[]> => {
 export const fetchPastMonthEvents = async (): Promise<UpcomingEvent[]> => {
   try {
     const response = await fetch(
-      "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/past-month",
+      "http://localhost:8080/api/auth/event-organizer/past-month",
       {
         method: "GET",
         headers: {
@@ -411,7 +411,7 @@ export const fetchPastMonthEvents = async (): Promise<UpcomingEvent[]> => {
 export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
   try {
     const response = await fetch(
-      "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/company/participants",
+      "http://localhost:8080/api/auth/event-organizer/company/participants",
       {
         method: "GET",
         headers: {
@@ -436,7 +436,7 @@ export const fetchParticipantsByCompany = async (): Promise<Participant[]> => {
 export const fetchDepartmentsByCompany = async (): Promise<DepartmentDTO[]> => {
   try {
     const response = await fetch(
-      "https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/company/departments",
+      "http://localhost:8080/api/auth/event-organizer/company/departments",
       {
         method: "GET",
         headers: {
@@ -462,7 +462,7 @@ export const fetchDepartmentsByCompany = async (): Promise<DepartmentDTO[]> => {
 export const fetchEventDetails = async (eventId: string): Promise<any> => {
   try {
     const response = await fetch(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/event-details/${eventId}`,
+      `http://localhost:8080/api/auth/event-organizer/event-details/${eventId}`,
       {
         method: "GET",
         headers: {
@@ -492,7 +492,7 @@ export const addDepartments = async (
     const token = localStorage.getItem("token");
 
     await axios.post(
-      `https://attendify-backend-el2r.onrender.com/api/auth/event-organizer/${companyId}/add-departments`,
+      `http://localhost:8080/api/auth/event-organizer/${companyId}/add-departments`,
       departmentNames,
       {
         headers: {

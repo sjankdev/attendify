@@ -94,7 +94,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "https://attendify-backend-el2r.onrender.com/api/auth/login",
+        "http://localhost:8080/api/auth/login",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
@@ -129,7 +129,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-organizer",
+        "http://localhost:8080/api/auth/register-organizer",
         formData
       );
       setSuccess(

@@ -29,7 +29,7 @@ const EventParticipantRegister = () => {
     }
 
     axios
-      .get(`https://attendify-backend-el2r.onrender.com/api/auth/accept?token=${token}`)
+      .get(`http://localhost:8080/api/auth/accept?token=${token}`)
       .then((response) => {
         setEmail(response.data.email);
         setDepartmentId(response.data.departmentId);
@@ -62,7 +62,7 @@ const EventParticipantRegister = () => {
 
     axios
       .post(
-        "https://attendify-backend-el2r.onrender.com/api/auth/register-participant",
+        "http://localhost:8080/api/auth/register-participant",
         {
           name,
           email,
