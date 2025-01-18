@@ -18,6 +18,9 @@ const DepartmentsList: React.FC = () => {
     departmentId: number | null;
     eventId: number | null;
   }>({ departmentId: null, eventId: null });
+  const [showMoreEvents, setShowMoreEvents] = useState<{
+    [departmentId: number]: boolean;
+  }>({});
 
   const toggleEventDetails = (departmentId: number, eventId: number) => {
     setExpandedEvent((prev) =>
@@ -25,6 +28,13 @@ const DepartmentsList: React.FC = () => {
         ? { departmentId: null, eventId: null }
         : { departmentId, eventId }
     );
+  };
+
+  const handleMoreEventsClick = (departmentId: number) => {
+    setShowMoreEvents((prev) => ({
+      ...prev,
+      [departmentId]: !prev[departmentId],
+    }));
   };
 
   useEffect(() => {
@@ -135,16 +145,25 @@ const DepartmentsList: React.FC = () => {
                 </h4>
                 {department.participants &&
                 department.participants.length > 0 ? (
-                  <ul className="space-y-2 mt-4">
-                    {department.participants.map((participant) => (
-                      <li
-                        key={participant.participantId}
-                        className="border-b pb-2 text-gray-300"
-                      >
-                        <div>{participant.participantName}</div>
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul className="space-y-2 mt-4">
+                      {department.participants
+                        .slice(0, 5)
+                        .map((participant) => (
+                          <li
+                            key={participant.participantId}
+                            className="border-b pb-2 text-gray-300"
+                          >
+                            <div>{participant.participantName}</div>
+                          </li>
+                        ))}
+                    </ul>
+                    {department.participants.length > 5 && (
+                      <button className="text-blue-500 mt-4">
+                        More Participants
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <p className="text-gray-500">No participants</p>
                 )}
@@ -156,49 +175,70 @@ const DepartmentsList: React.FC = () => {
                   <span>Events:</span>
                 </h4>
                 {department.events && department.events.length > 0 ? (
-                  <ul className="space-y-4 mt-4">
-                    {department.events.map((event) => (
-                      <li key={event.id} className="border-b pb-4">
-                        <div className="flex justify-between items-center">
-                          <h5 className="text-xl font-semibold">
-                            {event.name}
-                          </h5>
-                          <button
-                            onClick={() =>
-                              toggleEventDetails(department.id, event.id)
-                            }
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            {expandedEvent.departmentId === department.id &&
-                            expandedEvent.eventId === event.id
-                              ? "See Less"
-                              : "See More"}
-                          </button>
-                        </div>
-                        {expandedEvent.departmentId === department.id &&
-                          expandedEvent.eventId === event.id && (
-                            <div className="mt-4 space-y-2 text-gray-300">
-                              <p>{event.description}</p>
-                              <p>
-                                <strong>Location:</strong> {event.location}
-                              </p>
-                              <p>
-                                <strong>Date:</strong>{" "}
-                                {new Date(
-                                  event.eventStartDate
-                                ).toLocaleString()}{" "}
-                                -{" "}
-                                {new Date(event.eventEndDate).toLocaleString()}
-                              </p>
-                              <p>
-                                <strong>Organizer:</strong>{" "}
-                                {event.organizerName}
-                              </p>
+                  <>
+                    <ul className="space-y-4 mt-4">
+                      {department.events
+                        .slice(
+                          0,
+                          showMoreEvents[department.id]
+                            ? department.events.length
+                            : 5
+                        )
+                        .map((event) => (
+                          <li key={event.id} className="border-b pb-4">
+                            <div className="flex justify-between items-center">
+                              <h5 className="text-xl font-semibold">
+                                {event.name}
+                              </h5>
+                              <button
+                                onClick={() =>
+                                  toggleEventDetails(department.id, event.id)
+                                }
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                {expandedEvent.departmentId === department.id &&
+                                expandedEvent.eventId === event.id
+                                  ? "See Less"
+                                  : "See More"}
+                              </button>
                             </div>
-                          )}
-                      </li>
-                    ))}
-                  </ul>
+                            {expandedEvent.departmentId === department.id &&
+                              expandedEvent.eventId === event.id && (
+                                <div className="mt-4 space-y-2 text-gray-300">
+                                  <p>{event.description}</p>
+                                  <p>
+                                    <strong>Location:</strong> {event.location}
+                                  </p>
+                                  <p>
+                                    <strong>Date:</strong>{" "}
+                                    {new Date(
+                                      event.eventStartDate
+                                    ).toLocaleString()}{" "}
+                                    -{" "}
+                                    {new Date(
+                                      event.eventEndDate
+                                    ).toLocaleString()}
+                                  </p>
+                                  <p>
+                                    <strong>Organizer:</strong>{" "}
+                                    {event.organizerName}
+                                  </p>
+                                </div>
+                              )}
+                          </li>
+                        ))}
+                    </ul>
+                    {department.events.length > 5 && (
+                      <button
+                        className="text-blue-500 mt-4"
+                        onClick={() => handleMoreEventsClick(department.id)}
+                      >
+                        {showMoreEvents[department.id]
+                          ? "Show Less"
+                          : "More Events"}
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <p className="text-gray-500">No events</p>
                 )}
