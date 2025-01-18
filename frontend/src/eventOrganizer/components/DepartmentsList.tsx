@@ -14,6 +14,18 @@ const DepartmentsList: React.FC = () => {
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [newDepartmentNames, setNewDepartmentNames] = useState<string[]>([]);
   const [isAddingDepartments, setIsAddingDepartments] = useState(false);
+  const [expandedEvent, setExpandedEvent] = useState<{
+    departmentId: number | null;
+    eventId: number | null;
+  }>({ departmentId: null, eventId: null });
+
+  const toggleEventDetails = (departmentId: number, eventId: number) => {
+    setExpandedEvent((prev) =>
+      prev.departmentId === departmentId && prev.eventId === eventId
+        ? { departmentId: null, eventId: null }
+        : { departmentId, eventId }
+    );
+  };
 
   useEffect(() => {
     const getDepartments = async () => {
@@ -68,23 +80,19 @@ const DepartmentsList: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-8 bg-[#101010] rounded-lg shadow-xl space-y-8">
+      <div className="p-6 space-y-8 bg-gray-900">
         <div className="flex justify-between items-center">
-          <h2 className="text-4xl font-semibold text-white">Departments</h2>
+          <h2 className="text-3xl font-semibold text-gray-100">Departments</h2>
           <button
             onClick={() => setIsAddingDepartments(!isAddingDepartments)}
-            className="px-6 py-2 bg-teal-600 text-white text-lg font-semibold rounded-md hover:bg-teal-500 transition-all"
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <FaPlusCircle className="inline mr-2" />
+            <FaPlusCircle className="mr-2" />
             {isAddingDepartments ? "Cancel" : "Add New Department"}
           </button>
         </div>
 
-        {error && (
-          <div className="p-4 bg-red-800 text-red-400 rounded-lg shadow-md">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-red-600">{error}</div>}
 
         {isAddingDepartments && (
           <div className="space-y-4 mt-6">
@@ -93,43 +101,38 @@ const DepartmentsList: React.FC = () => {
               value={newDepartmentNames.join(",")}
               onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
               placeholder="Enter department names, separated by commas"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
+              className="w-full p-3 border border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
             />
             <button
               onClick={handleAddDepartments}
-              className="w-full px-6 py-3 bg-teal-600 text-white text-lg font-semibold rounded-md hover:bg-teal-500 transition-all"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               Add Departments
             </button>
           </div>
         )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
           {departments.map((department) => (
             <div
               key={department.id}
-              className="p-6 bg-[#313030] rounded-lg shadow-md space-y-6 hover:shadow-xl hover:bg-[#424242] transition-all"
+              className="bg-gray-800 text-white p-6 rounded-lg shadow-md space-y-4"
             >
-              <h3 className="text-3xl font-semibold text-white">
-                {department.name}
-              </h3>
+              <h3 className="text-2xl font-semibold">{department.name}</h3>
 
               <div>
-                <h4 className="text-xl font-semibold text-gray-300 mb-3 flex items-center">
-                  <FaUsers className="inline mr-2" />
-                  Participants:
+                <h4 className="text-xl font-medium flex items-center space-x-2">
+                  <FaUsers />
+                  <span>Participants:</span>
                 </h4>
                 {department.participants &&
                 department.participants.length > 0 ? (
-                  <ul className="space-y-3">
+                  <ul className="space-y-2 mt-4">
                     {department.participants.map((participant) => (
                       <li
                         key={participant.participantId}
-                        className="p-4 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition-all"
+                        className="border-b pb-2 text-gray-300"
                       >
-                        <div className="text-white">
-                          {participant.participantName}
-                        </div>
+                        <div>{participant.participantName}</div>
                       </li>
                     ))}
                   </ul>
@@ -139,34 +142,51 @@ const DepartmentsList: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-xl font-semibold text-gray-300 mb-3 flex items-center">
-                  <FaCalendarAlt className="inline mr-2" />
-                  Events:
+                <h4 className="text-xl font-medium flex items-center space-x-2">
+                  <FaCalendarAlt />
+                  <span>Events:</span>
                 </h4>
                 {department.events && department.events.length > 0 ? (
-                  <ul className="space-y-3">
+                  <ul className="space-y-4 mt-4">
                     {department.events.map((event) => (
-                      <li
-                        key={event.id}
-                        className="p-4 bg-[#4a4a4a] border rounded-md hover:bg-[#5a5a5a] transition-all"
-                      >
-                        <h5 className="text-2xl font-semibold text-white">
-                          {event.name}
-                        </h5>
-                        <p className="text-sm text-gray-400">
-                          {event.description}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          <strong>Location:</strong> {event.location}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          <strong>Date:</strong>{" "}
-                          {new Date(event.eventStartDate).toLocaleString()} -{" "}
-                          {new Date(event.eventEndDate).toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          <strong>Organizer:</strong> {event.organizerName}
-                        </p>
+                      <li key={event.id} className="border-b pb-4">
+                        <div className="flex justify-between items-center">
+                          <h5 className="text-xl font-semibold">
+                            {event.name}
+                          </h5>
+                          <button
+                            onClick={() =>
+                              toggleEventDetails(department.id, event.id)
+                            }
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            {expandedEvent.departmentId === department.id &&
+                            expandedEvent.eventId === event.id
+                              ? "See Less"
+                              : "See More"}
+                          </button>
+                        </div>
+                        {expandedEvent.departmentId === department.id &&
+                          expandedEvent.eventId === event.id && (
+                            <div className="mt-4 space-y-2 text-gray-300">
+                              <p>{event.description}</p>
+                              <p>
+                                <strong>Location:</strong> {event.location}
+                              </p>
+                              <p>
+                                <strong>Date:</strong>{" "}
+                                {new Date(
+                                  event.eventStartDate
+                                ).toLocaleString()}{" "}
+                                -{" "}
+                                {new Date(event.eventEndDate).toLocaleString()}
+                              </p>
+                              <p>
+                                <strong>Organizer:</strong>{" "}
+                                {event.organizerName}
+                              </p>
+                            </div>
+                          )}
                       </li>
                     ))}
                   </ul>
