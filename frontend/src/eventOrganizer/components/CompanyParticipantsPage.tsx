@@ -49,7 +49,7 @@ const CompanyParticipantsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto">
+      <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto relative">
         <h2 className="text-3xl font-semibold text-white mb-6">
           Company Participants Dashboard
         </h2>
@@ -58,7 +58,14 @@ const CompanyParticipantsPage: React.FC = () => {
           Here you can view and manage participants, track their engagement, and
           see the events they have joined.
         </p>
-
+        <div className="absolute top-6 right-6">
+          <button
+            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
+            onClick={() => navigate("/event-organizer/invitations")}
+          >
+            Invite More Participants
+          </button>
+        </div>
         <div className="mb-8">
           <h3 className="text-2xl font-semibold text-white mb-4">Overview</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white">
@@ -80,20 +87,6 @@ const CompanyParticipantsPage: React.FC = () => {
                   <h4 className="text-xl font-medium">Active Participants</h4>
                   <p className="text-2xl font-semibold">
                     {participants.filter((p) => p.joinedEventCount > 0).length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
-              <div className="flex items-center space-x-4">
-                <FaCalendarAlt className="text-teal-500 text-3xl" />
-                <div>
-                  <h4 className="text-xl font-medium">Total Events</h4>
-                  <p className="text-2xl font-semibold">
-                    {participants.reduce(
-                      (acc, participant) => acc + participant.joinedEventCount,
-                      0
-                    )}
                   </p>
                 </div>
               </div>
@@ -144,14 +137,6 @@ const CompanyParticipantsPage: React.FC = () => {
             </div>
           </div>
         )}
-        <div className="mt-8 text-center">
-          <button
-            className="bg-teal-500 text-white py-3 px-8 rounded-full hover:bg-teal-600 transition-all"
-            onClick={() => navigate("/event-organizer/invitations")}
-          >
-            Invite More Participants
-          </button>
-        </div>
       </div>
     </Layout>
   );
