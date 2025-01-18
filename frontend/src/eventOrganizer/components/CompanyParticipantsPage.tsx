@@ -85,7 +85,8 @@ const CompanyParticipantsPage: React.FC = () => {
         <div className="mb-8">
           <h3 className="text-2xl font-semibold text-white mb-4">Overview</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white">
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+            <div className="p-6 bg-blue-800 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              {" "}
               <div className="flex items-center space-x-4">
                 <FaUsers className="text-teal-500 text-3xl" />
                 <div>
@@ -96,7 +97,8 @@ const CompanyParticipantsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+            <div className="p-6 bg-green-800 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              {" "}
               <div className="flex items-center space-x-4">
                 <FaUserCheck className="text-teal-500 text-3xl" />
                 <div>
