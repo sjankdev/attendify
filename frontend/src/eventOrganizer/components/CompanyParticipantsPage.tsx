@@ -3,9 +3,14 @@ import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
 import { useNavigate } from "react-router-dom";
-import { FaUsers, FaUserCheck, FaCalendarAlt } from "react-icons/fa";
+import { FaUsers, FaUserCheck } from "react-icons/fa";
+
+interface ExtendedParticipant extends Participant {
+  showAllEvents: boolean;
+}
+
 const CompanyParticipantsPage: React.FC = () => {
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<ExtendedParticipant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -25,6 +30,7 @@ const CompanyParticipantsPage: React.FC = () => {
           status: "PENDING" as "PENDING",
           joinedEventCount: participant.joinedEventCount,
           eventLinks: participant.eventLinks,
+          showAllEvents: false,
         }));
 
         setParticipants(mappedParticipants);
@@ -38,6 +44,16 @@ const CompanyParticipantsPage: React.FC = () => {
 
     loadParticipants();
   }, []);
+
+  const toggleShowMoreEvents = (participantId: number) => {
+    setParticipants((prevParticipants) =>
+      prevParticipants.map((participant) =>
+        participant.participantId === participantId
+          ? { ...participant, showAllEvents: !participant.showAllEvents }
+          : participant
+      )
+    );
+  };
 
   if (loading) {
     return <div className="text-center text-lg">Loading participants...</div>;
@@ -100,7 +116,7 @@ const CompanyParticipantsPage: React.FC = () => {
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {participants.map((participant) => (
                 <div
                   key={participant.participantId}
@@ -121,7 +137,7 @@ const CompanyParticipantsPage: React.FC = () => {
                   </div>
 
                   <ul className="mt-4 space-y-2">
-                    {participant.eventLinks.map((link, index) => (
+                    {participant.eventLinks.slice(0, 3).map((link, index) => (
                       <li key={index}>
                         <a
                           href={`/event-details/${link.split("/").pop()}`}
@@ -131,6 +147,39 @@ const CompanyParticipantsPage: React.FC = () => {
                         </a>
                       </li>
                     ))}
+                    {participant.joinedEventCount > 3 &&
+                      participant.showAllEvents && (
+                        <>
+                          {participant.eventLinks
+                            .slice(3)
+                            .map((link, index) => (
+                              <li key={index + 3}>
+                                <a
+                                  href={`/event-details/${link
+                                    .split("/")
+                                    .pop()}`}
+                                  className="text-teal-500 hover:underline"
+                                >
+                                  Event {index + 4}
+                                </a>
+                              </li>
+                            ))}
+                        </>
+                      )}
+                    {participant.joinedEventCount > 3 && (
+                      <li>
+                        <button
+                          onClick={() =>
+                            toggleShowMoreEvents(participant.participantId)
+                          }
+                          className="text-teal-500 hover:underline"
+                        >
+                          {participant.showAllEvents
+                            ? "Show Less"
+                            : "See More Events"}
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
               ))}
