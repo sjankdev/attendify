@@ -172,7 +172,7 @@ const DepartmentsList: React.FC = () => {
               <div>
                 <h4 className="text-xl font-medium flex items-center space-x-2">
                   <FaCalendarAlt />
-                  <span>Events:</span>
+                  <span>Events</span>
                 </h4>
                 {department.events && department.events.length > 0 ? (
                   <>
