@@ -219,27 +219,19 @@ const InvitationPage: React.FC = () => {
             </div>
           </div>
         ))}
-        <div className="space-y-4">
+        <div className="flex justify-start items-center gap-2">
           <button
             onClick={handleAddEmail}
-            className="w-40 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-md hover:bg-teal-500"
+            className="w-40 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-teal-500"
           >
-            Add Email
+            Add Another Email
           </button>
-          <div className="flex items-center gap-[20px]">
-            <button
-              onClick={handleSendInvitations}
-              className="w-40 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-500"
-            >
-              Send
-            </button>
-            <button
-              onClick={handleGoBack}
-              className="w-40 px-4 py-2 bg-red-800 text-white text-sm font-medium rounded-md hover:bg-red-700"
-            >
-              Back
-            </button>
-          </div>
+          <button
+            onClick={handleSendInvitations}
+            className="w-40 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-blue-500"
+          >
+            Send Invitations
+          </button>
         </div>
 
         {successMessage && (
