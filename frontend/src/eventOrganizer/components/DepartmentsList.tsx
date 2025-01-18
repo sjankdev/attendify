@@ -88,7 +88,7 @@ const DepartmentsList: React.FC = () => {
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FaPlusCircle className="mr-2" />
-            {isAddingDepartments ? "Cancel" : "Add New Department"}
+            {isAddingDepartments ? "Add New Department" : "Add New Department"}
           </button>
         </div>
 
@@ -103,14 +103,23 @@ const DepartmentsList: React.FC = () => {
               placeholder="Enter department names, separated by commas"
               className="w-full p-3 border border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
             />
-            <button
-              onClick={handleAddDepartments}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              Add Departments
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleAddDepartments}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Add Departments
+              </button>
+              <button
+                onClick={() => setIsAddingDepartments(false)}
+                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
           {departments.map((department) => (
             <div
