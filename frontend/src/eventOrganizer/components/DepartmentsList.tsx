@@ -90,14 +90,13 @@ const DepartmentsList: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-8 bg-gray-900">
+      <div className="p-6 space-y-8 bg-[#101010]">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-semibold text-gray-100">Departments</h2>
           <button
             onClick={() => setIsAddingDepartments(!isAddingDepartments)}
             className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
           >
-            <FaPlusCircle className="mr-2" />
             {isAddingDepartments ? "Add New Department" : "Add New Department"}
           </button>
         </div>
@@ -111,7 +110,7 @@ const DepartmentsList: React.FC = () => {
               value={newDepartmentNames.join(",")}
               onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
               placeholder="Enter department names, separated by commas"
-              className="w-full p-3 border border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+              className="w-full p-3 border border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-[#2A2A2A] text-white"
             />
             <div className="flex space-x-4">
               <button
@@ -130,11 +129,11 @@ const DepartmentsList: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
+        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
           {departments.map((department) => (
             <div
               key={department.id}
-              className="bg-gray-800 text-white p-6 rounded-lg shadow-md space-y-4"
+              className="bg-[#2A2A2A] text-white p-6 rounded-lg shadow-md space-y-4"
             >
               <h3 className="text-2xl font-semibold">{department.name}</h3>
 

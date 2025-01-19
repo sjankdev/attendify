@@ -3,9 +3,14 @@ import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
 import { useNavigate } from "react-router-dom";
-import { FaUsers, FaUserCheck, FaCalendarAlt } from "react-icons/fa";
+import { FaUsers, FaUserCheck } from "react-icons/fa";
+
+interface ExtendedParticipant extends Participant {
+  showAllEvents: boolean;
+}
+
 const CompanyParticipantsPage: React.FC = () => {
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<ExtendedParticipant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -25,6 +30,7 @@ const CompanyParticipantsPage: React.FC = () => {
           status: "PENDING" as "PENDING",
           joinedEventCount: participant.joinedEventCount,
           eventLinks: participant.eventLinks,
+          showAllEvents: false,
         }));
 
         setParticipants(mappedParticipants);
@@ -39,6 +45,16 @@ const CompanyParticipantsPage: React.FC = () => {
     loadParticipants();
   }, []);
 
+  const toggleShowMoreEvents = (participantId: number) => {
+    setParticipants((prevParticipants) =>
+      prevParticipants.map((participant) =>
+        participant.participantId === participantId
+          ? { ...participant, showAllEvents: !participant.showAllEvents }
+          : participant
+      )
+    );
+  };
+
   if (loading) {
     return <div className="text-center text-lg">Loading participants...</div>;
   }
@@ -49,7 +65,7 @@ const CompanyParticipantsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto">
+      <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto relative">
         <h2 className="text-3xl font-semibold text-white mb-6">
           Company Participants Dashboard
         </h2>
@@ -58,11 +74,19 @@ const CompanyParticipantsPage: React.FC = () => {
           Here you can view and manage participants, track their engagement, and
           see the events they have joined.
         </p>
-
+        <div className="absolute top-6 right-6">
+          <button
+            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
+            onClick={() => navigate("/event-organizer/invitations")}
+          >
+            Invite More Participants
+          </button>
+        </div>
         <div className="mb-8">
           <h3 className="text-2xl font-semibold text-white mb-4">Overview</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white">
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+            <div className="p-6 bg-blue-800 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              {" "}
               <div className="flex items-center space-x-4">
                 <FaUsers className="text-teal-500 text-3xl" />
                 <div>
@@ -73,27 +97,14 @@ const CompanyParticipantsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
+            <div className="p-6 bg-green-800 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+              {" "}
               <div className="flex items-center space-x-4">
                 <FaUserCheck className="text-teal-500 text-3xl" />
                 <div>
                   <h4 className="text-xl font-medium">Active Participants</h4>
                   <p className="text-2xl font-semibold">
                     {participants.filter((p) => p.joinedEventCount > 0).length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6 bg-[#2A2A2A] rounded-lg shadow-md hover:shadow-xl transition-shadow">
-              <div className="flex items-center space-x-4">
-                <FaCalendarAlt className="text-teal-500 text-3xl" />
-                <div>
-                  <h4 className="text-xl font-medium">Total Events</h4>
-                  <p className="text-2xl font-semibold">
-                    {participants.reduce(
-                      (acc, participant) => acc + participant.joinedEventCount,
-                      0
-                    )}
                   </p>
                 </div>
               </div>
@@ -107,7 +118,7 @@ const CompanyParticipantsPage: React.FC = () => {
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {participants.map((participant) => (
                 <div
                   key={participant.participantId}
@@ -128,7 +139,7 @@ const CompanyParticipantsPage: React.FC = () => {
                   </div>
 
                   <ul className="mt-4 space-y-2">
-                    {participant.eventLinks.map((link, index) => (
+                    {participant.eventLinks.slice(0, 3).map((link, index) => (
                       <li key={index}>
                         <a
                           href={`/event-details/${link.split("/").pop()}`}
@@ -138,20 +149,45 @@ const CompanyParticipantsPage: React.FC = () => {
                         </a>
                       </li>
                     ))}
+                    {participant.joinedEventCount > 3 &&
+                      participant.showAllEvents && (
+                        <>
+                          {participant.eventLinks
+                            .slice(3)
+                            .map((link, index) => (
+                              <li key={index + 3}>
+                                <a
+                                  href={`/event-details/${link
+                                    .split("/")
+                                    .pop()}`}
+                                  className="text-teal-500 hover:underline"
+                                >
+                                  Event {index + 4}
+                                </a>
+                              </li>
+                            ))}
+                        </>
+                      )}
+                    {participant.joinedEventCount > 3 && (
+                      <li>
+                        <button
+                          onClick={() =>
+                            toggleShowMoreEvents(participant.participantId)
+                          }
+                          className="text-teal-500 hover:underline"
+                        >
+                          {participant.showAllEvents
+                            ? "Show Less"
+                            : "See More Events"}
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
               ))}
             </div>
           </div>
         )}
-        <div className="mt-8 text-center">
-          <button
-            className="bg-teal-500 text-white py-3 px-8 rounded-full hover:bg-teal-600 transition-all"
-            onClick={() => navigate("/event-organizer/invitations")}
-          >
-            Invite More Participants
-          </button>
-        </div>
       </div>
     </Layout>
   );
