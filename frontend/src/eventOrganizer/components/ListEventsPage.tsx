@@ -247,55 +247,54 @@ const ListEventsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-6 flex space-x-4">
-          <button
-            onClick={() => setFilter("week")}
-            className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500"
-          >
-            <CalendarIcon className="w-5 h-5 mr-2 inline" />
-            This Week ({counts.thisWeek} Events, {acceptedParticipants.thisWeek}{" "}
-            Accepted)
-          </button>
-          <button
-            onClick={() => setFilter("month")}
-            className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500"
-          >
-            <CalendarIcon className="w-5 h-5 mr-2 inline" />
-            This Month ({counts.thisMonth} Events,{" "}
-            {acceptedParticipants.thisMonth} Accepted)
-          </button>
-          <button
-            onClick={() => setFilter("")}
-            className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500"
-          >
-            <ListBulletIcon className="w-5 h-5 mr-2 inline" />
-            All Events ({counts.allEvents} Events,{" "}
-            {acceptedParticipants.allEvents} Accepted)
-          </button>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-gray-300 font-semibold mb-2">
-            Filter by Department
-          </label>
-          <select
-            onChange={(e) => setDepartmentFilter(Number(e.target.value))}
-            value={departmentFilter ?? ""}
-            className="bg-[#313030] text-gray-300 rounded-lg py-2 px-4 w-1/6 sm:w-1/8"
-          >
-            <option value="" className="bg-[#313030] text-gray-300">
-              All Departments
-            </option>
-            {departments.map((department) => (
-              <option
-                key={department.id}
-                value={department.id}
-                className="bg-[#313030] text-gray-300"
-              >
-                {department.name}
+        <div className="mb-6 flex items-center space-x-6">
+          <div className="w-1/5">
+            <label className="block text-gray-400 font-medium mb-2 tracking-wide">
+              Filter by Date
+            </label>
+            <select
+              onChange={(e) => setFilter(e.target.value)}
+              value={filter}
+              className="bg-[#313030] text-gray-300 border border-gray-500 rounded-lg py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow hover:border-blue-500"
+            >
+              <option value="" className="bg-[#313030] text-gray-300">
+                All Events ({counts.allEvents} Events,{" "}
+                {acceptedParticipants.allEvents} Accepted)
               </option>
-            ))}
-          </select>
+              <option value="week" className="bg-[#313030] text-gray-300">
+                This Week ({counts.thisWeek} Events,{" "}
+                {acceptedParticipants.thisWeek} Accepted)
+              </option>
+              <option value="month" className="bg-[#313030] text-gray-300">
+                This Month ({counts.thisMonth} Events,{" "}
+                {acceptedParticipants.thisMonth} Accepted)
+              </option>
+            </select>
+          </div>
+
+          <div className="w-1/5">
+            <label className="block text-gray-400 font-medium mb-2 tracking-wide">
+              Filter by Department
+            </label>
+            <select
+              onChange={(e) => setDepartmentFilter(Number(e.target.value))}
+              value={departmentFilter ?? ""}
+              className="bg-[#313030] text-gray-300 border border-gray-500 rounded-lg py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow hover:border-blue-500"
+            >
+              <option value="" className="bg-[#313030] text-gray-300">
+                All Departments
+              </option>
+              {departments.map((department) => (
+                <option
+                  key={department.id}
+                  value={department.id}
+                  className="bg-[#313030] text-gray-300"
+                >
+                  {department.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {events.length === 0 ? (
