@@ -58,8 +58,8 @@ function App() {
             element={<DepartmentsList />}
           />
           <Route
-            path="/event-organizer/events/:eventId"
-            element={<EventDetailPage />}
+            path="/event-details/:eventId"
+            element={<EventDetailPage />} 
           />
         </Routes>
       </div>

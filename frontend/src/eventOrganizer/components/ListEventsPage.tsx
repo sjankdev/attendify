@@ -354,7 +354,7 @@ const ListEventsPage: React.FC = () => {
                 </div>
 
                 <Link
-                  to={`/event-organizer/events/${event.id}`}
+                  to={`/event-details/${event.id}`}
                   className="text-blue-400 hover:underline mt-4 inline-block"
                 >
                   See Full Event
