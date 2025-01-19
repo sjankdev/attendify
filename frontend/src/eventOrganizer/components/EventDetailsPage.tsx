@@ -131,6 +131,14 @@ const EventDetailsPage: React.FC = () => {
                     eventDetails.attendeeLimit
                   }`}
             </span>
+            <p className="flex items-center space-x-3">
+              <strong className="text-sm">
+                Available for All Departments:
+              </strong>
+              <span>
+                {eventDetails.availableForAllDepartments ? "Yes" : "No"}
+              </span>
+            </p>
           </div>
           {eventDetails.participants?.length > 0 && (
             <div className="mt-6 border-t border-gray-600 pt-4">

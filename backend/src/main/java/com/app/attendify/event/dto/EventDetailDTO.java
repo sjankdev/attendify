@@ -19,8 +19,9 @@ public class EventDetailDTO {
     private List<ParticipantDTO> joinedParticipants;
     private Integer availableSeats;
     private Integer attendeeLimit;
+    private boolean availableForAllDepartments;
 
-    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, String organizerName, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit) {
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, String organizerName, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit, boolean availableForAllDepartments) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -32,6 +33,7 @@ public class EventDetailDTO {
         this.joinedParticipants = joinedParticipants;
         this.availableSeats = availableSeats;
         this.attendeeLimit = attendeeLimit;
+        this.availableForAllDepartments = availableForAllDepartments;
     }
 
     public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, Integer attendeeLimit, List<ParticipantDTO> joinedParticipants) {
@@ -132,5 +134,13 @@ public class EventDetailDTO {
 
     public void setJoinedParticipants(List<ParticipantDTO> joinedParticipants) {
         this.joinedParticipants = joinedParticipants;
+    }
+
+    public boolean isAvailableForAllDepartments() {
+        return availableForAllDepartments;
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
     }
 }
