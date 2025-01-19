@@ -2,6 +2,7 @@ package com.app.attendify.event.dto;
 
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,18 +14,20 @@ public class EventDetailDTO {
     private String location;
     private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
+    private LocalDateTime joinDeadline;
     private String organizerName;
     private List<ParticipantDTO> joinedParticipants;
     private Integer availableSeats;
     private Integer attendeeLimit;
 
-    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit) {
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, String organizerName, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.location = location;
         this.eventStartDate = eventStartDate;
         this.eventEndDate = eventEndDate;
+        this.joinDeadline = joinDeadline;
         this.organizerName = organizerName;
         this.joinedParticipants = joinedParticipants;
         this.availableSeats = availableSeats;
@@ -97,6 +100,14 @@ public class EventDetailDTO {
 
     public void setEventEndDate(LocalDateTime eventEndDate) {
         this.eventEndDate = eventEndDate;
+    }
+
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
+
+    public void setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
     }
 
     public String getOrganizerName() {

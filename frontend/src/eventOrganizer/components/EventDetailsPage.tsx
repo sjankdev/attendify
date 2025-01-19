@@ -117,6 +117,12 @@ const EventDetailsPage: React.FC = () => {
                 ? new Date(eventDetails.eventEndDate).toLocaleString()
                 : "N/A"}
             </p>
+            <p className="text-lg text-white">
+              <strong className="font-semibold">Join Deadline:</strong>{" "}
+              {eventDetails.joinDeadline
+                ? new Date(eventDetails.joinDeadline).toLocaleString()
+                : "N/A"}
+            </p>
             <strong className="text-sm">Available Seats:</strong>
             <span>
               {eventDetails.attendeeLimit === null
