@@ -359,6 +359,31 @@ const ListEventsPage: React.FC = () => {
                 >
                   See Full Event
                 </Link>
+                <div className="absolute bottom-4 right-4 flex space-x-2">
+                  <button
+                    onClick={() => navigate(`/event-stats/${event.id}`)}
+                    className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-500"
+                    title="View Stats"
+                  >
+                    <ChartBarIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigate(`/event-organizer/update-event/${event.id}`)
+                    }
+                    className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500"
+                    title="Edit Event"
+                  >
+                    <PencilSquareIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
+                    title="Delete Event"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
