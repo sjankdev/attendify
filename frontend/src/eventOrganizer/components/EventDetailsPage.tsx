@@ -139,7 +139,35 @@ const EventDetailsPage: React.FC = () => {
                 {eventDetails.availableForAllDepartments ? "Yes" : "No"}
               </span>
             </p>
+            <p className="flex items-center space-x-3">
+              <strong className="text-sm">Pending Requests:</strong>
+              <span>{eventDetails.pendingRequests}</span>
+            </p>
           </div>
+
+          {eventDetails.agendaItems.length > 0 && (
+            <div className="mt-6 border-t border-gray-600 pt-4">
+              <h4 className="text-lg font-semibold text-white flex items-center">
+                Agenda:
+              </h4>
+              <ul className="space-y-4 mt-4">
+                {eventDetails.agendaItems.map((agendaItem, index) => (
+                  <li key={index} className="border-b border-gray-600 pb-4">
+                    <h5 className="font-medium text-teal-400">
+                      {agendaItem.title}
+                    </h5>
+                    <p className="text-gray-300 mt-1">
+                      {agendaItem.description}
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                      {new Date(agendaItem.endTime).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {eventDetails.participants?.length > 0 && (
             <div className="mt-6 border-t border-gray-600 pt-4">
               <h4 className="text-lg font-semibold text-white">

@@ -605,7 +605,9 @@ public class EventOrganizerService {
             Integer availableSeats = participants.size();
             Integer attendeeLimit = event.getAttendeeLimit();
 
-            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getJoinDeadline(), event.getOrganizer().getUser().getFullName(), participants, availableSeats, attendeeLimit,event.isAvailableForAllDepartments());
+            List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+
+            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getJoinDeadline(), event.getOrganizer().getUser().getFullName(), agendaItems, event.getPendingRequests(), participants, availableSeats, attendeeLimit, event.isAvailableForAllDepartments());
         } catch (Exception e) {
             logger.error("Error retrieving event details", e);
             throw new RuntimeException("Error retrieving event details", e);
