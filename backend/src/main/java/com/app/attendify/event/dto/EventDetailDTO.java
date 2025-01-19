@@ -14,10 +14,24 @@ public class EventDetailDTO {
     private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
     private String organizerName;
-    private String attendeeLimit;
     private List<ParticipantDTO> joinedParticipants;
+    private Integer availableSeats;
+    private Integer attendeeLimit;
 
-    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, String attendeeLimit, List<ParticipantDTO> joinedParticipants) {
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.organizerName = organizerName;
+        this.joinedParticipants = joinedParticipants;
+        this.availableSeats = availableSeats;
+        this.attendeeLimit = attendeeLimit;
+    }
+
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, Integer attendeeLimit, List<ParticipantDTO> joinedParticipants) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -27,6 +41,14 @@ public class EventDetailDTO {
         this.organizerName = organizerName;
         this.attendeeLimit = attendeeLimit;
         this.joinedParticipants = joinedParticipants;
+    }
+
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
     }
 
     public int getId() {
@@ -85,11 +107,11 @@ public class EventDetailDTO {
         this.organizerName = organizerName;
     }
 
-    public String getAttendeeLimit() {
+    public Integer getAttendeeLimit() {
         return attendeeLimit;
     }
 
-    public void setAttendeeLimit(String attendeeLimit) {
+    public void setAttendeeLimit(Integer attendeeLimit) {
         this.attendeeLimit = attendeeLimit;
     }
 

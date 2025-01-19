@@ -44,6 +44,53 @@ export const fetchEventStatistics = async (eventId: string) => {
   }
 };
 
+export const fetchEventDetailsWithParticipants = async (
+  eventId: string
+): Promise<Event> => {
+  try {
+    const eventResponse = await fetch(
+      `http://localhost:8080/api/auth/event-organizer/event-details/${eventId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!eventResponse.ok) {
+      throw new Error("Failed to fetch event details");
+    }
+
+    const eventData = await eventResponse.json();
+
+    const participantsResponse = await fetch(
+      `http://localhost:8080/api/auth/event-organizer/my-events/${eventId}/participants`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (participantsResponse.ok) {
+      const participants = await participantsResponse.json();
+      return {
+        ...eventData,
+        participants,
+      };
+    }
+
+    return eventData;
+  } catch (error) {
+    console.error("Error fetching event details with participants:", error);
+    throw error;
+  }
+};
+
 export const fetchEventsWithParticipants = async (
   filter: string,
   departmentIds?: number[]
