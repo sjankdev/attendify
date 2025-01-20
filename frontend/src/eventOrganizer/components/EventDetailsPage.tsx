@@ -3,34 +3,102 @@ import { useParams } from "react-router-dom";
 import {
   fetchEventDetailsWithParticipants,
   reviewJoinRequest,
+  fetchEventFeedbacks,
+  fetchEventFeedbackSummary,
 } from "../services/eventOrganizerService";
 import Layout from "../../shared/components/EventOrganizerLayout";
 import { Event } from "../../types/eventTypes";
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 const EventDetailsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [eventDetails, setEventDetails] = useState<Event | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
+  const [averageRatings, setAverageRatings] = useState<Record<number, number>>(
+    {}
+  );
   const [showAccepted, setShowAccepted] = useState<{
     [eventId: number]: boolean;
   }>({});
-  useEffect(() => {
-    const loadEventDetails = async () => {
-      try {
-        if (!eventId) return;
-        const data = await fetchEventDetailsWithParticipants(eventId);
-        setEventDetails(data);
-      } catch (err) {
-        console.error("Error fetching event details:", err);
-        setError("Failed to fetch event details");
-      } finally {
-        setLoading(false);
-      }
-    };
 
+  const [expandedFeedbacks, setExpandedFeedbacks] = useState<{
+    [eventId: number]: boolean;
+  }>({});
+
+  const loadFeedbackSummary = async (eventId: number) => {
+    try {
+      const feedbackSummary = await fetchEventFeedbackSummary(eventId);
+      console.log("Feedback Summary:", feedbackSummary);
+      setFeedbacks((prevFeedbacks) => ({
+        ...prevFeedbacks,
+        [eventId]: feedbackSummary.feedbacks,
+      }));
+      setAverageRatings((prevRatings) => ({
+        ...prevRatings,
+        [eventId]: feedbackSummary.averageRating,
+      }));
+    } catch (error) {
+      console.error(
+        `Failed to load feedback summary for event ${eventId}:`,
+        error
+      );
+    }
+  };
+
+  const loadEventDetails = async () => {
+    try {
+      if (!eventId) return;
+      const data = await fetchEventDetailsWithParticipants(eventId);
+      setEventDetails(data);
+
+      await loadFeedbackSummary(parseInt(eventId));
+    } catch (err) {
+      console.error("Error fetching event details:", err);
+      setError("Failed to fetch event details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadEventDetails();
   }, [eventId]);
+
+  const toggleFeedback = (eventId: number) => {
+    setExpandedFeedbacks((prev) => {
+      const isExpanded = prev[eventId];
+      if (!isExpanded) {
+        loadFeedbacks(eventId);
+      }
+      return {
+        ...prev,
+        [eventId]: !isExpanded,
+      };
+    });
+  };
+
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <>
+        {[...Array(fullStars)].map((_, i) => (
+          <FaStar key={`full-${i}`} className="text-yellow-400 inline-block" />
+        ))}
+        {halfStar && <FaStarHalfAlt className="text-yellow-400 inline-block" />}
+        {[...Array(emptyStars)].map((_, i) => (
+          <FaRegStar
+            key={`empty-${i}`}
+            className="text-yellow-400 inline-block"
+          />
+        ))}
+      </>
+    );
+  };
 
   if (loading) {
     return (
@@ -57,6 +125,18 @@ const EventDetailsPage: React.FC = () => {
       ...prev,
       [eventId]: !prev[eventId],
     }));
+  };
+
+  const loadFeedbacks = async (eventId: number) => {
+    try {
+      const feedbackResponse = await fetchEventFeedbacks(eventId);
+      setFeedbacks((prevFeedbacks) => ({
+        ...prevFeedbacks,
+        [eventId]: feedbackResponse,
+      }));
+    } catch (error) {
+      console.error(`Failed to load feedback for event ${eventId}:`, error);
+    }
   };
 
   const handleReviewJoinRequest = async (
@@ -168,6 +248,56 @@ const EventDetailsPage: React.FC = () => {
               </ul>
             </div>
           )}
+
+          <div className="mt-6 border-t border-gray-600 pt-4">
+            <h4 className="text-lg font-semibold text-white">Feedbacks:</h4>
+
+            {feedbacks[eventDetails.id]?.length > 0 ? (
+              <>
+                <p className="text-gray-300 mt-2">
+                  <strong className="font-medium">Average Rating:</strong>{" "}
+                  {renderStars(averageRatings[eventDetails.id] || 0)}
+                </p>
+
+                <button
+                  onClick={() => toggleFeedback(eventDetails.id)}
+                  className="mt-2 text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                >
+                  {expandedFeedbacks[eventDetails.id]
+                    ? "Hide Feedbacks"
+                    : "View Feedbacks"}
+                </button>
+
+                {expandedFeedbacks[eventDetails.id] && (
+                  <ul className="space-y-4 mt-4 bg-gray-800 rounded-lg p-4">
+                    {feedbacks[eventDetails.id].map((feedback, index) => (
+                      <li
+                        key={index}
+                        className="border-b border-gray-600 pb-4 last:border-none"
+                      >
+                        <p className="text-gray-300">{feedback.comments}</p>
+
+                        <div className="mt-2 text-sm text-gray-400">
+                          <p>
+                            <strong className="font-medium">Rating:</strong>{" "}
+                            {renderStars(feedback.rating)}
+                          </p>
+                          <p>
+                            <strong className="font-medium">
+                              Participant:
+                            </strong>{" "}
+                            {feedback.participantName}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            ) : (
+              <p className="text-gray-300 mt-4">No feedbacks</p>
+            )}
+          </div>
           {eventDetails.participants?.length > 0 && (
             <div className="mt-6 border-t border-gray-600 pt-4">
               <h4 className="text-lg font-semibold text-white">
