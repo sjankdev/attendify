@@ -2,6 +2,7 @@ package com.app.attendify.event.dto;
 
 import com.app.attendify.eventParticipant.dto.ParticipantDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,11 +14,33 @@ public class EventDetailDTO {
     private String location;
     private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
+    private LocalDateTime joinDeadline;
+    private List<AgendaItemDTO> agendaItems;
+    private Integer pendingRequests;
     private String organizerName;
-    private String attendeeLimit;
     private List<ParticipantDTO> joinedParticipants;
+    private Integer availableSeats;
+    private Integer attendeeLimit;
+    private boolean availableForAllDepartments;
 
-    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, String attendeeLimit, List<ParticipantDTO> joinedParticipants) {
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, LocalDateTime joinDeadline, String organizerName, List<AgendaItemDTO> agendaItems, Integer pendingRequests, List<ParticipantDTO> joinedParticipants, Integer availableSeats, Integer attendeeLimit, boolean availableForAllDepartments) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.joinDeadline = joinDeadline;
+        this.organizerName = organizerName;
+        this.agendaItems = agendaItems;
+        this.pendingRequests = pendingRequests;
+        this.joinedParticipants = joinedParticipants;
+        this.availableSeats = availableSeats;
+        this.attendeeLimit = attendeeLimit;
+        this.availableForAllDepartments = availableForAllDepartments;
+    }
+
+    public EventDetailDTO(int id, String name, String description, String location, LocalDateTime eventStartDate, LocalDateTime eventEndDate, String organizerName, Integer attendeeLimit, List<ParticipantDTO> joinedParticipants) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -27,6 +50,14 @@ public class EventDetailDTO {
         this.organizerName = organizerName;
         this.attendeeLimit = attendeeLimit;
         this.joinedParticipants = joinedParticipants;
+    }
+
+    public Integer getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
     }
 
     public int getId() {
@@ -77,6 +108,14 @@ public class EventDetailDTO {
         this.eventEndDate = eventEndDate;
     }
 
+    public LocalDateTime getJoinDeadline() {
+        return joinDeadline;
+    }
+
+    public void setJoinDeadline(LocalDateTime joinDeadline) {
+        this.joinDeadline = joinDeadline;
+    }
+
     public String getOrganizerName() {
         return organizerName;
     }
@@ -85,11 +124,11 @@ public class EventDetailDTO {
         this.organizerName = organizerName;
     }
 
-    public String getAttendeeLimit() {
+    public Integer getAttendeeLimit() {
         return attendeeLimit;
     }
 
-    public void setAttendeeLimit(String attendeeLimit) {
+    public void setAttendeeLimit(Integer attendeeLimit) {
         this.attendeeLimit = attendeeLimit;
     }
 
@@ -99,5 +138,29 @@ public class EventDetailDTO {
 
     public void setJoinedParticipants(List<ParticipantDTO> joinedParticipants) {
         this.joinedParticipants = joinedParticipants;
+    }
+
+    public boolean isAvailableForAllDepartments() {
+        return availableForAllDepartments;
+    }
+
+    public void setAvailableForAllDepartments(boolean availableForAllDepartments) {
+        this.availableForAllDepartments = availableForAllDepartments;
+    }
+
+    public List<AgendaItemDTO> getAgendaItems() {
+        return agendaItems;
+    }
+
+    public void setAgendaItems(List<AgendaItemDTO> agendaItems) {
+        this.agendaItems = agendaItems;
+    }
+
+    public Integer getPendingRequests() {
+        return pendingRequests;
+    }
+
+    public void setPendingRequests(Integer pendingRequests) {
+        this.pendingRequests = pendingRequests;
     }
 }
