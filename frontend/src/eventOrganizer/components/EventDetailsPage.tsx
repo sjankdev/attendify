@@ -181,15 +181,15 @@ const EventDetailsPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-6 py-8 bg-[#101010] text-white rounded-lg shadow-2xl">
-        <h2 className="text-4xl font-bold text-indigo-400">
+      <div className="max-w-7xl mx-auto px-6 py-8 bg-[#101010] text-white rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-indigo-400">
           {eventDetails.name}
         </h2>
         <p className="mt-4 text-lg text-gray-300">{eventDetails.description}</p>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-8">
-            <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-xl">
+            <div className="bg-[#2A2A2A] p-8 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaCalendarAlt className="mr-2" /> Event Dates
               </h3>
@@ -227,7 +227,7 @@ const EventDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-xl">
+            <div className="bg-[#2A2A2A] p-8 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaMapMarkerAlt className="mr-2" /> Location & Seats
               </h3>
@@ -290,7 +290,7 @@ const EventDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-xl">
+            <div className="bg-[#2A2A2A] p-8 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaUsers className="mr-2" /> Participants
               </h3>
@@ -343,7 +343,7 @@ const EventDetailsPage: React.FC = () => {
           </div>
 
           <div className="space-y-8">
-            <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-xl">
+            <div className="bg-[#2A2A2A] p-8 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaClipboardList className="mr-2" /> Agenda
               </h3>
@@ -368,7 +368,7 @@ const EventDetailsPage: React.FC = () => {
               )}
             </div>
 
-            <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-xl">
+            <div className="bg-[#2A2A2A] p-8 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaStar className="mr-2" /> Feedbacks
               </h3>
