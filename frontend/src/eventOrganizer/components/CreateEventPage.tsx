@@ -205,296 +205,183 @@ const CreateEventPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-[#151515] rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
+      <div className="bg-gray-900 text-white min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-6">Create New Event</h2>
 
-        {error && (
-          <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="bg-red-500 text-white p-2 rounded mb-4">
+              {error}
+            </div>
+          )}
 
-        {successMessage && (
-          <div className="text-green-500 bg-green-800 p-4 rounded-lg mb-4">
-            {successMessage}
-          </div>
-        )}
+          {successMessage && (
+            <div className="bg-green-500 text-white p-2 rounded mb-4">
+              {successMessage}
+            </div>
+          )}
 
-        {validationErrors.length > 0 && (
-          <div className="bg-yellow-800 p-4 rounded-lg mb-4">
-            <ul className="list-disc pl-5 space-y-2 text-yellow-300">
-              {validationErrors.map((err, index) => (
-                <li key={index}>{err}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {validationErrors.length > 0 && (
+            <div className="bg-yellow-500 text-white p-2 rounded mb-4">
+              <ul className="list-disc list-inside">
+                {validationErrors.map((err, index) => (
+                  <li key={index}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div className=" p-5 rounded-lg ">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Event Title
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter event name"
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
+          <form className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Event Name
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter event name"
+              />
+            </div>
 
-          <div className=" p-5 rounded-lg ">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Event Start Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              value={eventStartDate}
-              onChange={(e) => setEventStartDate(e.target.value)}
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Event Start Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={eventStartDate}
+                  onChange={(e) => setEventStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Event End Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={eventEndDate}
+                  onChange={(e) => setEventEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Registration Deadline
+              </label>
+              <input
+                type="datetime-local"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={joinDeadline}
+                onChange={(e) => setJoinDeadline(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Location</label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Enter event location"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Event Description
+              </label>
+              <textarea
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter event description"
+                rows={4}
+              ></textarea>
+            </div>
 
-          <div className=" p-5 rounded-lg ">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Event End Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              value={eventEndDate}
-              onChange={(e) => setEventEndDate(e.target.value)}
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
-
-          <div className=" p-5 rounded-lg ">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Event Location
-            </label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Enter event location"
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
-
-          <div className=" p-5 rounded-lg ">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Registration Deadline
-            </label>
-            <input
-              type="datetime-local"
-              value={joinDeadline}
-              onChange={(e) => setJoinDeadline(e.target.value)}
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
-
-          <div className=" p-5 rounded-lg  col-span-1 sm:col-span-2 md:col-span-3">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              Event Description
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter event description"
-              rows={4}
-              className="w-full p-3  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-            />
-          </div>
-
-          <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-2">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
+                className="text-blue-500 focus:ring-0"
                 checked={joinApproval}
                 onChange={(e) => setJoinApproval(e.target.checked)}
-                className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
               />
-              <label className="text-sm font-semibold text-gray-300">
-                Require Join Approval
-              </label>
+              <label>Require Join Approval</label>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
+                className="text-blue-500 focus:ring-0"
                 checked={isAttendeeLimitChecked}
                 onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-                className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
               />
-              <label className="text-sm font-semibold text-gray-300">
-                Set Attendee Limit
-              </label>
+              <label>Set Attendee Limit</label>
               {isAttendeeLimitChecked && (
-                <div className="mt-2">
-                  <input
-                    type="number"
-                    value={attendeeLimit ?? ""}
-                    onChange={(e) => setAttendeeLimit(Number(e.target.value))}
-                    placeholder="Limit"
-                    min="1"
-                    className="w-28 p-2 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white placeholder-gray-400"
-                  />
-                </div>
+                <input
+                  type="number"
+                  className="w-24 px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={attendeeLimit ?? ""}
+                  onChange={(e) => setAttendeeLimit(Number(e.target.value))}
+                  placeholder="Limit"
+                  min="1"
+                />
               )}
             </div>
-          </div>
 
-          <div className="p-5 rounded-lg col-span-1 sm:col-span-2 md:col-span-3 flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={isAllDepartments}
-              onChange={() => setIsAllDepartments(!isAllDepartments)}
-              className="h-5 w-5 border-gray-600 rounded transition duration-200 transform scale-110 hover:scale-125 focus:ring-2 focus:ring-teal-500 text-teal-500"
-            />
-            <label className="text-sm font-semibold text-gray-300">
-              Event Open to All Departments
-            </label>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-[35%_65%] gap-6 col-span-1 sm:col-span-2 md:col-span-3">
-            {!isAllDepartments && (
-              <div className="p-5 rounded-lg">
-                <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Select Departments
-                </label>
-                <select
-                  multiple
-                  value={selectedDepartments.map(String)}
-                  onChange={(e) => {
-                    const selected = Array.from(
-                      e.target.selectedOptions,
-                      (option) => parseInt(option.value)
-                    );
-                    setSelectedDepartments(selected);
-                  }}
-                  className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                >
-                  {departments.map((department) => (
-                    <option key={department.id} value={department.id}>
-                      {department.name}
-                    </option>
-                  ))}
-                </select>
+            <div>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  className="text-blue-500 focus:ring-0"
+                  checked={isAllDepartments}
+                  onChange={() => setIsAllDepartments(!isAllDepartments)}
+                />
+                <label>Event Open to All Departments</label>
               </div>
-            )}
-            <div className="p-5 rounded-lg">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
-                Agenda Items for the Event
-              </label>
 
-              {isAgendaVisible && (
-                <div className="p-5 rounded-lg">
-                  {agendaItems.map((item, index) => (
-                    <div key={index} className="space-y-4 mb-4">
-                      <div>
-                        <input
-                          type="text"
-                          value={item.title}
-                          onChange={(e) =>
-                            handleAgendaChange(index, "title", e.target.value)
-                          }
-                          placeholder="Agenda item title"
-                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          value={item.description}
-                          onChange={(e) =>
-                            handleAgendaChange(
-                              index,
-                              "description",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Agenda item description"
-                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="datetime-local"
-                          value={item.startTime}
-                          onChange={(e) =>
-                            handleAgendaChange(
-                              index,
-                              "startTime",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="datetime-local"
-                          value={item.endTime}
-                          onChange={(e) =>
-                            handleAgendaChange(index, "endTime", e.target.value)
-                          }
-                          className="w-full p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-[#313030] text-white"
-                        />
-                      </div>
-                      <div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveAgendaItem(index)}
-                          className="text-red-400 hover:underline"
-                        >
-                          Remove Agenda Item
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {!isAgendaVisible && (
-                <button
-                  onClick={() => setIsAgendaVisible(true)}
-                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
-                >
-                  Add New Agenda Item
-                </button>
-              )}
-              {isAgendaVisible && (
-                <div className="flex flex-col space-y-4">
-                  <div className="mt-4">
-                    <button
-                      onClick={handleAddAgendaItem}
-                      className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
-                    >
-                      Add New Agenda Item
-                    </button>
-                  </div>
+              {!isAllDepartments && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Select Departments
+                  </label>
+                  <select
+                    multiple
+                    className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedDepartments.map(String)}
+                    onChange={(e) => {
+                      const selected = Array.from(
+                        e.target.selectedOptions,
+                        (option) => parseInt(option.value)
+                      );
+                      setSelectedDepartments(selected);
+                    }}
+                  >
+                    {departments.map((department) => (
+                      <option key={department.id} value={department.id}>
+                        {department.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             </div>
-            );
-          </div>
 
-          <div className="flex justify-start space-x-4 col-span-1 sm:col-span-2 md:col-span-3">
-            <button
-              onClick={handleCreateEvent}
-              disabled={isSubmitting}
-              className="bg-[#F6F6F7] text-[#151515] px-6 py-2 rounded-lg hover:bg-teal-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Submitting..." : "Create Event"}
-            </button>
-
-            <button
-              onClick={handleGoBack}
-              className="bg-red-100 text-red-700 px-6 py-2 rounded-lg hover:bg-red-200"
-            >
-              Go Back
-            </button>
-          </div>
+            <div className="space-y-4">
+              <button
+                type="button"
+                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded focus:outline-none"
+                onClick={handleCreateEvent}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Create Event"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </Layout>
