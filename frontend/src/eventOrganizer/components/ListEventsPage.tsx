@@ -353,6 +353,56 @@ const ListEventsPage: React.FC = () => {
                   </div>
                 </div>
 
+                {event.participants?.some(
+                  (participant) => participant.status === "PENDING"
+                ) && (
+                  <div className="mt-6 bg-[#2c2c2c] p-4 rounded-lg">
+                    <h4 className="text-xl text-white">
+                      Pending Join Requests:
+                    </h4>
+                    {event.participants
+                      ?.filter(
+                        (participant) => participant.status === "PENDING"
+                      )
+                      .map((participant) => (
+                        <div
+                          key={participant.participantId}
+                          className="flex items-center space-x-4"
+                        >
+                          <span className="text-gray-400">
+                            {participant.participantName}
+                          </span>
+                          <div className="space-x-2">
+                            <button
+                              onClick={() =>
+                                handleReviewJoinRequest(
+                                  event.id,
+                                  participant.participantId,
+                                  "ACCEPTED"
+                                )
+                              }
+                              className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-500"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleReviewJoinRequest(
+                                  event.id,
+                                  participant.participantId,
+                                  "REJECTED"
+                                )
+                              }
+                              className="bg-red-600 text-white p-2 rounded-lg hover:bg-red-500"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+
                 <Link
                   to={`/event-details/${event.id}`}
                   className="text-blue-400 hover:underline mt-4 inline-block"
