@@ -404,11 +404,10 @@ const CreateEventPage: React.FC = () => {
                 </div>
               )}
             </div>
-
-            <div className="space-y-4">
+            <div className="mt-6 flex justify-center">
               <button
                 type="button"
-                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded focus:outline-none"
+                className="w-auto px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                 onClick={handleCreateEvent}
                 disabled={isSubmitting}
               >
