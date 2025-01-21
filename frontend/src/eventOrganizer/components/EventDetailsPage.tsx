@@ -300,31 +300,35 @@ const EventDetailsPage: React.FC = () => {
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaUsers className="mr-2" /> Participants
               </h3>
-              {eventDetails.participants?.length > 0 && (
+              {eventDetails.participants?.length > 0 ? (
                 <div className="space-y-4 mt-4">
-                  <div className="flex justify-between items-center">
-                    <h5 className="font-semibold text-lg">
-                      Joined participants:{" "}
-                      {
-                        eventDetails.participants.filter(
-                          (p) => p.status === "ACCEPTED"
-                        ).length
-                      }
-                    </h5>
-                    <button
-                      onClick={() =>
-                        toggleAcceptedParticipants(eventDetails.id)
-                      }
-                      className={`mt-2 px-4 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
-                        showAccepted[eventDetails.id]
-                          ? "bg-indigo-500 text-white hover:bg-indigo-600"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                      }`}
-                    >
-                      {showAccepted[eventDetails.id] ? "Hide" : "View"} accepted
-                      participants
-                    </button>
-                  </div>
+                  {eventDetails.participants.filter(
+                    (p) => p.status === "ACCEPTED"
+                  ).length > 0 && (
+                    <div className="flex justify-between items-center">
+                      <h5 className="font-semibold text-lg">
+                        Joined participants:{" "}
+                        {
+                          eventDetails.participants.filter(
+                            (p) => p.status === "ACCEPTED"
+                          ).length
+                        }
+                      </h5>
+                      <button
+                        onClick={() =>
+                          toggleAcceptedParticipants(eventDetails.id)
+                        }
+                        className={`mt-2 px-4 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
+                          showAccepted[eventDetails.id]
+                            ? "bg-indigo-500 text-white hover:bg-indigo-600"
+                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        }`}
+                      >
+                        {showAccepted[eventDetails.id] ? "Hide" : "View"}{" "}
+                        accepted participants
+                      </button>
+                    </div>
+                  )}
 
                   {showAccepted[eventDetails.id] &&
                     eventDetails.participants.filter(
@@ -343,7 +347,51 @@ const EventDetailsPage: React.FC = () => {
                           ))}
                       </div>
                     )}
+                  {eventDetails.participants
+                    .filter((p) => p.status === "PENDING")
+                    .map((participant) => (
+                      <div
+                        key={participant.participantId}
+                        className="bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="text-lg font-semibold text-gray-200">
+                            {participant.participantName}
+                          </p>
+                        </div>
+                        <div className="flex space-x-4">
+                          <button
+                            onClick={() =>
+                              handleReviewJoinRequest(
+                                eventDetails.id,
+                                participant.participantId,
+                                "ACCEPTED"
+                              )
+                            }
+                            className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleReviewJoinRequest(
+                                eventDetails.id,
+                                participant.participantId,
+                                "REJECTED"
+                              )
+                            }
+                            className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                 </div>
+              ) : (
+                <p className="text-lg text-gray-400">
+                  No participants available
+                </p>
               )}
             </div>
           </div>
@@ -353,7 +401,7 @@ const EventDetailsPage: React.FC = () => {
               <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
                 <FaClipboardList className="mr-2" /> Agenda
               </h3>
-              {eventDetails.agendaItems.length > 0 && (
+              {eventDetails.agendaItems.length > 0 ? (
                 <div className="space-y-4 mt-4">
                   {eventDetails.agendaItems
                     .slice(0, expandedAgenda ? undefined : 3)
@@ -383,6 +431,8 @@ const EventDetailsPage: React.FC = () => {
                     </button>
                   )}
                 </div>
+              ) : (
+                <p className="text-lg text-gray-400">No agenda available</p>
               )}
             </div>
 
@@ -434,7 +484,7 @@ const EventDetailsPage: React.FC = () => {
                   )}
                 </>
               ) : (
-                <p className="text-lg text-gray-400">No feedbacks</p>
+                <p className="text-lg text-gray-400">No feedbacks available</p>
               )}
             </div>
           </div>
