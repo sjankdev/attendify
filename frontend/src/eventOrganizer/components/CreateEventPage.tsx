@@ -309,18 +309,38 @@ const CreateEventPage: React.FC = () => {
                 className="text-blue-500 focus:ring-0"
                 checked={joinApproval}
                 onChange={(e) => setJoinApproval(e.target.checked)}
+                id="joinApproval"
               />
-              <label>Require Join Approval</label>
+              <label htmlFor="joinApproval">Require Approval to Join</label>
+              <div className="relative group">
+                <span className="cursor-pointer text-blue-500">
+                  <i className="fas fa-question-circle text-xl"></i>
+                </span>
+                <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
+                  Requires organizer approval for participants to join, ensuring
+                  event quality.
+                </div>
+              </div>
             </div>
-
             <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 className="text-blue-500 focus:ring-0"
                 checked={isAttendeeLimitChecked}
                 onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+                id="attendeeLimitCheck"
               />
-              <label>Set Attendee Limit</label>
+              <label htmlFor="attendeeLimitCheck">Set Attendee Limit</label>
+              <div className="relative group">
+                <span className="cursor-pointer text-blue-500">
+                  <i className="fas fa-question-circle text-xl"></i>
+                </span>
+                <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
+                  Set the max number of attendees to control event size and
+                  capacity.
+                </div>
+              </div>
+
               {isAttendeeLimitChecked && (
                 <input
                   type="number"
@@ -329,19 +349,33 @@ const CreateEventPage: React.FC = () => {
                   onChange={(e) => setAttendeeLimit(Number(e.target.value))}
                   placeholder="Limit"
                   min="1"
+                  id="attendeeLimit"
                 />
               )}
             </div>
-
             <div>
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="text-blue-500 focus:ring-0"
-                  checked={isAllDepartments}
-                  onChange={() => setIsAllDepartments(!isAllDepartments)}
-                />
-                <label>Event Open to All Departments</label>
+              <div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    className="text-blue-500 focus:ring-0"
+                    checked={isAllDepartments}
+                    onChange={() => setIsAllDepartments(!isAllDepartments)}
+                    id="allDepartments"
+                  />
+                  <label htmlFor="allDepartments">
+                    Event Open to All Departments
+                  </label>
+                  <div className="relative group">
+                    <span className="cursor-pointer text-blue-500">
+                      <i className="fas fa-question-circle text-xl"></i>
+                    </span>
+                    <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
+                      Allows participation from all departments, fostering
+                      collaboration and inclusion.
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {!isAllDepartments && (
