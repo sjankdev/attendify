@@ -24,6 +24,8 @@ const EventDetailsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<number, any[]>>({});
+  const [expandedAgenda, setExpandedAgenda] = useState<boolean>(false);
+
   const [averageRatings, setAverageRatings] = useState<Record<number, number>>(
     {}
   );
@@ -34,6 +36,10 @@ const EventDetailsPage: React.FC = () => {
   const [expandedFeedbacks, setExpandedFeedbacks] = useState<{
     [eventId: number]: boolean;
   }>({});
+
+  const handleAgendaToggle = () => {
+    setExpandedAgenda((prev) => !prev);
+  };
 
   const loadFeedbackSummary = async (eventId: number) => {
     try {
@@ -349,21 +355,33 @@ const EventDetailsPage: React.FC = () => {
               </h3>
               {eventDetails.agendaItems.length > 0 && (
                 <div className="space-y-4 mt-4">
-                  {eventDetails.agendaItems.map((agendaItem, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#005757] p-4 rounded-lg shadow-md"
+                  {eventDetails.agendaItems
+                    .slice(0, expandedAgenda ? undefined : 3)
+                    .map((agendaItem, index) => (
+                      <div
+                        key={index}
+                        className="bg-[#005757] p-4 rounded-lg shadow-md"
+                      >
+                        <h5 className="text-xl font-semibold text-white">
+                          {agendaItem.title}
+                        </h5>
+                        <p className="text-gray-200">
+                          {agendaItem.description}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                          {new Date(agendaItem.endTime).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                  {eventDetails.agendaItems.length > 3 && (
+                    <button
+                      onClick={handleAgendaToggle}
+                      className="mt-4 px-6 py-2 rounded-lg shadow-md transition ease-in-out duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600"
                     >
-                      <h5 className="text-xl font-semibold text-white">
-                        {agendaItem.title}
-                      </h5>
-                      <p className="text-gray-200">{agendaItem.description}</p>
-                      <p className="text-sm text-gray-400">
-                        {new Date(agendaItem.startTime).toLocaleString()} -{" "}
-                        {new Date(agendaItem.endTime).toLocaleString()}
-                      </p>
-                    </div>
-                  ))}
+                      {expandedAgenda ? "Show Less" : "Show More"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
