@@ -352,13 +352,13 @@ const EventDetailsPage: React.FC = () => {
                   {eventDetails.agendaItems.map((agendaItem, index) => (
                     <div
                       key={index}
-                      className="bg-gray-800 p-4 rounded-lg shadow-md"
+                      className="bg-[#005757] p-4 rounded-lg shadow-md"
                     >
-                      <h5 className="text-xl font-semibold text-gray-100">
+                      <h5 className="text-xl font-semibold text-white">
                         {agendaItem.title}
                       </h5>
-                      <p className="text-gray-300">{agendaItem.description}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-gray-200">{agendaItem.description}</p>
+                      <p className="text-sm text-gray-400">
                         {new Date(agendaItem.startTime).toLocaleString()} -{" "}
                         {new Date(agendaItem.endTime).toLocaleString()}
                       </p>
