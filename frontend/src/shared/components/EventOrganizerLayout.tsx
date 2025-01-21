@@ -78,7 +78,7 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
                 style={{ color: "#fffcf2" }}
                 className="text-lg font-medium"
               >
-                See Events
+                Events
               </span>
             </div>
 
@@ -95,7 +95,7 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
                 style={{ color: "#fffcf2" }}
                 className="text-lg font-medium"
               >
-                Manage Invitations
+                Invitations
               </span>
             </div>
 
@@ -112,7 +112,7 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
                 style={{ color: "#fffcf2" }}
                 className="text-lg font-medium"
               >
-                Company Participants
+                Participants
               </span>
             </div>
 
@@ -129,7 +129,7 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
                 style={{ color: "#fffcf2" }}
                 className="text-lg font-medium"
               >
-                Company Departments
+                Departments
               </span>
             </div>
           </div>
