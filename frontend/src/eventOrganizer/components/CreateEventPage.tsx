@@ -404,6 +404,101 @@ const CreateEventPage: React.FC = () => {
                 </div>
               )}
             </div>
+            <div className="p-5 bg-[#202020] rounded-lg shadow-lg">
+              <label className="block text-sm font-semibold text-gray-300 mb-4">
+                Agenda Items for the Event
+              </label>
+              {isAgendaVisible ? (
+                <div>
+                  {agendaItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-[#2A2A2A] rounded-lg shadow-md mb-4 border border-gray-700"
+                    >
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-medium text-gray-200">
+                          Agenda Item {index + 1}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAgendaItem(index)}
+                          className="text-red-400 hover:text-red-500 focus:outline-none"
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) =>
+                            handleAgendaChange(index, "title", e.target.value)
+                          }
+                          placeholder="Title"
+                          className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          type="text"
+                          value={item.description}
+                          onChange={(e) =>
+                            handleAgendaChange(
+                              index,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Description"
+                          className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <input
+                            type="datetime-local"
+                            value={item.startTime}
+                            onChange={(e) =>
+                              handleAgendaChange(
+                                index,
+                                "startTime",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <input
+                            type="datetime-local"
+                            value={item.endTime}
+                            onChange={(e) =>
+                              handleAgendaChange(
+                                index,
+                                "endTime",
+                                e.target.value
+                              )
+                            }
+                            className="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleAddAgendaItem();
+                    }}
+                    className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500"
+                  >
+                    Add New Agenda Item
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAgendaVisible(true)}
+                  className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                >
+                  Add New Agenda Item
+                </button>
+              )}
+            </div>
             <div className="mt-6 flex justify-center">
               <button
                 type="button"
