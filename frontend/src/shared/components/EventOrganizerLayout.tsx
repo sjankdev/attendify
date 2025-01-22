@@ -17,7 +17,7 @@ interface LayoutProps {
 
 const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get current route
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
