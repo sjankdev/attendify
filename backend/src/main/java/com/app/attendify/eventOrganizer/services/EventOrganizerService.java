@@ -517,19 +517,6 @@ public class EventOrganizerService {
         logger.info("Updated join request to status: {}", newStatus);
     }
 
-    public Integer getAvailableSlotsForEvent(int eventId) {
-        try {
-            Event event = eventRepository.findById(eventId).orElseThrow(() -> {
-                logger.error("Event not found for ID: {}", eventId);
-                return new IllegalArgumentException("Event not found");
-            });
-
-            return event.getAvailableSlots();
-        } catch (Exception e) {
-            logger.error("Error calculating available slots for event", e);
-            throw new RuntimeException("Error calculating available slots for event", e);
-        }
-    }
 
     @Transactional
     public List<EventParticipantDTO> getParticipantsByCompany() {
@@ -593,7 +580,7 @@ public class EventOrganizerService {
                     return new EventParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), company.getName(), joinedEventCount, eventLinks, departmentName);
                 }).collect(Collectors.toList());
 
-                List<EventDetailDTO> events = Stream.concat(department.getEvents().stream(), globalEvents.stream()).map(event -> new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), event.getAttendeeLimit() != null ? event.getAttendeeLimit().toString() : "Unlimited", event.getEventAttendances().stream().filter(att -> att.getStatus() == AttendanceStatus.ACCEPTED).map(att -> new ParticipantDTO(att.getParticipant().getId(), att.getParticipant().getUser().getFullName(), att.getParticipant().getUser().getEmail(), att.getParticipant().getDepartment() != null ? att.getParticipant().getDepartment().getName() : "N/A")).collect(Collectors.toList()))).collect(Collectors.toList());
+                List<EventDetailDTO> events = Stream.concat(department.getEvents().stream(), globalEvents.stream()).map(event -> new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), event.getAttendeeLimit(), event.getEventAttendances().stream().filter(att -> att.getStatus() == AttendanceStatus.ACCEPTED).map(att -> new ParticipantDTO(att.getParticipant().getId(), att.getParticipant().getUser().getFullName(), att.getParticipant().getUser().getEmail(), att.getParticipant().getDepartment() != null ? att.getParticipant().getDepartment().getName() : "N/A")).collect(Collectors.toList()))).collect(Collectors.toList());
 
                 return new DepartmentDto(department.getId(), department.getName(), participants, events);
 
@@ -609,15 +596,18 @@ public class EventOrganizerService {
         try {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
-            List<ParticipantDTO> participants = event.getEventAttendances().stream().map(eventAttendance -> {
+            List<ParticipantDTO> participants = event.getEventAttendances().stream().filter(eventAttendance -> eventAttendance.getStatus() == AttendanceStatus.ACCEPTED).map(eventAttendance -> {
                 EventParticipant participant = eventAttendance.getParticipant();
                 String departmentName = participant.getDepartment() != null ? participant.getDepartment().getName() : "No Department";
                 return new ParticipantDTO(participant.getId(), participant.getUser().getFullName(), participant.getUser().getEmail(), departmentName);
             }).collect(Collectors.toList());
 
-            String attendeeLimit = (event.getAttendeeLimit() == null) ? "No Limit" : String.valueOf(event.getAttendeeLimit());
+            Integer availableSeats = participants.size();
+            Integer attendeeLimit = event.getAttendeeLimit();
 
-            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getOrganizer().getUser().getFullName(), attendeeLimit, participants);
+            List<AgendaItemDTO> agendaItems = event.getAgendaItems().stream().map(agendaItem -> new AgendaItemDTO(agendaItem.getId(), agendaItem.getTitle(), agendaItem.getDescription(), agendaItem.getStartTime(), agendaItem.getEndTime())).collect(Collectors.toList());
+
+            return new EventDetailDTO(event.getId(), event.getName(), event.getDescription(), event.getLocation(), event.getEventStartDate(), event.getEventEndDate(), event.getJoinDeadline(), event.getOrganizer().getUser().getFullName(), agendaItems, event.getPendingRequests(), participants, availableSeats, attendeeLimit, event.isAvailableForAllDepartments());
         } catch (Exception e) {
             logger.error("Error retrieving event details", e);
             throw new RuntimeException("Error retrieving event details", e);

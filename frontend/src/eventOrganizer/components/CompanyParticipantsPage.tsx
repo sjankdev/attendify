@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchParticipantsByCompany } from "../services/eventOrganizerService";
 import { Participant } from "../../types/eventTypes";
 import Layout from "../../shared/components/EventOrganizerLayout";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaUsers, FaUserCheck } from "react-icons/fa";
 
 interface ExtendedParticipant extends Participant {
@@ -141,12 +141,12 @@ const CompanyParticipantsPage: React.FC = () => {
                   <ul className="mt-4 space-y-2">
                     {participant.eventLinks.slice(0, 3).map((link, index) => (
                       <li key={index}>
-                        <a
-                          href={`/event-details/${link.split("/").pop()}`}
+                        <Link
+                          to={`/event-details/${link.split("/").pop()}`}
                           className="text-teal-500 hover:underline"
                         >
                           Event {index + 1}
-                        </a>
+                        </Link>
                       </li>
                     ))}
                     {participant.joinedEventCount > 3 &&
@@ -156,14 +156,12 @@ const CompanyParticipantsPage: React.FC = () => {
                             .slice(3)
                             .map((link, index) => (
                               <li key={index + 3}>
-                                <a
-                                  href={`/event-details/${link
-                                    .split("/")
-                                    .pop()}`}
+                                <Link
+                                  to={`/event-details/${link.split("/").pop()}`}
                                   className="text-teal-500 hover:underline"
                                 >
                                   Event {index + 4}
-                                </a>
+                                </Link>
                               </li>
                             ))}
                         </>

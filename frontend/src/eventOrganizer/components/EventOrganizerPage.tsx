@@ -77,15 +77,14 @@ const EventOrganizerPage: React.FC = () => {
           Event Organizer Dashboard
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
-            <h2 className="text-2xl font-semibold mb-4 text-white">
+          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
+            <h2 className="text-2xl font-semibold text-white mb-4">
               Upcoming Events This Week
             </h2>
             <p className="text-3xl font-bold text-white mb-4">
               {upcomingThisWeek.length} Events
             </p>
-
-            <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto">
+            <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto flex-1">
               {visibleEvents.map((event) => (
                 <li key={event.id} className="truncate">
                   <strong>{event.name}</strong> -{" "}
@@ -119,15 +118,15 @@ const EventOrganizerPage: React.FC = () => {
               </button>
             )}
           </div>
-          <div className="bg-gradient-to-r from-green-600 via-teal-600 to-cyan-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
+
+          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Events in the Past Month
             </h2>
             <p className="text-3xl font-bold text-white mb-4">
               {pastMonthEvents.length} Events
             </p>
-
-            <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto">
+            <ul className="text-sm text-gray-200 mt-4 space-y-3 overflow-y-auto flex-1">
               {pastMonthEvents.slice(0, 5).map((event) => (
                 <li key={event.id} className="truncate">
                   <strong>{event.name}</strong> -{" "}
@@ -154,11 +153,11 @@ const EventOrganizerPage: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-gradient-to-r from-pink-600 via-red-600 to-orange-600 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col justify-between">
+          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Expected Participants This Week
             </h2>
-            <p className="text-3xl font-bold text-white">
+            <p className="text-3xl font-bold text-white mb-4">
               {uniqueParticipantsCount} Participants
             </p>
           </div>
