@@ -73,9 +73,14 @@ const EventOrganizerPage: React.FC = () => {
   return (
     <SidebarLayout className="bg-[#1f1f1f] text-white">
       <div className="flex flex-col p-8 space-y-12">
-        <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-6">
-          Event Organizer Dashboard
+        <h1 className="text-3xl font-extrabold text-left text-white mb-2 ml-4">
+          Dashboard
         </h1>
+        <p className="text-center text-2xl text-gray-300 max-w-5xl mx-auto">
+          Welcome to your event organizer dashboard! Here, you can find an
+          overview of the latest and upcoming events, along with participation
+          details to keep you informed and ready for action.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
@@ -118,7 +123,6 @@ const EventOrganizerPage: React.FC = () => {
               </button>
             )}
           </div>
-
           <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Events in the Past Month
