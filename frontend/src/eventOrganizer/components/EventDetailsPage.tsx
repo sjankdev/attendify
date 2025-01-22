@@ -250,24 +250,7 @@ const EventDetailsPage: React.FC = () => {
                   <p className="text-lg font-semibold text-gray-200">
                     Available Seats:
                   </p>
-                  <p
-                    className={`text-lg font-medium ${
-                      eventDetails.attendeeLimit === null
-                        ? "text-green-500"
-                        : eventDetails.availableSeats === 0
-                        ? "text-red-500"
-                        : eventDetails.availableSeats <=
-                          (eventDetails.attendeeLimit ?? Infinity) * 0.2
-                        ? "text-yellow-400"
-                        : eventDetails.availableSeats <=
-                          (eventDetails.attendeeLimit ?? Infinity) * 0.5
-                        ? "text-yellow-400"
-                        : eventDetails.availableSeats <=
-                          (eventDetails.attendeeLimit ?? Infinity) * 0.8
-                        ? "text-blue-400"
-                        : "text-green-400"
-                    }`}
-                  >
+                  <p className="text-lg font-medium text-gray-400">
                     {eventDetails.attendeeLimit === null
                       ? `Available: ${
                           eventDetails.availableSeats ?? 0
