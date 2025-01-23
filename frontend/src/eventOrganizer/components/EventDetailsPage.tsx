@@ -203,11 +203,11 @@ const EventDetailsPage: React.FC = () => {
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaInfoCircle className="mr-2" /> General Info
           </h3>
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-indigo-400">
+            <h2 className="text-3xl font-bold text-white">
               {eventDetails.name}
             </h2>
             <p className="text-lg text-gray-300">{eventDetails.description}</p>
@@ -215,7 +215,7 @@ const EventDetailsPage: React.FC = () => {
         </div>
 
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaCalendarAlt className="mr-2" /> Event Dates
           </h3>
           <div className="space-y-4">
@@ -249,7 +249,7 @@ const EventDetailsPage: React.FC = () => {
         </div>
 
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaMapMarkerAlt className="mr-2" /> Location & Seats
           </h3>
           <div className="space-y-4">
@@ -289,7 +289,7 @@ const EventDetailsPage: React.FC = () => {
         </div>
 
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaClipboardList className="mr-2" /> Agenda
           </h3>
           {eventDetails.agendaItems.length > 0 ? (
@@ -325,9 +325,8 @@ const EventDetailsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Updated Participants Section */}
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-4 flex flex-col">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaUsers className="mr-2" /> Participants
           </h3>
           {eventDetails.participants?.length > 0 ? (
@@ -419,9 +418,8 @@ const EventDetailsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Updated Feedbacks Section */}
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-4 flex flex-col">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaStar className="mr-2" /> Feedbacks
           </h3>
           {feedbacks[eventDetails.id]?.length > 0 ? (
