@@ -246,7 +246,7 @@ const ListEventsPage: React.FC = () => {
         backgroundPosition: "center",
       }}
     >
-      <h2 className="text-3xl font-bold text-white mb-6">My Events</h2>
+      <h2 className="text-2xl font-bold mb-6">My Events</h2>
       {error && (
         <div className="text-red-500 bg-red-800 p-4 rounded-lg mb-4">
           {error}
