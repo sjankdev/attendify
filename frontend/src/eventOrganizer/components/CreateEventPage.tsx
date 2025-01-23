@@ -357,25 +357,25 @@ const CreateEventPage: React.FC = () => {
         <div>
           <div>
             <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                className="text-blue-500 focus:ring-0"
-                checked={isAllDepartments}
-                onChange={() => setIsAllDepartments(!isAllDepartments)}
-                id="allDepartments"
-              />
-              <label htmlFor="allDepartments">
-                Event Open to All Departments
-              </label>
-              <div className="relative group">
-                <span className="cursor-pointer text-blue-500">
-                  <i className="fas fa-question-circle text-xl"></i>
+              <label
+                htmlFor="allDepartments"
+                className={`flex items-center px-4 py-2 rounded border cursor-pointer transition-colors duration-300 ${
+                  isAllDepartments
+                    ? "bg-[#BA10AA] border-[#BA10AA] text-white"
+                    : "bg-[#11011E] text-gray-800 border"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={isAllDepartments}
+                  onChange={() => setIsAllDepartments(!isAllDepartments)}
+                  id="allDepartments"
+                />
+                <span className="mr-2 text-white">
+                  Event Open to All Departments
                 </span>
-                <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
-                  Allows participation from all departments, fostering
-                  collaboration and inclusion.
-                </div>
-              </div>
+              </label>
             </div>
           </div>
 
@@ -386,7 +386,7 @@ const CreateEventPage: React.FC = () => {
               </label>
               <select
                 multiple
-                className="w-full px-3 py-2 bg-[#11011E] text-white rounded border border-[#BA10AA] border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-[#11011E] text-white rounded border border-[#BA10AA] focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={selectedDepartments.map(String)}
                 onChange={(e) => {
                   const selected = Array.from(
@@ -405,6 +405,7 @@ const CreateEventPage: React.FC = () => {
             </div>
           )}
         </div>
+
         <div className="p-5 bg-[#11011E] rounded-lg shadow-lg">
           <label className="block text-sm font-semibold text-gray-300 mb-4">
             Agenda Items for the Event
