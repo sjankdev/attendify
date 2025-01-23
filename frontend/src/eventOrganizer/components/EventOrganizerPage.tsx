@@ -81,13 +81,21 @@ const EventOrganizerPage: React.FC = () => {
       }}
     >
       <div className="flex flex-col p-8 space-y-12">
-        <p className="text-center text-2xl text-gray-300 max-w-5xl mx-auto">
-          Welcome to your event organizer dashboard! Here, you can find an
-          overview of the latest and upcoming events, along with participation
-          details to keep you informed and ready for action.
-        </p>
+        {/* Headline Section with two rows and custom font */}
+        <div className="text-center space-y-4 mb-12">
+          <h1
+            className="text-4xl sm:text-5xl font-semibold leading-tight text-white"
+            style={{ fontFamily: "Poppins, sans-serif" }}
+          >
+            <span className="block">Simplify Your Event Planning</span>
+            <span className="block text-blue-400">
+              From Creation to Stats, We’ve Got You Covered
+            </span>
+          </h1>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
+          <div className="bg-[#424CE0] p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Upcoming Events This Week
             </h2>
@@ -128,7 +136,8 @@ const EventOrganizerPage: React.FC = () => {
               </button>
             )}
           </div>
-          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
+
+          <div className="bg-[#424CE0] p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Events in the Past Month
             </h2>
@@ -162,7 +171,7 @@ const EventOrganizerPage: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-700 p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
+          <div className="bg-[#424CE0] p-6 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col">
             <h2 className="text-2xl font-semibold text-white mb-4">
               Expected Participants This Week
             </h2>
