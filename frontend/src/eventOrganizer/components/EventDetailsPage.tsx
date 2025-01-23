@@ -202,20 +202,20 @@ const EventDetailsPage: React.FC = () => {
       </p>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaInfoCircle className="mr-2" /> General Info
           </h3>
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-indigo-400">
+            <h2 className="text-3xl font-bold text-white">
               {eventDetails.name}
             </h2>
             <p className="text-lg text-gray-300">{eventDetails.description}</p>
           </div>
         </div>
 
-        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaCalendarAlt className="mr-2" /> Event Dates
           </h3>
           <div className="space-y-4">
@@ -248,8 +248,8 @@ const EventDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaMapMarkerAlt className="mr-2" /> Location & Seats
           </h3>
           <div className="space-y-4">
@@ -288,8 +288,45 @@ const EventDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
+            <FaClipboardList className="mr-2" /> Agenda
+          </h3>
+          {eventDetails.agendaItems.length > 0 ? (
+            <div className="space-y-4 mt-4">
+              {eventDetails.agendaItems
+                .slice(0, expandedAgenda ? undefined : 3)
+                .map((agendaItem, index) => (
+                  <div
+                    key={index}
+                    className="bg-[#1F0039] p-4 rounded-lg shadow-md"
+                  >
+                    <h5 className="text-xl font-semibold text-white">
+                      {agendaItem.title}
+                    </h5>
+                    <p className="text-gray-200">{agendaItem.description}</p>
+                    <p className="text-sm text-gray-400">
+                      {new Date(agendaItem.startTime).toLocaleString()} -{" "}
+                      {new Date(agendaItem.endTime).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              {eventDetails.agendaItems.length > 3 && (
+                <button
+                  onClick={handleAgendaToggle}
+                  className="mt-4 px-6 py-2 rounded-lg shadow-md transition ease-in-out duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600"
+                >
+                  {expandedAgenda ? "Show Less" : "Show More"}
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-lg text-gray-400">No agenda available</p>
+          )}
+        </div>
+
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-4 flex flex-col">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaUsers className="mr-2" /> Participants
           </h3>
           {eventDetails.participants?.length > 0 ? (
@@ -381,8 +418,8 @@ const EventDetailsPage: React.FC = () => {
           )}
         </div>
 
-        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6">
-          <h3 className="text-2xl font-semibold text-indigo-300 flex items-center">
+        <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-4 flex flex-col">
+          <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaStar className="mr-2" /> Feedbacks
           </h3>
           {feedbacks[eventDetails.id]?.length > 0 ? (
