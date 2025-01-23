@@ -58,7 +58,7 @@ const SidebarLayout: React.FC<LayoutProps> = ({
                   key={item.label}
                   onClick={() => navigate(item.path)}
                   className={`cursor-pointer text-lg font-medium transition-colors duration-200 px-4 py-2 rounded-lg text-white font-roboto ${
-                    isItemActive ? "text-[#D414A3]" : ""
+                    isItemActive ? "text-[#BA10AA]" : ""
                   }`}
                 >
                   {item.label}
