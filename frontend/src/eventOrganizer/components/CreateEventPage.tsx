@@ -204,7 +204,15 @@ const CreateEventPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="bg-[#101010] text-white min-h-screen py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto bg-[#2A2A2A] p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-6">Create New Event</h2>

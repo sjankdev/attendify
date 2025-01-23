@@ -186,7 +186,15 @@ const EventDetailsPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-6 py-8 bg-[#101010] text-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-indigo-400">
           {eventDetails.name}

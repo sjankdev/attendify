@@ -237,7 +237,15 @@ const ListEventsPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="p-6 bg-[#151515] rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-white mb-6">My Events</h2>
         {error && (

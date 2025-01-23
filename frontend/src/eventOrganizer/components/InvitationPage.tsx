@@ -143,7 +143,15 @@ const InvitationPage: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="max-w-4xl mx-auto p-6 bg-[#151515] rounded-lg shadow-lg space-y-6">
         <h2 className="text-3xl font-semibold text-center text-white">
           Invite Participants

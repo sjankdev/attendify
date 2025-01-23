@@ -89,7 +89,15 @@ const DepartmentsList: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="p-6 space-y-8 bg-[#101010]">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-semibold text-gray-100">Departments</h2>

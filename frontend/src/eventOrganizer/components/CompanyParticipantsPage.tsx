@@ -64,7 +64,15 @@ const CompanyParticipantsPage: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="p-8 bg-[#101010] rounded-lg shadow-xl max-w-5xl mx-auto relative">
         <h2 className="text-3xl font-semibold text-white mb-6">
           Company Participants Dashboard

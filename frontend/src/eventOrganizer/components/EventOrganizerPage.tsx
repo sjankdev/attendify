@@ -71,11 +71,16 @@ const EventOrganizerPage: React.FC = () => {
     : upcomingThisWeek.slice(0, 5);
 
   return (
-    <SidebarLayout className="bg-[#1f1f1f] text-white">
+    <SidebarLayout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="flex flex-col p-8 space-y-12">
-        <h1 className="text-3xl font-extrabold text-left text-white mb-2 ml-4">
-          Dashboard
-        </h1>
         <p className="text-center text-2xl text-gray-300 max-w-5xl mx-auto">
           Welcome to your event organizer dashboard! Here, you can find an
           overview of the latest and upcoming events, along with participation
