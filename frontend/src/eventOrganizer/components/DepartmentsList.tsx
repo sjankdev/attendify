@@ -193,6 +193,8 @@ const DepartmentsList: React.FC = () => {
                             <h5 className="text-xl font-semibold">
                               {event.name}
                             </h5>
+                          </div>
+                          <div className="text-center mt-2">
                             <button
                               onClick={() =>
                                 toggleEventDetails(department.id, event.id)

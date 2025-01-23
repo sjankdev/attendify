@@ -201,7 +201,7 @@ const EventDetailsPage: React.FC = () => {
         View and manage all the events you've created.
       </p>
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
         <div className="bg-[#11011E] p-6 rounded-lg shadow-lg space-y-6 min-h-0 h-auto">
           <h3 className="text-1xl font-semibold text-indigo-300 flex items-center">
             <FaInfoCircle className="mr-2" /> General Info
