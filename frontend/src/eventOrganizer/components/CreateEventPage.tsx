@@ -240,7 +240,7 @@ const CreateEventPage: React.FC = () => {
           <label className="block text-sm font-medium mb-1">Event Name</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter event name"
@@ -254,7 +254,7 @@ const CreateEventPage: React.FC = () => {
             </label>
             <input
               type="datetime-local"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={eventStartDate}
               onChange={(e) => setEventStartDate(e.target.value)}
             />
@@ -265,7 +265,7 @@ const CreateEventPage: React.FC = () => {
             </label>
             <input
               type="datetime-local"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={eventEndDate}
               onChange={(e) => setEventEndDate(e.target.value)}
             />
@@ -277,7 +277,7 @@ const CreateEventPage: React.FC = () => {
           </label>
           <input
             type="datetime-local"
-            className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={joinDeadline}
             onChange={(e) => setJoinDeadline(e.target.value)}
           />
@@ -286,7 +286,7 @@ const CreateEventPage: React.FC = () => {
           <label className="block text-sm font-medium mb-1">Location</label>
           <input
             type="text"
-            className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Enter event location"
@@ -297,7 +297,7 @@ const CreateEventPage: React.FC = () => {
             Event Description
           </label>
           <textarea
-            className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter event description"
