@@ -307,19 +307,6 @@ const EventDetailsPage: React.FC = () => {
                         ).length
                       }
                     </h5>
-                    <button
-                      onClick={() =>
-                        toggleAcceptedParticipants(eventDetails.id)
-                      }
-                      className={`mt-2 px-4 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
-                        showAccepted[eventDetails.id]
-                          ? "bg-indigo-500 text-white"
-                          : "bg-[#6167E0] text-gray-300"
-                      }`}
-                    >
-                      {showAccepted[eventDetails.id] ? "Hide" : "View"} accepted
-                      participants
-                    </button>
                   </div>
                 )}
                 {showAccepted[eventDetails.id] && (
@@ -375,6 +362,19 @@ const EventDetailsPage: React.FC = () => {
                     </div>
                   ))}
               </div>
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => toggleAcceptedParticipants(eventDetails.id)}
+                  className={`px-4 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
+                    showAccepted[eventDetails.id]
+                      ? "bg-indigo-500 text-white"
+                      : "bg-[#6167E0] text-gray-300"
+                  }`}
+                >
+                  {showAccepted[eventDetails.id] ? "Hide" : "View"} accepted
+                  participants
+                </button>
+              </div>
             </>
           ) : (
             <p className="text-lg text-gray-400">No participants available</p>
@@ -391,18 +391,20 @@ const EventDetailsPage: React.FC = () => {
                 <strong>Average Rating:</strong>{" "}
                 {renderStars(averageRatings[eventDetails.id] || 0)}
               </p>
-              <button
-                onClick={() => toggleFeedback(eventDetails.id)}
-                className={`mt-4 px-6 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
-                  expandedFeedbacks[eventDetails.id]
-                    ? "bg-indigo-500 text-white"
-                    : "bg-[#6167E0] text-gray-300"
-                }`}
-              >
-                {expandedFeedbacks[eventDetails.id]
-                  ? "Hide Feedbacks"
-                  : "View Feedbacks"}
-              </button>
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => toggleFeedback(eventDetails.id)}
+                  className={`px-6 py-2 rounded-lg shadow-md transition ease-in-out duration-200 ${
+                    expandedFeedbacks[eventDetails.id]
+                      ? "bg-indigo-500 text-white"
+                      : "bg-[#6167E0] text-gray-300"
+                  }`}
+                >
+                  {expandedFeedbacks[eventDetails.id]
+                    ? "Hide Feedbacks"
+                    : "View Feedbacks"}
+                </button>
+              </div>
               {expandedFeedbacks[eventDetails.id] && (
                 <div className="space-y-4 mt-4">
                   {feedbacks[eventDetails.id].map((feedback, index) => (
