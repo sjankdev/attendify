@@ -152,7 +152,13 @@ const InvitationPage: React.FC = () => {
         backgroundPosition: "center",
       }}
     >
-      <h2 className="text-2xl font-bold mb-6">Invite Participants</h2>
+      <h2 className="text-2xl font-bold mb-2">Invite Participants</h2>
+      <p className="text-sm text-white mb-6">
+        Use this page to invite participants to your company on the platform.
+        You can add their email addresses and select their department to help
+        organize your team. Once invited, they will be able to join your events
+        and activities.
+      </p>
       {emails.map((emailData, index) => (
         <div key={index} className="flex flex-col space-y-4 text-white">
           <div className="flex gap-4 items-center text-white">
