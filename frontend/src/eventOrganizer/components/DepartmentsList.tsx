@@ -89,162 +89,165 @@ const DepartmentsList: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="p-6 space-y-8 bg-[#101010]">
-        <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-semibold text-gray-100">Departments</h2>
-          <button
-            onClick={() => setIsAddingDepartments(!isAddingDepartments)}
-            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
-          >
-            {isAddingDepartments ? "Add New Department" : "Add New Department"}
-          </button>
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold mb-6">Company Departments</h2>
+        <button
+          onClick={() => setIsAddingDepartments(!isAddingDepartments)}
+          className="flex items-center px-6 py-3 bg-[#6167E0] text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500"
+        >
+          {isAddingDepartments ? "Add New Department" : "Add New Department"}
+        </button>
+      </div>
+
+      {error && <div className="text-red-600">{error}</div>}
+
+      {isAddingDepartments && (
+        <div className="space-y-4 mt-6">
+          <input
+            type="text"
+            value={newDepartmentNames.join(",")}
+            onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
+            placeholder="Enter department names, separated by commas"
+            className="w-full p-3 border border-[#BA10AA] rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-[#11011E] text-white"
+          />
+          <div className="flex space-x-4">
+            <button
+              onClick={handleAddDepartments}
+              className="px-6 py-3 bg-[#BA10AA] text-white rounded-lg transition-colors focus:ring-2 focus:ring-green-500"
+            >
+              Add Departments
+            </button>
+            <button
+              onClick={() => setIsAddingDepartments(false)}
+              className="px-6 py-3 bg-gray-500  text-white rounded-lg transition-colors focus:ring-2 focus:ring-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
+      )}
 
-        {error && <div className="text-red-600">{error}</div>}
+      <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
+        {departments.map((department) => (
+          <div
+            key={department.id}
+            className="bg-[#11011E] text-white p-6 rounded-lg shadow-md space-y-4"
+          >
+            <h3 className="text-2xl font-semibold">{department.name}</h3>
 
-        {isAddingDepartments && (
-          <div className="space-y-4 mt-6">
-            <input
-              type="text"
-              value={newDepartmentNames.join(",")}
-              onChange={(e) => setNewDepartmentNames(e.target.value.split(","))}
-              placeholder="Enter department names, separated by commas"
-              className="w-full p-3 border border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 bg-[#2A2A2A] text-white"
-            />
-            <div className="flex space-x-4">
-              <button
-                onClick={handleAddDepartments}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors focus:ring-2 focus:ring-green-500"
-              >
-                Add Departments
-              </button>
-              <button
-                onClick={() => setIsAddingDepartments(false)}
-                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors focus:ring-2 focus:ring-gray-400"
-              >
-                Cancel
-              </button>
+            <div>
+              <h4 className="text-xl font-medium flex items-center space-x-2">
+                <FaUsers />
+                <span>Participants:</span>
+              </h4>
+              {department.participants && department.participants.length > 0 ? (
+                <>
+                  <ul className="space-y-2 mt-4">
+                    {department.participants.slice(0, 5).map((participant) => (
+                      <li
+                        key={participant.participantId}
+                        className="border-b pb-2 text-gray-300"
+                      >
+                        <div>{participant.participantName}</div>
+                      </li>
+                    ))}
+                  </ul>
+                  {department.participants.length > 5 && (
+                    <button className="text-blue-500 mt-4">
+                      More Participants
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p className="text-gray-500">No participants</p>
+              )}
+            </div>
+
+            <div>
+              <h4 className="text-xl font-medium flex items-center space-x-2">
+                <FaCalendarAlt />
+                <span>Events</span>
+              </h4>
+              {department.events && department.events.length > 0 ? (
+                <>
+                  <ul className="space-y-4 mt-4">
+                    {department.events
+                      .slice(
+                        0,
+                        showMoreEvents[department.id]
+                          ? department.events.length
+                          : 5
+                      )
+                      .map((event) => (
+                        <li key={event.id} className="border-b pb-4">
+                          <div className="flex justify-between items-center">
+                            <h5 className="text-xl font-semibold">
+                              {event.name}
+                            </h5>
+                            <button
+                              onClick={() =>
+                                toggleEventDetails(department.id, event.id)
+                              }
+                              className="text-blue-400 hover:text-blue-700"
+                            >
+                              {expandedEvent.departmentId === department.id &&
+                              expandedEvent.eventId === event.id
+                                ? "See Less"
+                                : "See More"}
+                            </button>
+                          </div>
+                          {expandedEvent.departmentId === department.id &&
+                            expandedEvent.eventId === event.id && (
+                              <div className="mt-4 space-y-2 text-gray-300">
+                                <p>{event.description}</p>
+                                <p>
+                                  <strong>Location:</strong> {event.location}
+                                </p>
+                                <p>
+                                  <strong>Date:</strong>{" "}
+                                  {new Date(
+                                    event.eventStartDate
+                                  ).toLocaleString()}{" "}
+                                  -{" "}
+                                  {new Date(
+                                    event.eventEndDate
+                                  ).toLocaleString()}
+                                </p>
+                                <p>
+                                  <strong>Organizer:</strong>{" "}
+                                  {event.organizerName}
+                                </p>
+                              </div>
+                            )}
+                        </li>
+                      ))}
+                  </ul>
+                  {department.events.length > 5 && (
+                    <button
+                      className="text-blue-500 mt-4"
+                      onClick={() => handleMoreEventsClick(department.id)}
+                    >
+                      {showMoreEvents[department.id]
+                        ? "Show Less"
+                        : "More Events"}
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p className="text-gray-500">No events</p>
+              )}
             </div>
           </div>
-        )}
-
-        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
-          {departments.map((department) => (
-            <div
-              key={department.id}
-              className="bg-[#2A2A2A] text-white p-6 rounded-lg shadow-md space-y-4"
-            >
-              <h3 className="text-2xl font-semibold">{department.name}</h3>
-
-              <div>
-                <h4 className="text-xl font-medium flex items-center space-x-2">
-                  <FaUsers />
-                  <span>Participants:</span>
-                </h4>
-                {department.participants &&
-                department.participants.length > 0 ? (
-                  <>
-                    <ul className="space-y-2 mt-4">
-                      {department.participants
-                        .slice(0, 5)
-                        .map((participant) => (
-                          <li
-                            key={participant.participantId}
-                            className="border-b pb-2 text-gray-300"
-                          >
-                            <div>{participant.participantName}</div>
-                          </li>
-                        ))}
-                    </ul>
-                    {department.participants.length > 5 && (
-                      <button className="text-blue-500 mt-4">
-                        More Participants
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-gray-500">No participants</p>
-                )}
-              </div>
-
-              <div>
-                <h4 className="text-xl font-medium flex items-center space-x-2">
-                  <FaCalendarAlt />
-                  <span>Events</span>
-                </h4>
-                {department.events && department.events.length > 0 ? (
-                  <>
-                    <ul className="space-y-4 mt-4">
-                      {department.events
-                        .slice(
-                          0,
-                          showMoreEvents[department.id]
-                            ? department.events.length
-                            : 5
-                        )
-                        .map((event) => (
-                          <li key={event.id} className="border-b pb-4">
-                            <div className="flex justify-between items-center">
-                              <h5 className="text-xl font-semibold">
-                                {event.name}
-                              </h5>
-                              <button
-                                onClick={() =>
-                                  toggleEventDetails(department.id, event.id)
-                                }
-                                className="text-blue-500 hover:text-blue-700"
-                              >
-                                {expandedEvent.departmentId === department.id &&
-                                expandedEvent.eventId === event.id
-                                  ? "See Less"
-                                  : "See More"}
-                              </button>
-                            </div>
-                            {expandedEvent.departmentId === department.id &&
-                              expandedEvent.eventId === event.id && (
-                                <div className="mt-4 space-y-2 text-gray-300">
-                                  <p>{event.description}</p>
-                                  <p>
-                                    <strong>Location:</strong> {event.location}
-                                  </p>
-                                  <p>
-                                    <strong>Date:</strong>{" "}
-                                    {new Date(
-                                      event.eventStartDate
-                                    ).toLocaleString()}{" "}
-                                    -{" "}
-                                    {new Date(
-                                      event.eventEndDate
-                                    ).toLocaleString()}
-                                  </p>
-                                  <p>
-                                    <strong>Organizer:</strong>{" "}
-                                    {event.organizerName}
-                                  </p>
-                                </div>
-                              )}
-                          </li>
-                        ))}
-                    </ul>
-                    {department.events.length > 5 && (
-                      <button
-                        className="text-blue-500 mt-4"
-                        onClick={() => handleMoreEventsClick(department.id)}
-                      >
-                        {showMoreEvents[department.id]
-                          ? "Show Less"
-                          : "More Events"}
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-gray-500">No events</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </Layout>
   );
