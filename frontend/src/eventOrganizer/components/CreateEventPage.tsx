@@ -397,7 +397,20 @@ const CreateEventPage: React.FC = () => {
                 }}
               >
                 {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
+                  <option
+                    key={department.id}
+                    value={department.id}
+                    style={{
+                      backgroundColor: selectedDepartments.includes(
+                        department.id
+                      )
+                        ? "#BA10AA"
+                        : "#11011E",
+                      color: selectedDepartments.includes(department.id)
+                        ? "#FFFFFF"
+                        : "#FFFFFF",
+                    }}
+                  >
                     {department.name}
                   </option>
                 ))}
