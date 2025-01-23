@@ -102,13 +102,13 @@ const EventDetailsPage: React.FC = () => {
     return (
       <>
         {[...Array(fullStars)].map((_, i) => (
-          <FaStar key={`full-${i}`} className="text-yellow-400 inline-block" />
+          <FaStar key={`full-${i}`} className="text-[#BA10AA] inline-block" />
         ))}
-        {halfStar && <FaStarHalfAlt className="text-yellow-400 inline-block" />}
+        {halfStar && <FaStarHalfAlt className="text-[#BA10AA] inline-block" />}
         {[...Array(emptyStars)].map((_, i) => (
           <FaRegStar
             key={`empty-${i}`}
-            className="text-yellow-400 inline-block"
+            className="text-[#BA10AA] inline-block"
           />
         ))}
       </>
