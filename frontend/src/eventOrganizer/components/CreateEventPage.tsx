@@ -254,7 +254,7 @@ const CreateEventPage: React.FC = () => {
             </label>
             <input
               type="datetime-local"
-              className="w-full px-3 py-2  text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-white rounded border border-[#BA10AA] bg-[#11011E] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={eventStartDate}
               onChange={(e) => setEventStartDate(e.target.value)}
             />
@@ -305,48 +305,46 @@ const CreateEventPage: React.FC = () => {
           ></textarea>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            className="text-blue-500 focus:ring-0"
-            checked={joinApproval}
-            onChange={(e) => setJoinApproval(e.target.checked)}
-            id="joinApproval"
-          />
-          <label htmlFor="joinApproval">Require Approval to Join</label>
-          <div className="relative group">
-            <span className="cursor-pointer text-blue-500">
-              <i className="fas fa-question-circle text-xl"></i>
-            </span>
-            <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
-              Requires organizer approval for participants to join, ensuring
-              event quality.
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <input
-            type="checkbox"
-            className="text-blue-500 focus:ring-0"
-            checked={isAttendeeLimitChecked}
-            onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
-            id="attendeeLimitCheck"
-          />
-          <label htmlFor="attendeeLimitCheck">Set Attendee Limit</label>
-          <div className="relative group">
-            <span className="cursor-pointer text-blue-500">
-              <i className="fas fa-question-circle text-xl"></i>
-            </span>
-            <div className="absolute hidden group-hover:block text-sm bg-gray-800 text-white rounded px-4 py-2 w-80 -top-8 left-0 transition-all duration-300">
-              Set the max number of attendees to control event size and
-              capacity.
-            </div>
-          </div>
+        <div className="flex items-center space-x-6">
+          <label
+            htmlFor="joinApproval"
+            className={`flex text-white items-center px-4 py-2 rounded border ${
+              joinApproval
+                ? "bg-[#BA10AA] border border-[#BA10AA] text-white"
+                : "bg-[#11011E] text-gray-800"
+            } cursor-pointer transition-colors duration-300`}
+          >
+            <input
+              type="checkbox"
+              className="hidden"
+              checked={joinApproval}
+              onChange={(e) => setJoinApproval(e.target.checked)}
+              id="joinApproval"
+            />
+            Join with Organizer Approval
+          </label>
 
+          <label
+            htmlFor="attendeeLimitCheck"
+            className={`flex text-white items-center px-4 py-2 rounded border ${
+              isAttendeeLimitChecked
+                ? "bg-[#BA10AA] border border-[#BA10AA] text-white"
+                : "bg-[#11011E] text-gray-800"
+            } cursor-pointer transition-colors duration-300`}
+          >
+            <input
+              type="checkbox"
+              className="hidden"
+              checked={isAttendeeLimitChecked}
+              onChange={(e) => setIsAttendeeLimitChecked(e.target.checked)}
+              id="attendeeLimitCheck"
+            />
+            Set Attendee Limit
+          </label>
           {isAttendeeLimitChecked && (
             <input
               type="number"
-              className="w-24 px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-24 px-2 py-1 bg-[#11011E] text-white rounded border border-[#BA10AA] focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={attendeeLimit ?? ""}
               onChange={(e) => setAttendeeLimit(Number(e.target.value))}
               placeholder="Limit"
@@ -355,6 +353,7 @@ const CreateEventPage: React.FC = () => {
             />
           )}
         </div>
+
         <div>
           <div>
             <div className="flex items-center space-x-3">
