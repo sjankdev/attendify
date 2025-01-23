@@ -123,7 +123,7 @@ const CompanyParticipantsPage: React.FC = () => {
             {participants.map((participant) => (
               <div
                 key={participant.participantId}
-                className="bg-[#11011E] p-6 rounded-lg shadow-md hover:bg-[#333333] hover:shadow-xl transition-all"
+                className="bg-[#11011E] p-6 rounded-lg shadow-md hover:bg-[#290168] hover:shadow-xl transition-all"
               >
                 <div className="flex justify-between items-center">
                   <div>

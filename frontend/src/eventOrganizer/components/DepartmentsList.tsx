@@ -54,7 +54,7 @@ const DepartmentsList: React.FC = () => {
     const fetchCompanyId = async () => {
       try {
         const companyResponse = await axios.get(
-          "http://localhost:8080/api/auth/company",
+          "https://attendify-backend-el2r.onrender.com/api/auth/company",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -193,6 +193,8 @@ const DepartmentsList: React.FC = () => {
                             <h5 className="text-xl font-semibold">
                               {event.name}
                             </h5>
+                          </div>
+                          <div className="text-center mt-2">
                             <button
                               onClick={() =>
                                 toggleEventDetails(department.id, event.id)
