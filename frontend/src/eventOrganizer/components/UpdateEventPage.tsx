@@ -5,6 +5,7 @@ import {
   fetchEventsWithParticipants,
 } from "../services/eventOrganizerService";
 import { Event, AgendaItemDTO } from "../../types/eventTypes";
+import Layout from "../../shared/components/EventOrganizerLayout";
 
 const UpdateEventPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -144,185 +145,195 @@ const UpdateEventPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h3>Update Event</h3>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      {validationErrors.length > 0 && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          <ul>
-            {validationErrors.map((err, index) => (
-              <li key={index}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {event && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleUpdateEvent();
-          }}
-        >
-          <div>
-            <label>Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={updatedEvent.name}
-              onChange={handleInputChange}
-            />
+    <Layout
+      className="text-white"
+      style={{
+        backgroundImage: `url('/assets/organizer-homepage/home-bg-1.jpg')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+      }}
+    >
+      <div>
+        <h3>Update Event</h3>
+        {error && <div style={{ color: "red" }}>{error}</div>}
+        {validationErrors.length > 0 && (
+          <div style={{ color: "red", marginBottom: "10px" }}>
+            <ul>
+              {validationErrors.map((err, index) => (
+                <li key={index}>{err}</li>
+              ))}
+            </ul>
           </div>
-          <div>
-            <label>Description:</label>
-            <input
-              type="text"
-              name="description"
-              value={updatedEvent.description}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label>Location:</label>
-            <input
-              type="text"
-              name="location"
-              value={updatedEvent.location}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label>Event Date:</label>
-            <input
-              type="datetime-local"
-              name="eventDate"
-              value={updatedEvent.eventStartDate}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label>Event End Date:</label>
-            <input
-              type="datetime-local"
-              name="eventEndDate"
-              value={updatedEvent.eventEndDate}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label>Join Deadline:</label>
-            <input
-              type="datetime-local"
-              name="joinDeadline"
-              value={updatedEvent.joinDeadline}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                name="setAttendeeLimit"
-                checked={
-                  updatedEvent.attendeeLimit !== null &&
-                  updatedEvent.attendeeLimit !== undefined
-                }
-                onChange={(e) => {
-                  if (!e.target.checked) {
-                    setUpdatedEvent((prevEvent) => ({
-                      ...prevEvent,
-                      attendeeLimit: null,
-                    }));
-                  } else {
-                    setUpdatedEvent((prevEvent) => ({
-                      ...prevEvent,
-                      attendeeLimit: prevEvent.attendeeLimit || 1,
-                    }));
-                  }
-                }}
-              />
-              Set Attendee Limit
-            </label>
-
-            {updatedEvent.attendeeLimit !== null &&
-              updatedEvent.attendeeLimit !== undefined && (
-                <div>
-                  <label>Attendee Limit:</label>
-                  <input
-                    type="number"
-                    name="attendeeLimit"
-                    value={updatedEvent.attendeeLimit || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              )}
-          </div>
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                name="joinApproval"
-                checked={updatedEvent.joinApproval}
-                onChange={(e) =>
-                  setUpdatedEvent({
-                    ...updatedEvent,
-                    joinApproval: e.target.checked,
-                  })
-                }
-              />
-              Join Approval
-            </label>
-          </div>
-
-          <h4>Agenda Items</h4>
-          {agendaItems.map((item, index) => (
-            <div key={index}>
+        )}
+        {event && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUpdateEvent();
+            }}
+          >
+            <div>
+              <label>Name:</label>
               <input
                 type="text"
-                placeholder="Title"
-                value={item.title}
-                onChange={(e) =>
-                  handleAgendaItemChange(index, "title", e.target.value)
-                }
+                name="name"
+                value={updatedEvent.name}
+                onChange={handleInputChange}
               />
-              <input
-                type="text"
-                placeholder="Description"
-                value={item.description}
-                onChange={(e) =>
-                  handleAgendaItemChange(index, "description", e.target.value)
-                }
-              />
-              <input
-                type="datetime-local"
-                value={item.startTime}
-                onChange={(e) =>
-                  handleAgendaItemChange(index, "startTime", e.target.value)
-                }
-              />
-              <input
-                type="datetime-local"
-                value={item.endTime}
-                onChange={(e) =>
-                  handleAgendaItemChange(index, "endTime", e.target.value)
-                }
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveAgendaItem(index)}
-              >
-                Remove
-              </button>
             </div>
-          ))}
-          <button type="button" onClick={handleAddAgendaItem}>
-            Add Agenda Item
-          </button>
-          <button type="submit">Update Event</button>
-        </form>
-      )}
-    </div>
+            <div>
+              <label>Description:</label>
+              <input
+                type="text"
+                name="description"
+                value={updatedEvent.description}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Location:</label>
+              <input
+                type="text"
+                name="location"
+                value={updatedEvent.location}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Event Date:</label>
+              <input
+                type="datetime-local"
+                name="eventDate"
+                value={updatedEvent.eventStartDate}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Event End Date:</label>
+              <input
+                type="datetime-local"
+                name="eventEndDate"
+                value={updatedEvent.eventEndDate}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label>Join Deadline:</label>
+              <input
+                type="datetime-local"
+                name="joinDeadline"
+                value={updatedEvent.joinDeadline}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  name="setAttendeeLimit"
+                  checked={
+                    updatedEvent.attendeeLimit !== null &&
+                    updatedEvent.attendeeLimit !== undefined
+                  }
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setUpdatedEvent((prevEvent) => ({
+                        ...prevEvent,
+                        attendeeLimit: null,
+                      }));
+                    } else {
+                      setUpdatedEvent((prevEvent) => ({
+                        ...prevEvent,
+                        attendeeLimit: prevEvent.attendeeLimit || 1,
+                      }));
+                    }
+                  }}
+                />
+                Set Attendee Limit
+              </label>
+
+              {updatedEvent.attendeeLimit !== null &&
+                updatedEvent.attendeeLimit !== undefined && (
+                  <div>
+                    <label>Attendee Limit:</label>
+                    <input
+                      type="number"
+                      name="attendeeLimit"
+                      value={updatedEvent.attendeeLimit || ""}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                )}
+            </div>
+
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  name="joinApproval"
+                  checked={updatedEvent.joinApproval}
+                  onChange={(e) =>
+                    setUpdatedEvent({
+                      ...updatedEvent,
+                      joinApproval: e.target.checked,
+                    })
+                  }
+                />
+                Join Approval
+              </label>
+            </div>
+
+            <h4>Agenda Items</h4>
+            {agendaItems.map((item, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={item.title}
+                  onChange={(e) =>
+                    handleAgendaItemChange(index, "title", e.target.value)
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={item.description}
+                  onChange={(e) =>
+                    handleAgendaItemChange(index, "description", e.target.value)
+                  }
+                />
+                <input
+                  type="datetime-local"
+                  value={item.startTime}
+                  onChange={(e) =>
+                    handleAgendaItemChange(index, "startTime", e.target.value)
+                  }
+                />
+                <input
+                  type="datetime-local"
+                  value={item.endTime}
+                  onChange={(e) =>
+                    handleAgendaItemChange(index, "endTime", e.target.value)
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveAgendaItem(index)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={handleAddAgendaItem}>
+              Add Agenda Item
+            </button>
+            <button type="submit">Update Event</button>
+          </form>
+        )}
+      </div>
+    </Layout>
   );
 };
 

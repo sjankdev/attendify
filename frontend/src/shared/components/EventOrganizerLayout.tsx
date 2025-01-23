@@ -1,21 +1,18 @@
 import React, { useState } from "react";
+import { FaBars } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  FaPlusCircle,
-  FaClipboardList,
-  FaCalendarAlt,
-  FaUsers,
-  FaBuilding,
-  FaHome,
-  FaBars,
-} from "react-icons/fa";
 
 interface LayoutProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
+const SidebarLayout: React.FC<LayoutProps> = ({
+  children,
+  className,
+  style,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,118 +24,54 @@ const SidebarLayout: React.FC<LayoutProps> = ({ children, className }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-[#471C7E] flex flex-col lg:flex-row">
+    <div
+      className="min-h-screen bg-gradient-to-r from-[#111] to-[#222] flex flex-col lg:flex-row"
+      style={style}
+    >
       <div
-        className={`lg:w-64 w-full bg-[#471C7E] p-6 flex flex-col justify-between ${
-          isSidebarOpen ? "block" : "hidden lg:block"
+        className={`lg:w-64 w-full p-6 flex flex-col justify-between transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? "block" : "lg:hidden"
         }`}
       >
-        <div className="space-y-6">
-          <h2 className="text-[#e0e1dd] text-2xl font-bold mb-10">Attendify</h2>
-          <div
-            onClick={() => navigate("/event-organizer")}
-            className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-              isActive("/event-organizer") ? "bg-[#0d1b2a]" : "bg-[#57239F]"
-            }`}
-          >
-            <FaHome className="text-2xl text-teal-400" />
-            <span style={{ color: "#fffcf2" }} className="text-lg font-medium">
-              Event Organizer
-            </span>
-          </div>
-
-          <div className="space-y-6">
-            <div
-              onClick={() => navigate("/event-organizer/create-event")}
-              className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-                isActive("/event-organizer/create-event")
-                  ? "bg-[#0d1b2a]"
-                  : "bg-[#57239F]"
-              }`}
-            >
-              <FaPlusCircle className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Create Event
-              </span>
-            </div>
-
-            <div
-              onClick={() => navigate("/event-organizer/events")}
-              className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-                isActive("/event-organizer/events")
-                  ? "bg-[#0d1b2a]"
-                  : "bg-[#57239F]"
-              }`}
-            >
-              <FaCalendarAlt className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Events
-              </span>
-            </div>
-
-            <div
-              onClick={() => navigate("/event-organizer/invitations")}
-              className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-                isActive("/event-organizer/invitations")
-                  ? "bg-[#0d1b2a]"
-                  : "bg-[#57239F]"
-              }`}
-            >
-              <FaClipboardList className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Invitations
-              </span>
-            </div>
-
-            <div
-              onClick={() => navigate("/event-organizer/company-participants")}
-              className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-                isActive("/event-organizer/company-participants")
-                  ? "bg-[#0d1b2a]"
-                  : "bg-[#57239F]"
-              }`}
-            >
-              <FaUsers className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Participants
-              </span>
-            </div>
-
-            <div
-              onClick={() => navigate("/event-organizer/company-departments")}
-              className={`flex items-center space-x-4 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300 cursor-pointer ${
-                isActive("/event-organizer/company-departments")
-                  ? "bg-[#0d1b2a]"
-                  : "bg-[#57239F]"
-              }`}
-            >
-              <FaBuilding className="text-2xl text-teal-400" />
-              <span
-                style={{ color: "#fffcf2" }}
-                className="text-lg font-medium"
-              >
-                Departments
-              </span>
-            </div>
+        <div className="space-y-8">
+          <h2 className="text-white text-3xl font-semibold mb-12 font-alegreya tracking-wide">
+            Attendify
+          </h2>
+          <div className="space-y-4">
+            {[
+              { label: "Event Organizer", path: "/event-organizer" },
+              { label: "Create Event", path: "/event-organizer/create-event" },
+              { label: "Events", path: "/event-organizer/events" },
+              { label: "Invitations", path: "/event-organizer/invitations" },
+              {
+                label: "Participants",
+                path: "/event-organizer/company-participants",
+              },
+              {
+                label: "Departments",
+                path: "/event-organizer/company-departments",
+              },
+            ].map((item) => {
+              const isItemActive = isActive(item.path);
+              return (
+                <div
+                  key={item.label}
+                  onClick={() => navigate(item.path)}
+                  className={`cursor-pointer text-lg font-medium transition-colors duration-200 px-4 py-2 rounded-lg text-white font-roboto ${
+                    isItemActive ? "text-[#BA10AA]" : ""
+                  }`}
+                >
+                  {item.label}
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="mt-auto">
           <img
             src="/assets/logos/login-logo.png"
             alt="Event Organizer Logo"
-            className="w-28 mx-auto mt-8"
+            className="w-32 mx-auto mt-8 opacity-80 hover:opacity-100 transition-opacity duration-200"
           />
         </div>
       </div>
