@@ -33,8 +33,8 @@ const SidebarLayout: React.FC<LayoutProps> = ({
           isSidebarOpen ? "block" : "lg:hidden"
         }`}
       >
-        <div className="space-y-8">
-          <h2 className="text-white text-3xl font-semibold mb-12 font-alegreya tracking-wide">
+        <div className="space-y-8 flex flex-col items-center justify-center">
+          <h2 className="text-white text-3xl font-semibold mb-12 font-alegreya tracking-wide text-center">
             Attendify
           </h2>
           <div className="space-y-4">
