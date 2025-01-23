@@ -197,7 +197,7 @@ const DepartmentsList: React.FC = () => {
                               onClick={() =>
                                 toggleEventDetails(department.id, event.id)
                               }
-                              className="text-[#BA10AA] hover:text-blue-700"
+                              className="text-blue-400 hover:text-blue-700"
                             >
                               {expandedEvent.departmentId === department.id &&
                               expandedEvent.eventId === event.id
